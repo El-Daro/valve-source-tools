@@ -80,7 +80,9 @@ function Import-Vmf {
 
 		[Parameter(Position = 1,
 		Mandatory = $false)]
-		[string]$LogFile
+		[string]$LogFile,
+
+		[System.Management.Automation.SwitchParameter]$Silent
 	)
 
 	BEGIN {
@@ -141,7 +143,7 @@ function Import-Vmf {
 		# Had to do this due to a nasty bug with .NET being dependent on the context of where the script was launched from
 		$Path = $(Get-AbsolutePath -Path $Path)
 		$LogFile = $(Get-AbsolutePath -Path $LogFile)
-		# if ($LogFile) {
+		# if ($LogFile -and -not $Silent.IsPresent) {
 		# 	$logMessage = "Input file path: {0}" -f $(Get-AbsolutePath -Path $Path)
 		# 	OutLog -Path $LogFile -Value $logMessage
 		# }
@@ -157,13 +159,15 @@ function Import-Vmf {
 			$fileSizeKB	= [math]::Round($fileSize / 1000)
 			$digitsFileSize = $fileSizeKB.ToString().Length - 2
 
-			$paramsLog	= @{
-				Property	= "File size"
-				Value		= $("{0,$digitsFileSize}Kb" -f $fileSizeKB)
-				ColumnWidth	= 20				# Should be default
-				Path		= $LogFile
+			if (-not $Silent.IsPresent) {
+				$paramsLog	= @{
+					Property	= "File size"
+					Value		= $("{0,$digitsFileSize}Kb" -f $fileSizeKB)
+					ColumnWidth	= 20				# Should be default
+					Path		= $LogFile
+				}
+				OutLog @paramsLog
 			}
-			OutLog @paramsLog
 			
 			$stringBuilder	= [System.Text.StringBuilder]::new(256)
 			$lineCount = 0
@@ -175,7 +179,9 @@ function Import-Vmf {
 					# ReCalculate average line length
 					$averageLineLength = ($stringBuilder.ToString().Split("`n") | ForEach-Object { $_.Length } | Measure-Object -Average).Average
 					$estimatedLines = [math]::Floor($fileSize / $averageLineLength)
-					OutLog -Property "Estimated lines" -Value $estimatedLines -Path $LogFile
+					if (-not $Silent.IsPresent) {
+						OutLog -Property "Estimated lines" -Value $estimatedLines -Path $LogFile
+					}
 
 				}
 				if ($lineCount -ge 10000 -and $lineCount % 10000 -eq 0) {
@@ -211,11 +217,13 @@ function Import-Vmf {
 			# 	Write-Host -ForegroundColor Cyan				$("{0,6}" -f $estimatedLines)
 			# }
 
-			$timeFormatted = "{0}m {1}s {2}ms" -f
-				$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
-			OutLog							-Value "`nReading: Complete"	-Path $LogFile -OneLine
-			OutLog -Property "Read lines"	-Value $lineCount				-Path $LogFile
-			OutLog -Property "Elapsed time"	-Value $timeFormatted			-Path $LogFile
+			if (-not $Silent.IsPresent) {
+				$timeFormatted = "{0}m {1}s {2}ms" -f
+					$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
+				OutLog							-Value "`nReading: Complete"	-Path $LogFile -OneLine
+				OutLog -Property "Read lines"	-Value $lineCount				-Path $LogFile
+				OutLog -Property "Elapsed time"	-Value $timeFormatted			-Path $LogFile
+			}
 
 			$vmfContent = $stringBuilder.ToString().Trim() -split "\n"
 			if ($lineCount -lt 1) {
@@ -223,7 +231,7 @@ function Import-Vmf {
 				return $false
 			} else {
 				# MAIN EXIT ROUTE
-				return ConvertFrom-Vmf -Lines $vmfContent -LogFile $LogFile
+				return ConvertFrom-Vmf -Lines $vmfContent -LogFile $LogFile -Silent:$Silent.IsPresent
 			}
 		} catch [System.IO.FileNotFoundException], [System.IO.IOException] {
 			Write-HostError -ForegroundColor Red -NoNewline		"  File ("

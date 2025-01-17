@@ -1,5 +1,4 @@
 # A simple test script for the .ini and .vdf parsers
-# TODO: Implement silent mode (no output to console, only logs)
 
 using namespace System.Diagnostics
 
@@ -28,7 +27,7 @@ Param (
 
 	[Parameter(Position = 6,
 	Mandatory = $false)]
-	[System.Management.Automation.SwitchParameter]$Silent = $False,
+	[System.Management.Automation.SwitchParameter]$Silent,
 
 	[Parameter(Position = 7,
 	Mandatory = $false)]
@@ -119,8 +118,10 @@ $logFile = "{0}{1}{2}{3}" -f
 Write-Debug "Input file: $InputFilePath"
 Write-Debug "Output file: $outputFilePath"
 Write-Debug "Log file: $logFile"
-Write-Host -ForegroundColor Magenta -NoNewline	$("{0,20}: " -f "NOTE")
-Write-Host -ForegroundColor Cyan				$("{0}" -f $additionalLog)
+if (-not $Silent.IsPresent) {
+	Write-Host -ForegroundColor Magenta -NoNewline	$("{0,20}: " -f "NOTE")
+	Write-Host -ForegroundColor Cyan				$("{0}" -f $additionalLog)
+}
 #endregion
 
 # $sw = [Stopwatch]::StartNew()
@@ -137,18 +138,20 @@ Try {
 	#region Logging
 	# $timestamp	 = Get-Date -Format "yyyy.MM.dd HH:mm:ss"
 	$success	 = $True
-	$timestamp	 = Get-Date -UFormat "%c"
+	if (-not $Silent.IsPresent) {
+		$timestamp	 = Get-Date -UFormat "%c"
 
-	$logMessage  = "=" * 40 + "`n"
-	$logMessage += "$timestamp `n"
-	$logMessage += "-" * 14 + "Test started" + "-" * 14 + "`n"
-	OutLog -Value $logMessage -Path $logFile -NoConsole
+		$logMessage  = "=" * 40 + "`n"
+		$logMessage += "$timestamp `n"
+		$logMessage += "-" * 14 + "Test started" + "-" * 14 + "`n"
+		OutLog -Value $logMessage -Path $logFile -NoConsole
 
-	OutLog -Property "NOTE"				-Value $additionalLog	-Path $logFile -NoConsole
-	OutLog -Property "Input file path"	-Value $InputFilePath	-Path $logFile -NoConsole
-	OutLog -Property "Output file path"	-Value $outputFilePath	-Path $logFile -NoConsole
-	OutLog -Property "Debug"			-Value $PSBoundParameters.ContainsKey('Debug').ToString()	-Path $logFile -NoConsole
-	OutLog -Property "Verbose"			-Value $PSBoundParameters.ContainsKey('Verbose').ToString()	-Path $logFile -NoConsole
+		OutLog -Property "NOTE"				-Value $additionalLog	-Path $logFile -NoConsole
+		OutLog -Property "Input file path"	-Value $InputFilePath	-Path $logFile -NoConsole
+		OutLog -Property "Output file path"	-Value $outputFilePath	-Path $logFile -NoConsole
+		OutLog -Property "Debug"			-Value $PSBoundParameters.ContainsKey('Debug').ToString()	-Path $logFile -NoConsole
+		OutLog -Property "Verbose"			-Value $PSBoundParameters.ContainsKey('Verbose').ToString()	-Path $logFile -NoConsole
+	}
 	#endregion
 
 	# Add properties to it
@@ -192,7 +195,7 @@ Try {
 
 		}
 	} elseif ($Extension -eq ".vmf") {
-		$vmfParsed = Import-Vmf -Path $InputFilePath -LogFile $logFile
+		$vmfParsed = Import-Vmf -Path $InputFilePath -LogFile $logFile -Silent:$Silent.IsPresent
 		if ($vmfParsed) {
 			# Write-Host "YAY! WE DID IT!"
 			# Write-Host $vmfParsed
@@ -223,30 +226,37 @@ Try {
 			# }
 
 			if ($debugPassed) {
-				Export-Vmf -InputObject $vmfParsed -DebugOutput $outputFilePath -LogFile $logFile -Fast $Fast -Debug
+				Export-Vmf -InputObject $vmfParsed -DebugOutput $outputFilePath -LogFile $logFile -Fast $Fast -Silent:$Silent.IsPresent -Debug
 			} else {
-				Export-Vmf -InputObject $vmfParsed -Path $outputFilePath -LogFile $logFile -Fast $Fast
+				Export-Vmf -InputObject $vmfParsed -Path $outputFilePath -LogFile $logFile -Fast $Fast -Silent:$Silent.IsPresent
 			}
 		}
 	} else {
 
 	}
+
+	return $true
 } catch {
 	$success = $false
 	Write-Debug "Now this shit is seriously broken, we're in the catch statement"
 	Write-Error "$($MyInvocation.MyCommand):  $($_.Exception.Message)"
 	OutLog -Property "$($MyInvocation.MyCommand)" -Value "$($_.Exception.Message)" -ColumnWidth 0 -Path $logFile -NoConsole
+
+	return $false
 } finally {
 	#region Logging
 	# $timestamp	 = Get-Date -Format "yyyy.MM.dd HH:mm:ss"
 
-	$timestamp	 = Get-Date -UFormat "%c" 
-	OutLog -Property "Success"	-Value $success		-Path $logFile -NoConsole
+	if (-not $Silent.IsPresent) {
+		
+		$timestamp	 = Get-Date -UFormat "%c" 
+		OutLog -Property "Success"	-Value $success		-Path $logFile -NoConsole
 
-	$logMessage  = "-" * 15 + "Test ended" + "-" * 15 + "`n"
-	$logMessage += "$timestamp `n"
-	$logMessage += "=" * 40 + "`n`n"
-	OutLog -Value $logMessage -Path $logFile -NoConsole
+		$logMessage  = "-" * 15 + "Test ended" + "-" * 15 + "`n"
+		$logMessage += "$timestamp `n"
+		$logMessage += "=" * 40 + "`n`n"
+		OutLog -Value $logMessage -Path $logFile -NoConsole
+	}
 	#endregion
 
 	$VerbosePreferenceOld = $VerbosePreference

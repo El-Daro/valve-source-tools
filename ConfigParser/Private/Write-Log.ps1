@@ -1,5 +1,6 @@
 # This function is essentially just a wrapper for the Add-Content cmdlet
 # Refer to Out-Log for the main logging function 
+# TODO: Standardize 'switch' usage
 
 function Write-Log {
 	[CmdletBinding()]

@@ -10,7 +10,9 @@ function EstimateLinesCount {
 
 		[Parameter(Position = 1,
 		Mandatory = $false)]
-		[string]$LogFile
+		[string]$LogFile,
+
+		[System.Management.Automation.SwitchParameter]$Silent
 	)
 
 	$estimatedLines = 0
@@ -35,7 +37,7 @@ function EstimateLinesCount {
 		Write-Error "$($MyInvocation.MyCommand):  $($_.Exception.Message)"
 	} finally {
 		$sw.Stop()
-		if ($estimatedLines -gt 0) {
+		if ($estimatedLines -gt 0 -and -not $Silent.IsPresent) {
 			$timeFormatted = "{0}m {1}s {2}ms" -f
 				$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
 			OutLog								-Value "`nOutput estimation: Complete"	-Path $LogFile -OneLine

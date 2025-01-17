@@ -20,7 +20,8 @@ Param (
 
 	[Parameter(Position = 4,
 	Mandatory = $false)]
-	[bool]$Silent = $true,
+	# [bool]$Silent,
+	[System.Management.Automation.SwitchParameter]$Silent,
 
 	[Parameter(Position = 5,
 	Mandatory = $false)]
@@ -77,16 +78,17 @@ foreach ($vmf in $Vmfs) {
 			Extension		= $Extension
 			Note			= $Note
 			LogFile			= $LogFile
+			Silent			= $Silent.IsPresent
 		}
-		if ($Silent) {
-			$success = .\Test-Module @params -Fast -Silent
-		} else {
+		# if ($Silent) {
+		# 	$success = .\Test-Module @params -Fast -Silent
+		# } else {
 			$success = .\Test-Module @params -Fast
-		}
+		# }
 		if ($success) {
 			Write-Host -ForegroundColor Green "$inputFilePath parsed successfully" 
 		}
 	} catch {
-		Write-Host -ForegroundColor DarkYellow "$inputFilePath failed to parse"
+		Write-Host -ForegroundColor Red "$inputFilePath failed to parse"
 	}
 }
