@@ -33,7 +33,9 @@ function ConvertTo-Vmf {
 
 		[Parameter(Position = 2,
 		Mandatory = $false)]
-		[bool]$Fast = $False
+		[bool]$Fast = $False,
+
+		[System.Management.Automation.SwitchParameter]$Silent
 	)
 
 	#region PROCESS
@@ -42,7 +44,7 @@ function ConvertTo-Vmf {
 		[int]$estimatedLines = 0
 		if (-not $Fast) {
 			try {
-				$dictEstimatedLines = EstimateLinesCount -Vmf $Vmf -LogFile $LogFile
+				$dictEstimatedLines = EstimateLinesCount -Vmf $Vmf -LogFile $LogFile -Silent:$Silent.IsPresent
 				$estimatedLines = $dictEstimatedLines["lines"]
 			} catch {
 				$Fast = $true
@@ -69,7 +71,9 @@ function ConvertTo-Vmf {
 					# $logMessage  = "Rough lines est: {0} ({1:n2}% off) `n" -f $roughLinesEstimate, $($estimationError * 100)
 					# OutLog -Path $LogFile -Value $logMessage
 
+				if (-not $Silent.IsPresent) {
 					OutLog -Property "Rough lines estimate" -Value $roughLinesEstimate -Path $LogFile
+				}
 				# }
 			} catch {
 				continue				# Fuhged about it
@@ -102,11 +106,13 @@ function ConvertTo-Vmf {
 		# AppendVmfBlockIter @paramsIter
 		
 		$sw.Stop()
-		$timeFormatted = "{0}m {1}s {2}ms" -f
-			$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
-
-		OutLog 							-Value "`nBuilding output: Complete"	-Path $LogFile -OneLine
-		OutLog -Property "Elapsed time"	-Value $timeFormatted					-Path $LogFile
+		
+		if (-not $Silent.IsPresent) {
+			$timeFormatted = "{0}m {1}s {2}ms" -f
+				$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
+			OutLog 							-Value "`nBuilding output: Complete"	-Path $LogFile -OneLine
+			OutLog -Property "Elapsed time"	-Value $timeFormatted					-Path $LogFile
+		}
 
 		return $stringBuilder.ToString().Trim()
 

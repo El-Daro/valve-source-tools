@@ -10,7 +10,9 @@ function ConvertFrom-Vmf {
 
 		[Parameter(Position = 1,
 		Mandatory = $false)]
-		[string]$LogFile
+		[string]$LogFile,
+
+		[System.Management.Automation.SwitchParameter]$Silent
 	)
 
 	#region Preparing shared variables
@@ -57,12 +59,14 @@ function ConvertFrom-Vmf {
 	} finally {
 		$sw.Stop()
 
-		$linesPerSecond = ($currentLine / $sw.ElapsedMilliseconds) * 1000
-		$timeFormatted = "{0}m {1}s {2}ms" -f
-			$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
-		OutLog 								-Value "`nParsing: Complete"							-Path $LogFile -OneLine
-		OutLog -Property "Parsed lines"		-Value $("{0} / {1}" -f $currentLine, $Lines.Count)		-Path $LogFile
-		OutLog -Property "Elapsed time"		-Value $timeFormatted									-Path $LogFile
-		OutLog -Property "Speed"			-Value $("{0:n0} lines per second" -f $linesPerSecond)	-Path $LogFile
+		if (-not $Silent.IsPresent) {
+			$linesPerSecond = ($currentLine / $sw.ElapsedMilliseconds) * 1000
+			$timeFormatted = "{0}m {1}s {2}ms" -f
+				$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
+			OutLog 								-Value "`nParsing: Complete"							-Path $LogFile -OneLine
+			OutLog -Property "Parsed lines"		-Value $("{0} / {1}" -f $currentLine, $Lines.Count)		-Path $LogFile
+			OutLog -Property "Elapsed time"		-Value $timeFormatted									-Path $LogFile
+			OutLog -Property "Speed"			-Value $("{0:n0} lines per second" -f $linesPerSecond)	-Path $LogFile
+		}
 	}
 }

@@ -39,8 +39,9 @@ function Out-Config {
 
 		[Parameter(Position = 4)]
 		[System.Management.Automation.SwitchParameter]$PassThru = $False,
-
-		[Parameter(Position = 5)]
+		
+		[System.Management.Automation.SwitchParameter]$Silent,
+		
 		[string]$DebugOutput = "./output_debug"
 	)
 
@@ -84,9 +85,17 @@ function Out-Config {
 		Write-Debug "$($MyInvocation.MyCommand): Path: $(Get-AbsolutePath -Path $Path)"
 		Write-Verbose "Writing to the normal output: $(Get-AbsolutePath -Path $Path)"
 		if ($Force) {
-			New-Item -Path $Path -Value $Content -Force
+			if ($Silent.IsPresent) {
+				New-Item -Path $Path -Value $Content -Force | Out-Null
+			} else {
+				New-Item -Path $Path -Value $Content -Force
+			}
 		} else {
-			New-Item -Path $Path -Value $Content
+			if ($Silent.IsPresent) {
+				New-Item -Path $Path -Value $Content | Out-Null
+			} else {
+				New-Item -Path $Path -Value $Content
+			}
 		}
 	}
 	if ((-Not $Path -and (-Not $DebugPreference -eq 'Continue')) -or

@@ -94,7 +94,9 @@ function Export-Vmf {
 
 		[Parameter(Position = 3,
 		Mandatory = $false)]
-		[bool]$Fast = $False
+		[bool]$Fast = $False,
+
+		[System.Management.Automation.SwitchParameter]$Silent
 	)
 
 	BEGIN {
@@ -143,7 +145,7 @@ function Export-Vmf {
 		#endregion
 		$LogFile = $(Get-AbsolutePath -Path $LogFile)		# Just a precaution
 
-		$vmf = ConvertTo-Vmf -Vmf $InputObject -LogFile $LogFile -Fast $Fast
+		$vmf = ConvertTo-Vmf -Vmf $InputObject -LogFile $LogFile -Fast $Fast -Silent:$Silent.IsPresent
 
 		$params = @{
 			Content		= $vmf
@@ -152,10 +154,13 @@ function Export-Vmf {
 			PassThru	= $PassThru
 			Extension	= ".vmf"
 			DebugOutput	= $DebugOutput
+			Silent		= $Silent.IsPresent
 		}
 		Out-Config @params
 
-		OutLog -Value "`nExporting file: Complete `n" -Path $LogFile -OneLine
+		if (-not $Silent.IsPresent) {
+			OutLog -Value "`nExporting file: Complete `n" -Path $LogFile -OneLine
+		}
 	}
 
 	END { }
