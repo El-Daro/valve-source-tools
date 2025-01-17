@@ -51,8 +51,6 @@ if ($PSBoundParameters.ContainsKey('Debug')) {
 	}
 }
 
-Write-Host "Testing the horrendous PowerShell extension"
-
 #region VARIABLES
 $env:PSModulePath = $env:PSModulePath + [System.IO.Path]::PathSeparator + "c:\Projects\PowerShell\L4D2Launcher"
 $modulesToImport = @{
@@ -60,8 +58,6 @@ $modulesToImport = @{
 	# VdfParser = "VdfParser"
 	ConfigParser = "ConfigParser"
 }
-
-# Write-Host "Testing the horrendous PowerShell extension"
 
 $appendix = "_"
 if ([string]::IsNullOrWhiteSpace($OutputFilePath) -or -not $(Test-Path $OutputFilePath -IsValid)) {
