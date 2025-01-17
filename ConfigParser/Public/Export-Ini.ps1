@@ -101,7 +101,7 @@ function Export-Ini {
 	.EXAMPLE
 	PS> Import-Ini -Path ".\settings.ini" -IgnoreCommentsPattern "^##.*##`$" | Export-Ini -Path ".\settings_updated.ini"
 
-	You can also pipe an object in the this function.
+	You can also pipe an object to this function.
 #>
 	[CmdletBinding(DefaultParameterSetName="HashtableDouble")]
 	Param (

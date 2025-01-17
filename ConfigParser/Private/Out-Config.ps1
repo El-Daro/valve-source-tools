@@ -4,23 +4,23 @@
 function Out-Config {
 <#
 	.SYNOPSIS
-	Outputs an INI- or VDF-formatted string
+	Outputs an INI- or VDF- or VMF-formatted string
 
 	.DESCRIPTION
-	Takes an INI- or VDF-formatted string and either outputs it in an `.ini/.vdf` file, if the `-Path` parameter was specified,
+	Takes an INI- or VDF-formatted string and either outputs it in an `.ini/.vdf/.vmf` file, if the `-Path` parameter was specified,
 	or returns the string back to the caller.
 	
 	.PARAMETER Content
 	An INI- or VDF-formatted string.
 
 	.PARAMETER Path
-	Specifies the path to the output .vdf file. Accepts absolute and relative paths. Does NOT accept wildcards.
+	Specifies the path to the output .ini/.vdf/.vmf file. Accepts absolute and relative paths. Does NOT accept wildcards.
 
 	.PARAMETER Force
 	If specified, forces the over-write of an existing file. This paramater has no effect, if `-Path` parameter was not specified.
 
 	.PARAMETER PassThru
-	If specified, returns the resulting .vdf formatted string even if `-Path` parameter was used. 
+	If specified, returns the resulting .ini/.vdf/.vmf formatted string even if `-Path` parameter was used. 
 #>
 	Param (
 		[Parameter(Position = 0,
@@ -84,9 +84,9 @@ function Out-Config {
 		Write-Debug "$($MyInvocation.MyCommand): Path: $(Get-AbsolutePath -Path $Path)"
 		Write-Verbose "Writing to the normal output: $(Get-AbsolutePath -Path $Path)"
 		if ($Force) {
-			New-Item -Name $Path -Value $Content -Force
+			New-Item -Path $Path -Value $Content -Force
 		} else {
-			New-Item -Name $Path -Value $Content
+			New-Item -Path $Path -Value $Content
 		}
 	}
 	if ((-Not $Path -and (-Not $DebugPreference -eq 'Continue')) -or

@@ -38,7 +38,7 @@ function ValidateIniKeyValue {
 	# A shitcode masterpiece:
 	if ($Matches.Contains('quoteCharacter') -and $value.LastIndexOf($Matches['quoteCharacter']) -ne 0) {
 		# If the value starts with one of two quote characters AND it's not the only one
-		# We allow comment symbols here (';', '#') that 'cause all the trouble below
+		# We allow comment symbols here (';', '#') that cause all the trouble below
 		$quoteChar = $Matches['quoteCharacter']
 		$firstIndex++						# Advance the beginning of a temp substring one character further
 		$length--							# Decrease the whole length because of that

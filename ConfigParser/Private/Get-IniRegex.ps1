@@ -60,10 +60,10 @@ function Get-IniRegex {
 		#region Value patterns hashtable
 		# Value hashtable
 		value = @{
-			# This is a string that is defnitely NOT enclosed in any quote symbols and that MIGHT contain a comment
+			# This is a string that is definitely NOT enclosed in any quote symbols and that MIGHT contain a comment
 			unquoted = "(?mnx:(?<value>[^\t\r\n;#]+)[\t ]*(?<comment>[;|#].*)?)";
 
-			# This is a string that is defnitely NOT enclosed in any quote symbols and that does NOT contain a comment
+			# This is a string that is definitely NOT enclosed in any quote symbols and that does NOT contain a comment
 			# Very similar to 'unquoted'. Only used for a faster search
 			unquotedNoComments = "(?mnx:(?<value>[^\r\n]+)[\t ]*)";
 
@@ -76,7 +76,7 @@ function Get-IniRegex {
 				(?<valueSingleQuote>['])?	# Include starting quote
 				(?(valueSingleQuote)		# Does it start with a single quote?
 					[^\t\r\n]+				# Assume the control character is single quote and capture one or more characters here
-					[']					# We're unsure, whether there are any more quotes, but include the last one, if it's there
+					[']						# We're unsure, whether there are any more quotes, but include the last one, if it's there
 				|							# Otherwise it starts with a double-quote
 					[`"]					# Include starting quote
 					[^\t\r\n]+				# Capture one or more characters here

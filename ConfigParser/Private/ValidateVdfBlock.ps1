@@ -1,3 +1,15 @@
+# Problem: VMF files contain a lot of 'key-value' pairs with the same key
+# Might have to ditch the dictionary principle
+
+# TODO: Create its own set of functions for VMF parsing
+# TODO: See how regex affects the speed of the processing
+
+# TODO: Do we even need the `world` section? Shouldn't we just preserve it as is?
+#		Are there the same problems with `entities`? If not, then it's not important to solve
+# Answ: Alas, the issue persists
+# Sol : Consider using id's. They seem to be unique and ubiquitos
+# NOTE: Not every pair of curly brackets comes with id
+
 function ValidateVdfBlock {
 <#
 	.SYNOPSIS
@@ -69,7 +81,7 @@ function ValidateVdfBlock {
 			# A key-value pair
 			"$($regex.keyValue)" {
 				# Write-Debug "$($currentLine.Value + 1). ---Key-Value---"
-				Write-Debug "$($currentLine.Value + 1): $_"
+				#Write-Debug "$($currentLine.Value + 1): $_"
 				$params = @{
 					CurrentLine		= $CurrentLine
 					CurrentBlock	= $currentBlock
@@ -83,7 +95,7 @@ function ValidateVdfBlock {
 			# An open bracket
 			"$($regex.bracketOpen)" {
 				# Write-Debug "$($currentLine.Value + 1). --Open-bracket--"
-				Write-Debug "$($currentLine.Value + 1): $_"
+				#Write-Debug "$($currentLine.Value + 1): $_"
 				if ($bracketExpected) {
 					$bracketExpected = $false
 					$currentLine.Value++
@@ -105,7 +117,7 @@ function ValidateVdfBlock {
 			# A close bracket
 			"$($regex.bracketClose)" {
 				# Write-Debug "$($currentLine.Value + 1). --Close-bracket--"
-				Write-Debug "$($currentLine.Value + 1): $_"
+				#Write-Debug "$($currentLine.Value + 1): $_"
 				$currentLine.Value++
 				$Depth.Value--
 				if ($Depth.Value -lt 0) {
@@ -117,21 +129,29 @@ function ValidateVdfBlock {
 			# A single-line comment
 			"$($regex.comment)" {
 				$currentLine.Value++
-				Write-Debug "$($currentLine.Value + 1). ----Comment----"
-				Write-Debug "$($currentLine.Value + 1): $_"
+				#Write-Debug "$($currentLine.Value + 1). ----Comment----"
+				#Write-Debug "$($currentLine.Value + 1): $_"
 				continue
 			}
 
 			default {
 				if ($_ -notmatch "$($regex.emptyLine)") {
 					$linesFaulty.Value++
-					Write-Verbose "An unidentified content on line $($currentLine.Value + 1): $_"
+					#Write-Verbose "An unidentified content on line $($currentLine.Value + 1): $_"
 					if (-not $PSBoundParameters.ContainsKey('Verbose')) {
-						Write-Debug "UNDEFINED (line $($currentLine.Value + 1)): $_"
+						#Write-Debug "UNDEFINED (line $($currentLine.Value + 1)): $_"
 					}
 				}
 				$currentLine.Value++
 			}
+		}
+
+		if ($currentLine.Value -ge 100 -and $currentLine.Value % 100 -eq 0) { 
+			$params = @{
+				CurrentLine	= $currentLine.Value
+				LinesCount	= $Lines.count
+			}
+			ReportProgressVdf @params
 		}
     }
 

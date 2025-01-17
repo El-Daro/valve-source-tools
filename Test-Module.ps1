@@ -1,4 +1,5 @@
 # A simple test script for the .ini and .vdf parsers
+# TODO: Implement silent mode (no output to console, only logs)
 
 using namespace System.Diagnostics
 
@@ -19,7 +20,26 @@ Param (
 	$Extension,
 
 	[Parameter(Position = 4)]
-	$PassThru = $false
+	$PassThru = $false,
+
+	[Parameter(Position = 5,
+	Mandatory = $false)]
+	[System.Management.Automation.SwitchParameter]$Fast = $False,
+
+	[Parameter(Position = 6,
+	Mandatory = $false)]
+	[System.Management.Automation.SwitchParameter]$Silent = $False,
+
+	[Parameter(Position = 7,
+	Mandatory = $false)]
+	[string]$OutputFilePath,
+
+	[Parameter(Position = 8)]
+	$Note,
+
+	[Parameter(Position = 9,
+	Mandatory = $false)]
+	[string]$LogFile = "../logs/stats.log"
 )
 # This is necessary for Windows PowerShell (up to 5.1.3)
 # When the common parameter '-Debug' is used, Windows PowerShell sets the $DebugPreference to 'Inquire'
@@ -31,6 +51,8 @@ if ($PSBoundParameters.ContainsKey('Debug')) {
 	}
 }
 
+Write-Host "Testing the horrendous PowerShell extension"
+
 #region VARIABLES
 $env:PSModulePath = $env:PSModulePath + [System.IO.Path]::PathSeparator + "c:\Projects\PowerShell\L4D2Launcher"
 $modulesToImport = @{
@@ -38,54 +60,102 @@ $modulesToImport = @{
 	# VdfParser = "VdfParser"
 	ConfigParser = "ConfigParser"
 }
-$outputFilePath = (Split-Path -Path $InputFilePath -LeafBase) + "_"
-$baseName = Join-Path -Path (Split-Path -Path $InputFilePath -Parent) -ChildPath (Split-Path -Path $InputFilePath -LeafBase)
-$appendix = "_"
-$testNoExtension = $false
-if (Split-Path -Path $InputFilePath -Extension) {
-	if ($Extension -ne ".vdf" -and $Extension -ne ".ini") {
-		$Extension = Split-Path -Path $InputFilePath -Extension
-	}
-} else {
-	#$Extension = ".ini"
-	$testNoExtension = $true
-}
-$count = 1
-#endregion
 
-#region PREPARATION
-# Compose the output file name
-if ($testNoExtension) {
-	do {
-			$outputFilePath = "{0}{1}{2}" -f $baseName, $appendix, $count
+# Write-Host "Testing the horrendous PowerShell extension"
+
+$appendix = "_"
+if ([string]::IsNullOrWhiteSpace($OutputFilePath) -or -not $(Test-Path $OutputFilePath -IsValid)) {
+	$outputFilePath = (Split-Path -Path $InputFilePath -LeafBase) + "_"
+	$baseName = Join-Path -Path (Split-Path -Path $InputFilePath -Parent) -ChildPath (Split-Path -Path $InputFilePath -LeafBase)
+	$testNoExtension = $false
+	if (Split-Path -Path $InputFilePath -Extension) {
+		if ($Extension -ne ".vdf" -and $Extension -ne ".ini" -and $Extension -ne ".vmf") {
+			$Extension = Split-Path -Path $InputFilePath -Extension
+		}
+	} else {
+		#$Extension = ".ini"
+		$testNoExtension = $true
+	}
+	$count = 1
+	#endregion
+
+	#region PREPARATION
+	# Compose the output file name
+	if ($testNoExtension) {
+		do {
+				$outputFilePath = "{0}{1}{2}" -f $baseName, $appendix, $count
+				$count++
+			} while ((Test-Path -Path ($outputFilePath + $Extension)) -and $count -le 100)
+			# If there is too muny output files, call it off
+			if ($count -eq 100) {
+				Write-Debug "Too many output files, go and delete some, Little Coder"
+				return -1
+			}
+	} else {
+		do {
+			$outputFilePath = "{0}{1}{2}{3}" -f $baseName, $appendix, $count, $Extension
 			$count++
-		} while ((Test-Path -Path ($outputFilePath + $Extension)) -and $count -le 100)
+		} while ((Test-Path -Path $outputFilePath) -and $count -le 100)
 		# If there is too muny output files, call it off
 		if ($count -eq 100) {
 			Write-Debug "Too many output files, go and delete some, Little Coder"
 			return -1
 		}
-} else {
-	do {
-		$outputFilePath = "{0}{1}{2}{3}" -f $baseName, $appendix, $count, $extension
-		$count++
-	} while ((Test-Path -Path $outputFilePath) -and $count -le 100)
-	# If there is too muny output files, call it off
-	if ($count -eq 100) {
-		Write-Debug "Too many output files, go and delete some, Little Coder"
-		return -1
 	}
 }
+
+# Compose log file name
+if (-not $Note) {
+	$additionalLog = "No note provided"
+} else {
+	$additionalLog = $Note
+}
+
+# $logFilePath = (Split-Path -Path $LogFile -LeafBase) + "_"
+$baseLogName = Join-Path -Path (Split-Path -Path $LogFile -Parent) -ChildPath (Split-Path -Path $LogFile -LeafBase)
+$logFile = "{0}{1}{2}{3}" -f
+	$baseLogName,
+	$appendix,
+	$Extension.SubString(1, $Extension.Length - 1),
+	$(Split-Path -Path $logFile -Extension)
+
+# $logFile = "../logs/stats_" + $Extension.SubString(1, $Extension.Length - 1) + ".log"
+Write-Debug "Input file: $InputFilePath"
+Write-Debug "Output file: $outputFilePath"
+Write-Debug "Log file: $logFile"
+Write-Host -ForegroundColor Magenta -NoNewline	"           NOTE: "
+Write-Host -ForegroundColor Cyan				$("{0}" -f $additionalLog)
 #endregion
 
-
-$sw = [Stopwatch]::StartNew()
+# $sw = [Stopwatch]::StartNew()
 # Try to parse .ini file
 Try {
+	$VerbosePreferenceOld = $VerbosePreference
+	$VerbosePreference = 'SilentlyContinue'
 	foreach ($module in $modulesToImport.GetEnumerator()) {
 		# TODO: Get PSModuleInfo from imported modules
 		Import-Module $module.Value
 	}
+	$VerbosePreference = $VerbosePreferenceOld
+
+	#region Logging
+	# $timestamp	 = Get-Date -Format "yyyy.MM.dd HH:mm:ss"
+	$success	 = $True
+	$timestamp	 = Get-Date -UFormat "%c"
+
+	$logMessage  = "=" * 32 + "`n"
+	$logMessage += "$timestamp `n"
+	$logMessage += "-" * 10 + "Test started" + "-" * 10 + "`n"
+	$logMessage += "            NOTE: {0} `n" -f $additionalLog
+	$logMessage	+= " Input file path: {0} `n" -f $InputFilePath
+	$logMessage += "Output file path: {0} `n" -f $outputFilePath
+	$logMessage += "           Debug: {0} `n" -f $PSBoundParameters.ContainsKey('Debug').ToString()
+	$logMessage += "         Verbose: {0} `n" -f $PSBoundParameters.ContainsKey('Verbose').ToString()
+
+	OutLog -Path $logFile -Value $logMessage
+
+	$logMessage = ""
+	#endregion
 
 	# Add properties to it
 	# $err = New-Object System.Management.Automation.ErrorRecord "Line 1 `n Line 2", $null, 'NotSpecified', $null
@@ -125,17 +195,72 @@ Try {
 			} else {
 				Export-Vdf -InputObject $vdfParsed -Path $outputFilePath
 			}
+
+		}
+	} elseif ($Extension -eq ".vmf") {
+		$vmfParsed = Import-Vmf -Path $InputFilePath -LogFile $logFile
+		if ($vmfParsed) {
+			# Write-Host "YAY! WE DID IT!"
+			# Write-Host $vmfParsed
+
+			# $loop = $true
+			# $fails = 0
+			# while ($loop) {
+				# try {
+				# 	if ($debugPassed) {
+				# 		Export-Vmf -InputObject $vmfParsed -DebugOutput $outputFilePath -Debug
+				# 		$loop = $false
+				# 	} else {
+				# 		Export-Vmf -InputObject $vmfParsed -Path $outputFilePath -Force
+				# 		$loop = $false
+				# 	}
+				# } catch {
+				# 	$fails++
+				# 	Write-Error "$($MyInvocation.MyCommand):  $($_.Exception.Message)"
+				# 	$response = Read-Host "Would you like to continue? y/n`n"
+				# 	if ($response -ne "y") {
+				# 		$loop = $false
+				# 	}
+				# } finally {
+				# 	if (-not $loop) {
+				# 		Write-Host -ForegroundColor DarkYellow "Finished exporting the file with $fails failed attempts"
+				# 	}
+				# }
+			# }
+
+			if ($debugPassed) {
+				Export-Vmf -InputObject $vmfParsed -DebugOutput $outputFilePath -LogFile $logFile -Fast $Fast -Debug
+			} else {
+				Export-Vmf -InputObject $vmfParsed -Path $outputFilePath -LogFile $logFile -Fast $Fast
+			}
 		}
 	} else {
 
 	}
 } catch {
+	$success = $false
 	Write-Debug "Now this shit is seriously broken, we're in the catch statement"
 	Write-Error "$($MyInvocation.MyCommand):  $($_.Exception.Message)"
+	$logMessage += "$($MyInvocation.MyCommand):  $($_.Exception.Message) `n"
 } finally {
+	#region Logging
+	# $timestamp	 = Get-Date -Format "yyyy.MM.dd HH:mm:ss"
+
+	$timestamp	 = Get-Date -UFormat "%c" 
+	$logMessage += "        Success: $success `n"
+	$logMessage += "$timestamp `n"
+	$logMessage += "-" * 11 + "Test ended" + "-" * 11 + "`n"
+	$logMessage += "=" * 32 + "`n`n"
+
+	OutLog -Path $logFile -Value $logMessage
+	#endregion
+
+	$VerbosePreferenceOld = $VerbosePreference
+	$VerbosePreference = 'SilentlyContinue'
 	foreach ($module in $modulesToImport.GetEnumerator()) {
 		Remove-Module -Name $module.Value
 	}
+	$VerbosePreference = $VerbosePreferenceOld
 }
-$sw.Stop()
-Write-Host "Elapsed time: $($sw.Elapsed.Milliseconds) ms"
+# $sw.Stop()
+# Write-Host "Elapsed time: $($sw.Elapsed.Milliseconds) ms"
