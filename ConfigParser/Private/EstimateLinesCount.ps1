@@ -35,27 +35,16 @@ function EstimateLinesCount {
 		Write-Error "$($MyInvocation.MyCommand):  $($_.Exception.Message)"
 	} finally {
 		$sw.Stop()
-		# Write-Host "Elapsed time: $($sw.Elapsed)"
-		Write-Host -ForegroundColor DarkYellow "Output estimation: Complete"
 		if ($estimatedLines -gt 0) {
-			Write-Host -ForegroundColor Magenta	"     Properties: $properties"
-			Write-Host -ForegroundColor Magenta "        Classes: $classes"
-			Write-Host -ForegroundColor Magenta "Estimated lines: $estimatedLines"
-			Write-Host -ForegroundColor Magenta -NoNewLine	"   Elapsed time: "
-			Write-Host -ForegroundColor Cyan				$("{0}m {1}s {2}ms" -f
-				$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds)
-
-			if ($LogFile) {
-				$logMessage  = "`nOutput estimation: Complete `n"
-				$logMessage += "     Properties: $properties `n"
-				$logMessage += "        Classes: $classes `n"
-				$logMessage += "Estimated lines: $estimatedLines `n"
-				$logMessage += "   Elapsed time: {0}m {1}s {2}ms" -f
-					$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
-				OutLog -Path $LogFile -Value $logMessage
-			}
+			$timeFormatted = "{0}m {1}s {2}ms" -f
+				$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
+			OutLog								-Value "`nOutput estimation: Complete"	-Path $LogFile -OneLine
+			OutLog -Property "Properties"		-Value $properties						-Path $LogFile
+			OutLog -Property "Classes"			-Value $classes							-Path $LogFile
+			OutLog -Property "Estimated lines"	-Value $estimatedLines					-Path $LogFile
+			OutLog -Property "Elapsed time"		-Value $timeFormatted					-Path $LogFile
 		} else {
-			Write-Host -ForegroundColor DarkYellow "Failed to estimate lines count"
+			OutLog	-Value "`Failed to estimate lines count"	-Path $LogFile -OneLine
 		}
 
 	}

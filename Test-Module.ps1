@@ -119,7 +119,7 @@ $logFile = "{0}{1}{2}{3}" -f
 Write-Debug "Input file: $InputFilePath"
 Write-Debug "Output file: $outputFilePath"
 Write-Debug "Log file: $logFile"
-Write-Host -ForegroundColor Magenta -NoNewline	"           NOTE: "
+Write-Host -ForegroundColor Magenta -NoNewline	$("{0,20}: " -f "NOTE")
 Write-Host -ForegroundColor Cyan				$("{0}" -f $additionalLog)
 #endregion
 
@@ -139,18 +139,16 @@ Try {
 	$success	 = $True
 	$timestamp	 = Get-Date -UFormat "%c"
 
-	$logMessage  = "=" * 32 + "`n"
+	$logMessage  = "=" * 40 + "`n"
 	$logMessage += "$timestamp `n"
-	$logMessage += "-" * 10 + "Test started" + "-" * 10 + "`n"
-	$logMessage += "            NOTE: {0} `n" -f $additionalLog
-	$logMessage	+= " Input file path: {0} `n" -f $InputFilePath
-	$logMessage += "Output file path: {0} `n" -f $outputFilePath
-	$logMessage += "           Debug: {0} `n" -f $PSBoundParameters.ContainsKey('Debug').ToString()
-	$logMessage += "         Verbose: {0} `n" -f $PSBoundParameters.ContainsKey('Verbose').ToString()
+	$logMessage += "-" * 14 + "Test started" + "-" * 14 + "`n"
+	OutLog -Value $logMessage -Path $logFile -NoConsole
 
-	OutLog -Path $logFile -Value $logMessage
-
-	$logMessage = ""
+	OutLog -Property "NOTE"				-Value $additionalLog	-Path $logFile -NoConsole
+	OutLog -Property "Input file path"	-Value $InputFilePath	-Path $logFile -NoConsole
+	OutLog -Property "Output file path"	-Value $outputFilePath	-Path $logFile -NoConsole
+	OutLog -Property "Debug"			-Value $PSBoundParameters.ContainsKey('Debug').ToString()	-Path $logFile -NoConsole
+	OutLog -Property "Verbose"			-Value $PSBoundParameters.ContainsKey('Verbose').ToString()	-Path $logFile -NoConsole
 	#endregion
 
 	# Add properties to it
@@ -237,18 +235,18 @@ Try {
 	$success = $false
 	Write-Debug "Now this shit is seriously broken, we're in the catch statement"
 	Write-Error "$($MyInvocation.MyCommand):  $($_.Exception.Message)"
-	$logMessage += "$($MyInvocation.MyCommand):  $($_.Exception.Message) `n"
+	OutLog -Property "$($MyInvocation.MyCommand)" -Value "$($_.Exception.Message)" -ColumnWidth 0 -Path $logFile -NoConsole
 } finally {
 	#region Logging
 	# $timestamp	 = Get-Date -Format "yyyy.MM.dd HH:mm:ss"
 
 	$timestamp	 = Get-Date -UFormat "%c" 
-	$logMessage += "        Success: $success `n"
-	$logMessage += "$timestamp `n"
-	$logMessage += "-" * 11 + "Test ended" + "-" * 11 + "`n"
-	$logMessage += "=" * 32 + "`n`n"
+	OutLog -Property "Success"	-Value $success		-Path $logFile -NoConsole
 
-	OutLog -Path $logFile -Value $logMessage
+	$logMessage  = "-" * 15 + "Test ended" + "-" * 15 + "`n"
+	$logMessage += "$timestamp `n"
+	$logMessage += "=" * 40 + "`n`n"
+	OutLog -Value $logMessage -Path $logFile -NoConsole
 	#endregion
 
 	$VerbosePreferenceOld = $VerbosePreference

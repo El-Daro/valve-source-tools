@@ -58,17 +58,19 @@ function ConvertTo-Vmf {
 				)
 				$estimatedLines = $roughLinesEstimate
 				# $estimationError = ($roughLinesEstimate - $estimatedLines["lines"]) / $estimatedLines["lines"]
-				Write-Host -ForegroundColor Magenta -NoNewLine	"Rough lines est: "
-				Write-Host -ForegroundColor Cyan				$("{0}" -f
-					$roughLinesEstimate)
+				# Write-Host -ForegroundColor Magenta -NoNewLine	"Rough lines est: "
+				# Write-Host -ForegroundColor Cyan				$("{0}" -f
+				# 	$roughLinesEstimate)
 				# Write-Host -ForegroundColor Cyan				$("{0} ({1:n2}% off)" -f
 				# 	$roughLinesEstimate, $($estimationError * 100))
 
-				if ($LogFile) {
-					$logMessage  = "Rough lines est: {0} `n" -f $roughLinesEstimate
+				# if ($LogFile) {
+					# $logMessage  = "Rough lines est: {0} `n" -f $roughLinesEstimate
 					# $logMessage  = "Rough lines est: {0} ({1:n2}% off) `n" -f $roughLinesEstimate, $($estimationError * 100)
-					OutLog -Path $LogFile -Value $logMessage
-				}
+					# OutLog -Path $LogFile -Value $logMessage
+
+					OutLog -Property "Rough lines estimate" -Value $roughLinesEstimate -Path $LogFile
+				# }
 			} catch {
 				continue				# Fuhged about it
 				# throw $_.Exception
@@ -100,17 +102,11 @@ function ConvertTo-Vmf {
 		# AppendVmfBlockIter @paramsIter
 		
 		$sw.Stop()
-		Write-Host -ForegroundColor DarkYellow			"Building output: Complete"
-		Write-Host -ForegroundColor Magenta -NoNewLine	"   Elapsed time: "
-		Write-Host -ForegroundColor Cyan				$("{0}m {1}s {2}ms" -f
-			$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds)
+		$timeFormatted = "{0}m {1}s {2}ms" -f
+			$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
 
-		if ($LogFile) {
-			$logMessage  = "Building output: Complete `n"
-			$logMessage += "   Elapsed time: {0}m {1}s {2}ms" -f
-				$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
-			OutLog -Path $LogFile -Value $logMessage
-		}
+		OutLog 							-Value "`nBuilding output: Complete"	-Path $LogFile -OneLine
+		OutLog -Property "Elapsed time"	-Value $timeFormatted					-Path $LogFile
 
 		return $stringBuilder.ToString().Trim()
 

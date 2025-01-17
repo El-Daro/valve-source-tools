@@ -1,40 +1,64 @@
-# TODO: Expand
-
 function OutLog {
 	[CmdletBinding()]
 	Param (
 		[Parameter(Position = 0,
-		Mandatory = $true,
-		ValueFromPipeline = $true)]
-		[string]$Value,
+		Mandatory = $false)]
+		[string]$Property = "",
 
 		[Parameter(Position = 1,
 		Mandatory = $false)]
-		[string]$Path,
+		[string]$Value = "",
 
 		[Parameter(Position = 2,
 		Mandatory = $false)]
+		$ColumnWidth = 20,
+
+		[Parameter(Position = 3,
+		Mandatory = $false)]
+		[string]$Path = "",
+
+		[Parameter(Position = 4,
+		Mandatory = $false)]
 		[string]$Extension = ".log",
 
-		
+		[System.Management.Automation.SwitchParameter]$NoFile,
 
-		[System.Management.Automation.SwitchParameter]$Force,
-
-		[System.Management.Automation.SwitchParameter]$PassThru,
+		[System.Management.Automation.SwitchParameter]$NoConsole,
 		
 		[System.Management.Automation.SwitchParameter]$NoNewLine,
+		
+		[System.Management.Automation.SwitchParameter]$OneLine,
+		
+		[System.Management.Automation.SwitchParameter]$NoFailSafe,
 
-		$FailSafePath = "./logs/stats.log"
+		[System.Management.Automation.SwitchParameter]$Force
 	)
 
-
-
-	$params = @{
-		Value		= $Value
-		Path		= $Path
-		Force		= $Force
-		PassThru	= $PassThru
-		NoNewLine	= $NoNewLine
+	# Construct the line
+	if (-not [string]::IsNullOrEmpty($Property)) {
+		$Property = "{0,$($ColumnWidth)}: " -f $Property
 	}
-	Write-Log @params
+	$line = "{0}{1}" -f $Property, $Value
+
+	# Print the line to the console
+	if (-not $NoConsole.IsPresent) {
+		if ($OneLine.IsPresent) {
+			Write-Host -ForegroundColor DarkYellow "$line"
+		} else {
+			Write-Host -ForegroundColor Magenta -NoNewline	$("{0}"	-f $Property)
+			Write-Host -ForegroundColor Cyan				$("{0}"	-f $Value)
+		}
+	}
+
+	# Send the line to the file
+	if (-not $NoFile.IsPresent) {
+		$params = @{
+			Value		= $line
+			Path		= $Path
+			Extension	= $Extension
+			NoNewLine	= $NoNewLine
+			Force		= $Force
+		}
+		Write-Log @params
+	}
 }

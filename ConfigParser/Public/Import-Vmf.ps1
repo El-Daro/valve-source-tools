@@ -156,12 +156,15 @@ function Import-Vmf {
 			$fileSize	= (Get-Item $Path).Length
 			$fileSizeKB	= [math]::Round($fileSize / 1000)
 			$digitsFileSize = $fileSizeKB.ToString().Length - 2
-			Write-Host -ForegroundColor Magenta -NoNewLine	"      File size: "
-			Write-Host -ForegroundColor Cyan	$("{0,$digitsFileSize}Kb" -f $fileSizeKB)
-			if ($LogFile) {
-				$logMessage = "      File size: {0,$digitsFileSize}Kb" -f $fileSizeKB
-				OutLog -Path $LogFile -Value $logMessage
+
+			$paramsLog	= @{
+				Property	= "File size"
+				Value		= $("{0,$digitsFileSize}Kb" -f $fileSizeKB)
+				ColumnWidth	= 20				# Should be default
+				Path		= $LogFile
 			}
+			OutLog @paramsLog
+			
 			$stringBuilder	= [System.Text.StringBuilder]::new(256)
 			$lineCount = 0
 			$sw = [Stopwatch]::StartNew()
@@ -172,14 +175,8 @@ function Import-Vmf {
 					# ReCalculate average line length
 					$averageLineLength = ($stringBuilder.ToString().Split("`n") | ForEach-Object { $_.Length } | Measure-Object -Average).Average
 					$estimatedLines = [math]::Floor($fileSize / $averageLineLength)
-					Write-Host -ForegroundColor Magenta -NoNewLine	"Estimated lines: "
-					Write-Host -ForegroundColor Cyan				$("{0}" -f $estimatedLines)
-					if ($LogFile) {
-						$logMessage = "Estimated lines: {0}" -f $estimatedLines
-						OutLog -Path $LogFile -Value $logMessage
-					}
+					OutLog -Property "Estimated lines" -Value $estimatedLines -Path $LogFile
 
-					# break
 				}
 				if ($lineCount -ge 10000 -and $lineCount % 10000 -eq 0) {
 					$progressPercentile = "{0:N2}" -f $(($lineCount / $estimatedLines) * 100)
@@ -208,36 +205,24 @@ function Import-Vmf {
 				$lineCount += 1
 			}
 			$sw.Stop()
-			# Write-Host -ForegroundColor DarkYellow			"Reading complete"
+
 			# if ($estimatedLines) {
 			# 	Write-Host -ForegroundColor Magenta -NoNewLine	"Estimated lines: "
 			# 	Write-Host -ForegroundColor Cyan				$("{0,6}" -f $estimatedLines)
 			# }
-			Write-Host -ForegroundColor DarkYellow			"Reading: Complete"
-			Write-Host -ForegroundColor Magenta -NoNewLine	"     Read lines: "
-			Write-Host -ForegroundColor Cyan				$("{0}" -f $lineCount)
-			Write-Host -ForegroundColor Magenta -NoNewLine	"   Elapsed time: "
-			Write-Host -ForegroundColor Cyan				$("{0}m {1}s {2}ms" -f
-				$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds)
-			if ($LogFile) {
-				$logMessage  = "`nReading: Complete `n"
-				$logMessage += "     Read lines: {0} `n" -f $lineCount
-				$logMessage += "   Elapsed time: {0}m {1}s {2}ms" -f
+
+			$timeFormatted = "{0}m {1}s {2}ms" -f
 				$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
-				OutLog -Path $LogFile -Value $logMessage
-			}
+			OutLog							-Value "`nReading: Complete"	-Path $LogFile -OneLine
+			OutLog -Property "Read lines"	-Value $lineCount				-Path $LogFile
+			OutLog -Property "Elapsed time"	-Value $timeFormatted			-Path $LogFile
 
 			$vmfContent = $stringBuilder.ToString().Trim() -split "\n"
-			# $vmfContent = $stringBuilder.ToString() -split '\r?\n'
-			# $vmfContent2 = "string 1 `n string 2 `n string 3" -split '\r?\n'
-			# Write-Host $vmfContent.GetType()
 			if ($lineCount -lt 1) {
 				Write-Verbose "The .vmf file is empty."
 				return $false
 			} else {
 				# MAIN EXIT ROUTE
-				# return ConvertFrom-Vmf -Lines $vmfContent
-				# return ConvertFrom-Vmf -Lines $( $stringBuilder.ToString() -split '\r?\n' )
 				return ConvertFrom-Vmf -Lines $vmfContent -LogFile $LogFile
 			}
 		} catch [System.IO.FileNotFoundException], [System.IO.IOException] {
