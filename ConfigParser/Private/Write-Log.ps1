@@ -16,39 +16,45 @@ function Write-Log {
 		[Parameter(Position = 2,
 		Mandatory = $false)]
 		[string]$Extension = ".log",
-
-		[System.Management.Automation.SwitchParameter]$Force,
-
-		[System.Management.Automation.SwitchParameter]$PassThru,
 		
 		[System.Management.Automation.SwitchParameter]$NoNewLine,
+		
+		[System.Management.Automation.SwitchParameter]$Force,
+		
+		[System.Management.Automation.SwitchParameter]$NoFailSafe,
 
 		$FailSafePath = "./logs/stats.log"
 	)
 
 	$pathInvalid = $false
 
-	if ($Path -and (-not (Test-Path -Path $($Path)				-IsValid) -and
-						 (Test-Path -Path $($Path + $Extension) -IsValid))) {
+	if ($Path -and (-not (Test-Path -Path $($Path)		-IsValid) -and
+						 (Test-Path -Path $($Path + $Extension) -IsValid)
+				   )
+		) {
 		Write-Verbose "$($MyInvocation.MyCommand): Log file path is invalid: $(Get-AbsolutePath -Path $Path)"
+		Write-Verbose "$($MyInvocation.MyCommand): Writing to a failsafe path"
+		$pathInvalid = $true
+	} elseif ([string]::IsNullOrWhiteSpace($Path)) {
+		Write-Verbose "$($MyInvocation.MyCommand): Log file path is not provided"
 		Write-Verbose "$($MyInvocation.MyCommand): Writing to a failsafe path"
 		$pathInvalid = $true
 	}
 	if ($pathInvalid) {
-		$Path = $FailSafePath
+		if ($NoFailSafe.IsPresent) {
+			return
+		}
+		$Path	= $FailSafePath
+		if (-not $(Test-Path -Path $FailSafePath)) {
+			New-Item -Path $FailSafePath -Force | Out-Null
+		}
 	}
 	Write-Debug		"$($MyInvocation.MyCommand): Path: $(Get-AbsolutePath -Path $Path)"
 	Write-Verbose	"$($MyInvocation.MyCommand): Path: $(Get-AbsolutePath -Path $Path)"
 	
-	if ($NoNewLine) {
-		Add-Content -Path $Path -Value $Value -NoNewLine
+	if ($NoNewLine.IsPresent) {
+		Add-Content -Path $Path -Value $Value -Force:$Force -NoNewLine
 	} else {
-		Add-Content -Path $Path -Value $Value
-	}
-
-	if ((-Not $Path -and (-Not $DebugPreference -eq 'Continue')) -or
-			$PassThru) {
-		# If none are specified or 'PassThru' is used, the content is returned as a string
-		return $Value
+		Add-Content -Path $Path -Value $Value -Force:$Force
 	}
 }

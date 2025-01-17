@@ -153,14 +153,9 @@ function Export-Vmf {
 			Extension	= ".vmf"
 			DebugOutput	= $DebugOutput
 		}
-		Write-Debug "FUCKING BULLSHIT! $Path"
 		Out-Config @params
 
-		Write-Host -ForegroundColor DarkYellow			"Exporting file: Complete"
-		if ($LogFile) {
-			$logMessage  = "Exporting file: Complete `n"
-			OutLog -Path $LogFile -Value $logMessage
-		}
+		OutLog -Value "`nExporting file: Complete `n" -Path $LogFile -OneLine
 	}
 
 	END { }

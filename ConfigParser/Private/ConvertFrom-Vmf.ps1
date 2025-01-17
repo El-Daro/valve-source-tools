@@ -56,27 +56,13 @@ function ConvertFrom-Vmf {
 		Throw $_.Exception
 	} finally {
 		$sw.Stop()
-		# $parseSpeed = $sw.ElapsedMilliseconds / $currentLine * 1000
-		$linesPerSecond = ($currentLine / $sw.ElapsedMilliseconds) * 1000
-		Write-Host -ForegroundColor DarkYellow			"Parsing: complete"
-		Write-Host -ForegroundColor Magenta -NoNewLine	"   Parsed lines: "
-		Write-Host -ForegroundColor Cyan				$("{0} / {1}" -f
-			$currentLine, $Lines.Count)
-		Write-Host -ForegroundColor Magenta -NoNewLine	"   Elapsed time: "
-		Write-Host -ForegroundColor Cyan				$("{0}m {1}s {2}ms" -f
-			$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds)
-		Write-Host -ForegroundColor Magenta -NoNewline	"          Speed: "
-		Write-Host -ForegroundColor Cyan				$("{0:n0} lines per second" -f $linesPerSecond)
 
-		if ($LogFile) {
-			$logMessage  = "`nParsing: Complete `n"
-			$logMessage += "   Parsed lines: {0} / {1} `n" -f $currentLine, $Lines.Count
-			$logMessage += "   Elapsed time: {0}m {1}s {2}ms `n" -f
+		$linesPerSecond = ($currentLine / $sw.ElapsedMilliseconds) * 1000
+		$timeFormatted = "{0}m {1}s {2}ms" -f
 			$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
-			$logMessage += "          Speed: {0:n0} lines per second" -f $linesPerSecond
-			OutLog -Path $LogFile -Value $logMessage
-		}
-		# Write-Host "Elapsed time: $($sw.Elapsed.Hours)h $($sw.Elapsed.Minutes)m $($sw.Elapsed.Seconds)s $($sw.Elapsed.Milliseconds)ms"
-		# ReportLine -Path (Resolve-Path $Path) -CurrentLine $Lines[$currentLine] -LinesCount $currentLine
+		OutLog 								-Value "`nParsing: Complete"							-Path $LogFile -OneLine
+		OutLog -Property "Parsed lines"		-Value $("{0} / {1}" -f $currentLine, $Lines.Count)		-Path $LogFile
+		OutLog -Property "Elapsed time"		-Value $timeFormatted									-Path $LogFile
+		OutLog -Property "Speed"			-Value $("{0:n0} lines per second" -f $linesPerSecond)	-Path $LogFile
 	}
 }
