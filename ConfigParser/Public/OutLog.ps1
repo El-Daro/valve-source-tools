@@ -58,6 +58,7 @@ function OutLog {
 			Extension	= $Extension
 			NoNewLine	= $NoNewLine
 			Force		= $Force
+			NoFailSafe	= $NoFailSafe
 		}
 		Write-Log @params
 	}
