@@ -173,6 +173,7 @@ function Import-Vmf {
 	}
 
 	PROCESS {
+		#region Input validation
 		if (-Not (Test-Path -Path $Path)) { 					# If file doesn't exist
 			if (Test-Path -Path $($Path + ".vmf")) {			# See if adding '.vmf' actually helps
 				$Path += ".vmf"									# If so, add the extension and proceed with the converting
@@ -189,6 +190,7 @@ function Import-Vmf {
 		}
 		Write-Verbose "The input path is correct. Processing..."
 		Write-Debug "$($MyInvocation.MyCommand): Path: $(Get-AbsolutePath -Path $Path)"
+		#endregion
 		
 		# Had to do this due to a nasty bug with .NET being dependent on the context of where the script was launched from
 		$Path = $(Get-AbsolutePath -Path $Path)
