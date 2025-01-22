@@ -1,4 +1,4 @@
-# TODO: Make estimations once per 10k lines (now that it works 10x faster)
+# TODO: Cleanup
 
 function ParseVmfBlockIter {
 

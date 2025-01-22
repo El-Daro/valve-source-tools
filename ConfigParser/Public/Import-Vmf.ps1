@@ -64,7 +64,7 @@ function Import-Vmf {
 		properties                     {}
 		classes                        {[world, System.Collections.Generic.List`1[System.Collections.Specialized.OrderedDictionary]], [entity, System.Collecti…
 	
-	PS> $vmfParsed["classes"]
+	PS> $vmfFile["classes"]
 
 		Name                           Value
 		----                           -----
