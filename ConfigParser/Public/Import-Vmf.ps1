@@ -1,7 +1,3 @@
-# DONE: Rewrite helper comments from VDF to VMF
-# TODO: Deliver on your promise ion the helper comments
-# TODO: Cleanup
-
 using namespace System.Diagnostics
 
 function Import-Vmf {
@@ -23,16 +19,29 @@ function Import-Vmf {
 	System.Collections.Specialized.OrderedDictionary
 
 	.NOTES
-	An empty line is ignored.
-	A key cannot be empty or contain any of the following symbols: `[`, `]`, `;`, `#` and `=`.
-	A value should be enclosed in double quotes (`" "`).
-	If a key provided with no corresponding value, a block is expected to follow next.
-	If there is no opening bracket after said key, an exception is raised.
-	Poor syntax can sometimes be forgiven, but in this case the function might yield unexpected results.
-	It is up to the author of the .vmf file to properly edit it.
+	Empty lines and comments are ignored (a comment can only sit on its own line and starts with `//`).
+	A key cannot be empty or contain symbols `"` and `//`.
+	Both key and value should be enclosed in double quotes (`" "`) and separated by one whitespace.
+	Class names are not enclosed in double quotes.
+	Every class is defined in curly brackets.
+	VMF files have a recursive structure; each class may contain properties and other classes.
+	
+	Note that key-value pairs, as well as classes, are not unique:
+	it is possible to define the same key multiple times with different values
+	(in practice only seen in the 'connections' class that defines outcoming script actions).
+	Having the same class definition multiple times, however, is very common.
+	In fact, a typical VMF file with 500k lines would only contain a handful of different class definitions,
+	but thousands of entries for some classes on the same level.
+	Because of that, every dictionary entry that defines a class or a property is initialized as a Generic.List type.
+
+	Note that the parser was made very strict in order to increase performance.
+	Be cautious trying to import manually edited VMF files.
 
 	.LINK
 	Export-Vmf
+
+	.LINK
+	Import-Vdf
 
 	.LINK
 	Import-Ini
@@ -47,28 +56,69 @@ function Import-Vmf {
 	about_Hash_Tables
 	
 	.EXAMPLE
-	PS> $vmfFile = Import-Vmf -Path ".\loginusers.vmf"
+	PS> $vmfFile = Import-Vmf -Path ".\c5m3_cemetery_d.vmf"
 	PS> $vmfFile
 
-	Name                           Value
-	----                           -----
-	users                          {[76561198254457678, System.Collections.Specialized.OrderedDictionary], [76561198347230468, System.Collections.Specialize…
+		Name                           Value
+		----                           -----
+		properties                     {}
+		classes                        {[world, System.Collections.Generic.List`1[System.Collections.Specialized.OrderedDictionary]], [entity, System.Collecti…
 	
-	PS> $vmfFile["users"][0]["PersonaName"]
-	El Daro
+	PS> $vmfParsed["classes"]
+
+		Name                           Value
+		----                           -----
+		world                          {System.Collections.Specialized.OrderedDictionary}
+		entity                         {System.Collections.Specialized.OrderedDictionary, System.Collections.Specialized.OrderedDictionary, System.Collections…
+		cameras                        {System.Collections.Specialized.OrderedDictionary}
+
+	PS> $vmfFile["classes"]["world"][0]["properties"]
+
+		Name                           Value
+		----                           -----
+		id                             {1}
+		timeofday                      {2}
+		startmusictype                 {1}
+		skyname                        {sky_l4d_c5_1_hdr}
+		musicpostfix                   {BigEasy}
+		maxpropscreenwidth             {-1}
+		detailvbsp                     {detail.vbsp}
+		detailmaterial                 {detail/detailsprites_overgrown}
+		mapversion                     {5359}
+		comment                        {Decompiled by BSPSource v1.4.6.1 from c5m3_cemetery}
+		classname                      {worldspawn}
+
+	PS> $vmfFile["classes"]["entity"].Count	
+	6648
 		
 	.EXAMPLE
-	PS> $vmfFile = Import-Vmf -Path ".\loginusers.vmf"
-	PS> $vmfFile["users"][0]["SkipOfflineModeWarning"]
-	0
-	PS> $vmfFile["users"][0]["SkipOfflineModeWarning"] = 1
-	PS> $vmfFile["users"][0]["SkipOfflineModeWarning"]
-	1
+	PS> $vmfFile = Import-Vmf -Path ".\c5m3_cemetery_d.vmf"
+	PS> $vmfFile["classes"]["entity"][1459]["properties"]
+		Name                           Value
+		----                           -----
+		id                             {2976892}
+		angles                         {-0 -90 0}
+		origin                         {5913 -1680 183}
+		spawnflags                     {1}
+		classname                      {logic_auto}
+	PS> $vmfFile["classes"]["entity"][1459]["properties"]["spawnflags"].GetType()
+		IsPublic IsSerial Name                                     BaseType
+		-------- -------- ----                                     --------
+		True     True     List`1                                   System.Object
+	PS> $vmfFile["classes"]["entity"][1459]["properties"]["spawnflags"][0] = 0
+	PS> $vmfFile["classes"]["entity"][1459]["properties"]
+		Name                           Value
+		----                           -----
+		id                             {2976892}
+		angles                         {-0 -90 0}
+		origin                         {5913 -1680 183}
+		spawnflags                     {0}
+		classname                      {logic_auto}
 
 	.EXAMPLE
-	PS> $vmfFile = Import-Vmf -Path ".\localconfig.vmf"
-	PS> $vmfFile["UserLocalConfigStore"]["system"]["EnableGameOverlay"] = 1
-	PS> Export-Vmf -InputObject $vmfFile -Path ".\localconfig.vmf" -Force
+	PS> $vmfFile = Import-Vmf -Path ".\c5m3_cemetery_d.vmf"
+	PS> $vmfFile["classes"]["entity"][1459]["properties"]["spawnflags"][0] = 0
+	PS> Export-Vmf -InputObject $vmfFile -Path ".\c5m3_cemetery_d_1.vmf"
 #>
 
 	[CmdletBinding()]
@@ -143,18 +193,8 @@ function Import-Vmf {
 		# Had to do this due to a nasty bug with .NET being dependent on the context of where the script was launched from
 		$Path = $(Get-AbsolutePath -Path $Path)
 		$LogFile = $(Get-AbsolutePath -Path $LogFile)
-		# if ($LogFile -and -not $Silent.IsPresent) {
-		# 	$logMessage = "Input file path: {0}" -f $(Get-AbsolutePath -Path $Path)
-		# 	OutLog -Path $LogFile -Value $logMessage
-		# }
 
-		# $stringBuilder	= [System.Text.StringBuilder]::new(256)
 		try {
-			# TODO: Clean this shit up!
-			# NOTE: The reading part seems to work fine
-			# $vmfContent = Get-Content $Path
-
-			# Gonna make this shit fast, boi
 			$fileSize	= (Get-Item $Path).Length
 			$fileSizeKB	= [math]::Round($fileSize / 1000)
 			$digitsFileSize = $fileSizeKB.ToString().Length - 2
