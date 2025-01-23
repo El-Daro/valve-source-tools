@@ -27,12 +27,14 @@ function EstimateOutputLmp {
 	} catch {
 		Write-Error "$($MyInvocation.MyCommand):  $($_.Exception.Message)"
 	} finally {
-		if ($estimatedLines -gt 0 -and -not $Silent.IsPresent) {
-			OutLog								-Value "`nOutput estimation: Complete"	-Path $LogFile -OneLine
-			OutLog -Property "Lines estimate"			-Value $estimatedLines		-Path $LogFile
-			OutLog -Property "Sections estimate"		-Value $estimatedSections	-Path $LogFile
-		} else {
-			OutLog	-Value "`nFailed to estimate lines count"	-Path $LogFile -OneLine
+		if (-not $Silent.IsPresent) {
+			if ($estimatedLines -gt 0) {
+				OutLog								-Value "`nOutput estimation: Complete"	-Path $LogFile -OneLine
+				OutLog -Property "Lines estimate"			-Value $estimatedLines		-Path $LogFile
+				OutLog -Property "Sections estimate"		-Value $estimatedSections	-Path $LogFile
+			} else {
+				OutLog	-Value "`nFailed to estimate lines count"	-Path $LogFile -OneLine
+			}
 		}
 
 	}
