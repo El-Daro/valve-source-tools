@@ -81,22 +81,22 @@ function Export-Vmf {
 		Mandatory = $false)]
 		[string]$Path,
 
+		[Parameter(Position = 2,
+		Mandatory = $false)]
+		[bool]$Fast = $false,
+
+		[Parameter(Position = 3,
+		Mandatory = $false)]
+		[string]$LogFile,
+
+		[System.Management.Automation.SwitchParameter]$Silent,
+
 		[System.Management.Automation.SwitchParameter]$Force = $False,
 
 		[System.Management.Automation.SwitchParameter]$PassThru = $False,
 
 		[Parameter(DontShow)]
-		[string]$DebugOutput = ".\output_debug.vmf",
-
-		[Parameter(Position = 2,
-		Mandatory = $false)]
-		[string]$LogFile,
-
-		[Parameter(Position = 3,
-		Mandatory = $false)]
-		[bool]$Fast = $False,
-
-		[System.Management.Automation.SwitchParameter]$Silent
+		[string]$DebugOutput = ".\output_debug.vmf"
 	)
 
 	BEGIN {
