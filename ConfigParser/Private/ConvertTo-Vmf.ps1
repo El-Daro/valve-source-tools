@@ -92,7 +92,7 @@ function ConvertTo-Vmf {
 			StringBuilder			= [ref]$stringBuilder
 			VmfSection				= $Vmf
 			Depth					= [ref]0
-			Stopwatch				= [ref]$sw
+			StopWatch				= [ref]$sw
 			EstimatedLines			= [ref]$estimatedLines
 			ProgressStep			= $($estimatedLines / 50)
 		}

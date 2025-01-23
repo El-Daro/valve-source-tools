@@ -1,20 +1,24 @@
-# TODO: Cleanup
-
 function Export-Lmp {
 	<#
 		.SYNOPSIS
-		Converts a hashtable into a .lmp file format string and outputs it in a file, if specified.
+		Converts a hashtable into a binary .lmp file and outputs it in a file.
 	
 		.DESCRIPTION
 		Converts a hashtable into a single string, formatted specifically for .lmp files.
 		This function is designed to work with ordered and unordered hashtables.
 	
 		.PARAMETER InputObject
-		The object to convert. It can be ordered or unordered hashtable.
+		The object to convert. It can be ordered or unordered hashtable. Must contain 'header' and 'data' hashtables inside.
 	
 		.PARAMETER Path
 		Specifies the path to the output .lmp file. Accepts absolute and relative paths. Does NOT accept wildcards.
-	
+
+		.PARAMETER AsText
+		If specified, output file is written as plain text without header
+		
+		.PARAMETER Silent
+		If specified, suppresses console output
+
 		.PARAMETER Force
 		If specified, forces the over-write of an existing file. This paramater has no effect, if `-Path` parameter was not specified.
 	
@@ -27,11 +31,31 @@ function Export-Lmp {
 	
 		.OUTPUTS
 		System.String
-			Note that by default this function returns only the .lmp formatted string. If you want to output to a file instead,
-			use the `-Path` parameter.
-	
+			Only returns string if both `-AsText` and `-PassThru` are specified
+
+		.NOTES
+		Input must contain 'header' and 'data' hashtables inside.
+		'Data' hashtable should contain other hashtable entries — sections.
+		Sections describe sets of parameters (key-value pairs).
+		Note that keys are not necessarily unique. 
+
+		.LINK
+		Import-Lmp
+
+		.LINK
+		Import-Vmf
+
 		.LINK
 		Import-Vdf
+
+		.LINK
+		Import-Ini
+		
+		.LINK
+		Export-Vmf
+		
+		.LINK
+		Export-Vdf
 	
 		.LINK
 		Export-Ini
@@ -46,29 +70,11 @@ function Export-Lmp {
 		about_Hash_Tables
 		
 		.EXAMPLE
-		PS> $vdfFile = Import-Vdf -Path ".\loginusers.lmp"
-		PS> $vdfFile
-	
-		Name                           Value
-		----                           -----
-		users                          {[76561198254457678, System.Collections.Specialized.OrderedDictionary], [76561198347230468, System.Collections.Specialize…
-		
-		PS> $vdfFile["users"][0]["PersonaName"]
-		El Daro
-			
-		.EXAMPLE
-		PS> $vdfFile = Import-Vdf -Path ".\loginusers.lmp"
-		PS> $vdfFile["users"][0]["SkipOfflineModeWarning"]
-		0
-		PS> $vdfFile["users"][0]["SkipOfflineModeWarning"] = 1
-		PS> $vdfFile["users"][0]["SkipOfflineModeWarning"]
-		1
-	
-		.EXAMPLE
-		PS> $vdfFile = Import-Vdf -Path ".\localconfig.lmp"
-		PS> $vdfFile["UserLocalConfigStore"]["system"]["EnableGameOverlay"] = 1
-		PS> Export-Vdf -InputObject $vdfFile -Path ".\localconfig.lmp" -Force
-	#>
+		PS> $lmpFile = Import-Lmp -Path ".\c5m3_cemetery_l_0.lmp"
+		PS> $lmpFile["data"]["hammerid-2935785"]["angles"][0] = "45 120 0"
+		PS> Export-Lmp -InputObject $lmpFile -Path ".\c5m3_cemetery_d_1.lmp"
+
+		#>
 	
 		[CmdletBinding()]
 		Param (
@@ -78,19 +84,17 @@ function Export-Lmp {
 			[System.Collections.IDictionary]$InputObject,
 	
 			[Parameter(Position = 1,
-			Mandatory = $false)]
+			Mandatory = $true)]
 			[string]$Path,
-	
-			[Parameter(Position = 2,
-			Mandatory = $false)]
-			[bool]$Fast = $false,
 
-			[Parameter(Position = 3,
+			[Parameter(Position = 2,
 			Mandatory = $false)]
 			[string]$LogFile,
 
 			[System.Management.Automation.SwitchParameter]$Silent,
 
+			[System.Management.Automation.SwitchParameter]$AsText,
+			
 			[System.Management.Automation.SwitchParameter]$Force,
 	
 			[System.Management.Automation.SwitchParameter]$PassThru,
@@ -141,20 +145,35 @@ function Export-Lmp {
 			if ($InputObject -and
 				$InputObject.GetType().ImplementedInterfaces.Contains([System.Collections.IDIctionary]) ) {
 				Write-Debug "Input: $($InputObject.GetType().FullName)"
+				if (-not ($InputObject.Contains("header") -and
+				$InputObject["header"].GetType().ImplementedInterfaces.Contains([System.Collections.IDIctionary]))) {
+					# Header will be recreated
+					# Write-Debug "Input hashtable does not contain header"
+					Write-Error "Input hashtable does not contain header"
+					Throw "$($MyInvocation.MyCommand): $($PSItem)"
+				}
+				if ((-not $InputObject.Contains("data") -and
+				$InputObject["data"].GetType().ImplementedInterfaces.Contains([System.Collections.IDIctionary]))) {
+					# Write-Debug "InputObject does not contain data hashtable"
+					# Write-Debug "InputObject is assumed to be only containing data"
+					Write-Error "InputObject does not contain data hashtable"
+					Throw "$($MyInvocation.MyCommand): $($PSItem)"
+				}
 			}
 			#endregion
 			$LogFile = $(Get-AbsolutePath -Path $LogFile)		# Just a precaution
 	
-			$lmp = ConvertTo-Lmp -Lmp $InputObject -LogFile $LogFile -Fast $Fast -Silent:$Silent.IsPresent
+			$lmp = ConvertTo-Lmp -Lmp $InputObject -LogFile $LogFile -Silent:$Silent.IsPresent -AsText:$AsText.IsPresent
 	
 			$params = @{
-				Content		= $lmp
-				Path		= $Path
-				Force 		= $Force
-				PassThru	= $PassThru
-				Extension	= ".lmp"
-				DebugOutput	= $DebugOutput
-				Silent		= $Silent.IsPresent
+				Content			= $lmp
+				Path			= $Path
+				Force 			= $Force.IsPresent
+				PassThru		= $PassThru.IsPresent
+				Extension		= ".lmp"
+				AsByteStream	= $(-not $AsText.IsPresent)
+				DebugOutput		= $DebugOutput
+				Silent			= $Silent.IsPresent
 			}
 			Out-Config @params
 	

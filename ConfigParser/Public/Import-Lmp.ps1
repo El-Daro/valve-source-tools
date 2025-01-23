@@ -11,6 +11,9 @@ function Import-Lmp {
 	.PARAMETER Path
 	Specifies the path to the .lmp file. Accepts absolute and relative paths. Does NOT accept wildcards.
 
+	.PARAMETER Silent
+	If specified, suppresses console output
+
 	.INPUTS
 	System.String
 		You can pipe a string containing a path to this function.
@@ -37,6 +40,15 @@ function Import-Lmp {
 
 	.LINK
 	Export-Lmp
+
+	.LINK
+	Export-Vmf
+
+	.LINK
+	Export-Vdf
+
+	.LINK
+	Export-Ini
 
 	.LINK
 	Import-Vmf
@@ -228,7 +240,7 @@ function Import-Lmp {
 			$lmpBinary	= [System.IO.File]::ReadAllBytes($Path)
 			$lmpHeader	= Get-LmpHeader -Binary $lmpBinary -LogFile $LogFile -Silent:$Silent.IsPresent
 			$offset		= 20
-			if ($lmpHeader) {
+			if ($null -ne $lmpHeader) {
 				$offset	= $lmpHeader["Offset"]
 			}
 			$params		= @{
@@ -260,7 +272,7 @@ function Import-Lmp {
 			}
 
 			# MAIN EXIT ROUTE
-			return [ordered]@{ Header = $lmpHeader; Data = $lmpData}
+			return [ordered]@{ header = $lmpHeader; data = $lmpData}
 
 		} catch [System.IO.FileNotFoundException], [System.IO.IOException] {
 			Write-HostError -ForegroundColor Red -NoNewline		"  File ("

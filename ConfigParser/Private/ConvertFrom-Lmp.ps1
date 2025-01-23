@@ -63,7 +63,6 @@ function ConvertFrom-Lmp {
 				Write-Debug "Line $($currentLine): Empty line or a comment"
 
 			} else {
-				$currentLine++				# Jump over the open bracket
 				$sectionsCounter++
 				$currentBlock = [ordered]@{ }
 				# $sectionsList.Add($currentBlock)
