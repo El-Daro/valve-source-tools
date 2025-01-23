@@ -122,7 +122,7 @@ function Merge-Map {
 			#region INPUT EVALUATION
 			if ($Vmf -and
 				$Vmf.GetType().ImplementedInterfaces.Contains([System.Collections.IDIctionary]) ) {
-				Write-Debug "Input: $($InputObject.GetType().FullName)"
+				Write-Debug "Input: $($Vmf.GetType().FullName)"
 			} else {
 				Write-Error "Vmf does not contain data hashtable"
 				Throw "$($MyInvocation.MyCommand): $($PSItem)"
