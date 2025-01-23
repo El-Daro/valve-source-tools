@@ -74,7 +74,7 @@ function Export-Lmp {
 		PS> $lmpFile["data"]["hammerid-2935785"]["angles"][0] = "45 120 0"
 		PS> Export-Lmp -InputObject $lmpFile -Path ".\c5m3_cemetery_d_1.lmp"
 
-		#>
+	#>
 	
 		[CmdletBinding()]
 		Param (

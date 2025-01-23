@@ -41,6 +41,18 @@ function Import-Vmf {
 	Export-Vmf
 
 	.LINK
+	Export-Lmp
+
+	.LINK
+	Export-Vdf
+
+	.LINK
+	Export-Ini
+
+	.LINK
+	Import-Lmp
+
+	.LINK
 	Import-Vdf
 
 	.LINK
