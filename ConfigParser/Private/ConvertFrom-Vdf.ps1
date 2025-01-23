@@ -1,4 +1,3 @@
-# TODO: Revert back to VDF regex. Branch a VMX parser
 # TODO: Revert everything back to VDF. This is strictrly VDF stuff (except leave optimisation in)
 
 using namespace System.Diagnostics
@@ -16,7 +15,7 @@ function ConvertFrom-Vdf {
 	$currentLine	= 0
 	$currentKey		= ""
 	$Depth			= 0
-	$regex			= Get-VmfRegex			# TODO: Rever back to VDF regex. Branch a VMX parser
+	$regex			= Get-VdfRegex			# TODO: Rever back to VDF regex. Branch a VMX parser
 	#endregion
 
 	try  {
@@ -50,7 +49,7 @@ function ConvertFrom-Vdf {
 	} finally {
 		$sw.Stop()
 		Write-Host "  Lines read: $currentLine / $($Lines.Count)" 
-		ReportStatisticsVdf -LinesCount $Lines.Count -CurrentLine $currentLine
+		ReportStatistics -LinesCount $Lines.Count -CurrentLine $currentLine
 		Write-Host "Elapsed time: $($sw.Elapsed.Hours)h $($sw.Elapsed.Minutes)m $($sw.Elapsed.Seconds)s $($sw.Elapsed.Milliseconds)ms"
 		# ReportLine -Path (Resolve-Path $Path) -CurrentLine $Lines[$currentLine] -LinesCount $currentLine
 	}

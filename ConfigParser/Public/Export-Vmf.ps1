@@ -150,8 +150,8 @@ function Export-Vmf {
 		$params = @{
 			Content		= $vmf
 			Path		= $Path
-			Force 		= $Force
-			PassThru	= $PassThru
+			Force 		= $Force.IsPresent
+			PassThru	= $PassThru.IsPresent
 			Extension	= ".vmf"
 			DebugOutput	= $DebugOutput
 			Silent		= $Silent.IsPresent

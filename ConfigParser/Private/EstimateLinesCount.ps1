@@ -46,7 +46,7 @@ function EstimateLinesCount {
 			OutLog -Property "Estimated lines"	-Value $estimatedLines					-Path $LogFile
 			OutLog -Property "Elapsed time"		-Value $timeFormatted					-Path $LogFile
 		} else {
-			OutLog	-Value "`Failed to estimate lines count"	-Path $LogFile -OneLine
+			OutLog	-Value "`nFailed to estimate lines count"	-Path $LogFile -OneLine
 		}
 
 	}

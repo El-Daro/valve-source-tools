@@ -23,22 +23,31 @@ Param (
 
 	[Parameter(Position = 5,
 	Mandatory = $false)]
-	[System.Management.Automation.SwitchParameter]$Fast = $False,
+	[System.Management.Automation.SwitchParameter]$Fast,
 
 	[Parameter(Position = 6,
 	Mandatory = $false)]
-	[System.Management.Automation.SwitchParameter]$Silent,
+	[System.Management.Automation.SwitchParameter]$Force,
 
 	[Parameter(Position = 7,
 	Mandatory = $false)]
-	[string]$OutputFilePath,
+	[System.Management.Automation.SwitchParameter]$Silent,
 
-	[Parameter(Position = 8)]
-	$Note,
+	[Parameter(Position = 8,
+	Mandatory = $false)]
+	[System.Management.Automation.SwitchParameter]$AsText,
 
 	[Parameter(Position = 9,
 	Mandatory = $false)]
+	[string]$OutputFilePath,
+
+	[Parameter(Position = 10)]
+	$Note,
+
+	[Parameter(Position = 11,
+	Mandatory = $false)]
 	[string]$LogFile = "../logs/stats.log"
+
 )
 # This is necessary for Windows PowerShell (up to 5.1.3)
 # When the common parameter '-Debug' is used, Windows PowerShell sets the $DebugPreference to 'Inquire'
@@ -167,15 +176,15 @@ Try {
 
 			if  ($NoComments) {
 				if ($debugPassed) {
-					Export-Ini -Settings $iniParsed["settings"] -DebugOutput $outputFilePath -Debug
+					Export-Ini -Settings $iniParsed["settings"] -DebugOutput $outputFilePath -Force:$Force.IsPresent -Debug
 				} else {
-					Export-Ini -Settings $iniParsed["settings"] -Path $outputFilePath
+					Export-Ini -Settings $iniParsed["settings"] -Path $outputFilePath -Force:$Force.IsPresent
 				}
 			} else {
 				if ($debugPassed) {
-					Export-Ini -Settings $iniParsed["settings"] -Comments $iniParsed["comments"] -DebugOutput $outputFilePath -Debug
+					Export-Ini -Settings $iniParsed["settings"] -Comments $iniParsed["comments"] -DebugOutput $outputFilePath -Force:$Force.IsPresent -Debug
 				} else {
-					Export-Ini -Settings $iniParsed["settings"] -Comments $iniParsed["comments"] -Path $outputFilePath
+					Export-Ini -Settings $iniParsed["settings"] -Comments $iniParsed["comments"] -Path $outputFilePath -Force:$Force.IsPresent
 				}
 			}
 		} else {
@@ -188,9 +197,9 @@ Try {
 			# Write-Host $vdfParsed
 
 			if ($debugPassed) {
-				Export-Vdf -InputObject $vdfParsed -DebugOutput $outputFilePath -Debug
+				Export-Vdf -InputObject $vdfParsed -DebugOutput $outputFilePath -Force:$Force.IsPresent -Debug
 			} else {
-				Export-Vdf -InputObject $vdfParsed -Path $outputFilePath
+				Export-Vdf -InputObject $vdfParsed -Path $outputFilePath -Force:$Force.IsPresent
 			}
 
 		}
@@ -226,22 +235,21 @@ Try {
 			# }
 
 			if ($debugPassed) {
-				Export-Vmf -InputObject $vmfParsed -DebugOutput $outputFilePath -LogFile $logFile -Fast $Fast -Silent:$Silent.IsPresent -Debug
+				Export-Vmf -InputObject $vmfParsed -DebugOutput $outputFilePath -LogFile $logFile -Fast $Fast -Silent:$Silent.IsPresent -Force:$Force.IsPresent -Debug
 			} else {
-				Export-Vmf -InputObject $vmfParsed -Path $outputFilePath -LogFile $logFile -Fast $Fast -Silent:$Silent.IsPresent
+				Export-Vmf -InputObject $vmfParsed -Path $outputFilePath -LogFile $logFile -Fast $Fast -Silent:$Silent.IsPresent -Force:$Force.IsPresent
 			}
 		}
 	} elseif ($Extension -eq ".lmp") {
 		$lmpParsed = Import-Lmp -Path $InputFilePath -LogFile $logFile -Silent:$Silent.IsPresent
 		if ($lmpParsed) {
-			Write-Host "YAY! WE DID IT!"
-			# Write-Host $vmfParsed
-
-			# if ($debugPassed) {
-			# 	Export-Vmf -InputObject $vmfParsed -DebugOutput $outputFilePath -LogFile $logFile -Fast $Fast -Silent:$Silent.IsPresent -Debug
-			# } else {
-			# 	Export-Vmf -InputObject $vmfParsed -Path $outputFilePath -LogFile $logFile -Fast $Fast -Silent:$Silent.IsPresent
-			# }
+			# Write-Host "YAY! WE DID IT!"
+			
+			if ($debugPassed) {
+				Export-Lmp -InputObject $lmpParsed -DebugOutput $outputFilePath -LogFile $logFile -Silent:$Silent.IsPresent -AsText:$AsText.IsPresent -Force:$Force.IsPresent -Debug
+			} else {
+				Export-Lmp -InputObject $lmpParsed -Path $outputFilePath -LogFile $logFile -Silent:$Silent.IsPresent -AsText:$AsText.IsPresent -Force:$Force.IsPresent
+			}
 		}
 	} else {
 

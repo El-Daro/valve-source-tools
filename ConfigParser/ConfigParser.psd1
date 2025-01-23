@@ -12,7 +12,7 @@
 RootModule = 'ConfigParser.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.9.2.001'
+ModuleVersion = '0.9.3.001'
 
 # ID used to uniquely identify this module
 GUID = 'ee86abf1-c36e-47e9-9bee-d975fbbea1ad'
@@ -63,7 +63,7 @@ PowerShellVersion = '5.0'
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = @('Import-Ini', 'Export-Ini', 'Import-Vdf', 'Export-Vdf', 'Import-Vmf', 'Export-Vmf', 'Import-Lmp', 'OutLog')
+FunctionsToExport = @('Import-Ini', 'Export-Ini', 'Import-Vdf', 'Export-Vdf', 'Import-Vmf', 'Export-Vmf', 'Import-Lmp', 'Export-Lmp', 'OutLog')
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
