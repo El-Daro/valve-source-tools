@@ -112,7 +112,7 @@ function AppendVmfBlockIter {
 				ElapsedMilliseconds		= $StopWatch.Value.ElapsedMilliseconds
 				Activity				= "Building..."
 			}
-			ReportProgressVmf @params
+			ReportProgress @params
 			$progressCounter++
 		}
 

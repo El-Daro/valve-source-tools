@@ -104,7 +104,7 @@ function AppendVmfBlockRecursive {
 			ElapsedMilliseconds		= $StopWatch.Value.ElapsedMilliseconds
 			Activity				= "Building..."
 		}
-		ReportProgressVmf @params
+		ReportProgress @params
 		$ProgressCounter.Value++
 	}
 }

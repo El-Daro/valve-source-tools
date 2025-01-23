@@ -151,7 +151,7 @@ function ValidateVmfBlock {
 					CurrentLine	= $currentLine.Value
 					LinesCount	= $Lines.count
 				}
-				ReportProgressVmf @params
+				ReportProgress @params
 			}
 		}
 	

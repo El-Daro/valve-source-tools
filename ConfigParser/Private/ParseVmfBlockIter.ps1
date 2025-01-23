@@ -80,7 +80,7 @@ function ParseVmfBlockIter {
 				ElapsedMilliseconds		= $StopWatch.Value.ElapsedMilliseconds
 				Activity				= "Parsing..."
 			}
-			ReportProgressVmf @params
+			ReportProgress @params
 		}
 
 	}

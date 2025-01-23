@@ -1,4 +1,4 @@
-function ReportProgressVmf {
+function ReportProgress {
 	Param (
 		[Parameter(Position = 0,
 		Mandatory = $true)]
@@ -21,6 +21,7 @@ function ReportProgressVmf {
 		$Activity = "Processing... "
 	)
 
+	#region Legacy
 	# $digitsTotal	= $LinesCount.ToString().Length + 1
 	# $digitsTitle	= [Math]::Ceiling(($digitsTotal + 21) / 2)
 	# $reportTitle	= "".PadLeft($digitsTitle, '-') + "LINES COUNT"	+ "".PadLeft($digitsTitle, '-')
@@ -33,6 +34,8 @@ function ReportProgressVmf {
 	# if ($intProgressPercentile -gt 100) {
 	# 	$intProgressPercentile = 100
 	# }
+	#endregion
+
 	$progressPercentile = "{0:N2}" -f $(($CurrentLine / $LinesCount) * 100)
 	if ([int]$progressPercentile -gt 100) {
 		[int]$progressPercentile = 100
@@ -63,20 +66,4 @@ function ReportProgressVmf {
 	}
 
 	Write-Progress @progressParameters
-
-	# for ($i = 1; $i -le 100; $i++ ) {
-	# 	$progressParameters = @{
-	# 		Activity         = 'Parsing'
-	# 		Status           = 'Progress->'
-	# 		PercentComplete  = $i
-	# 		CurrentOperation = 'MainLoop'
-	# 	}
-	# 	# Write-Progress -Activity "Search in Progress" -Status "$i% Complete:" -PercentComplete $i
-	# 	Write-Progress @progressParameters
-	# 	Start-Sleep -Milliseconds 100
-	# }
 }
-
-# $PSStyle.Progress.MaxWidth = 80
-# $PSStyle.Progress.View = "Minimal"
-# ReportCountVdf

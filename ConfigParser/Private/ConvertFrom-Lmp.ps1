@@ -83,7 +83,7 @@ function ConvertFrom-Lmp {
 					ElapsedMilliseconds		= $StopWatch.ElapsedMilliseconds
 					Activity				= "Parsing..."
 				}
-				ReportProgressVmf @params
+				ReportProgress @params
 			}
 	
 		}
