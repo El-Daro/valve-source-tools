@@ -34,8 +34,10 @@ function Set-LmpHeader {
 			# [Array]::Copy($headerBytes, 0, $header, $offset, $length)
 		}
 
-		OutLog -Property "Header (old)" -Value "$headerOld"	-Path $LogFile
-		OutLog -Property "Header (new)" -Value "$header"	-Path $LogFile
+		if ($PSBoundParameters.ContainsKey('Debug')) {
+			OutLog -Property "Header (old)" -Value "$headerOld"	-Path $LogFile
+			OutLog -Property "Header (new)" -Value "$header"	-Path $LogFile
+		}
 
 		return [byte[]]$header
 
