@@ -231,6 +231,18 @@ Try {
 				Export-Vmf -InputObject $vmfParsed -Path $outputFilePath -LogFile $logFile -Fast $Fast -Silent:$Silent.IsPresent
 			}
 		}
+	} elseif ($Extension -eq ".lmp") {
+		$lmpParsed = Import-Lmp -Path $InputFilePath -LogFile $logFile -Silent:$Silent.IsPresent
+		if ($lmpParsed) {
+			Write-Host "YAY! WE DID IT!"
+			# Write-Host $vmfParsed
+
+			# if ($debugPassed) {
+			# 	Export-Vmf -InputObject $vmfParsed -DebugOutput $outputFilePath -LogFile $logFile -Fast $Fast -Silent:$Silent.IsPresent -Debug
+			# } else {
+			# 	Export-Vmf -InputObject $vmfParsed -Path $outputFilePath -LogFile $logFile -Fast $Fast -Silent:$Silent.IsPresent
+			# }
+		}
 	} else {
 
 	}
