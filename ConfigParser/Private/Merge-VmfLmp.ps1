@@ -25,95 +25,39 @@ function Merge-VmfLmp {
 		
 		try {
 
-			# 1. Analyze the lmp hashtable
-			#region Analyzing LMP
 			$sw = [Stopwatch]::StartNew()
-			$counterHammerIds	= 0
-			$counterClassnames	= 0
-			$counterUnknown		= 0
-			$counterAll			= 0
-			foreach ($lmpSection in $Lmp["data"].Keys) {
-				if ($lmpSection.SubString(0,$lmpHammerIdOffset) -eq "hammerid-") {
-					$counterHammerIds++
-				} elseif ($lmpSection.SubString(0,$lmpClassnameOffset) -eq "classname-") {
-					$counterClassnames++
-				} else {
-					$counterUnknown++
-					Write-Host -ForegroundColor DarkYellow "This is an error"
-					Write-Host $lmpSection
-				}
-				$counterAll++
+
+			#region Analyzing LMP
+			$params = @{
+				Lmp					= $Lmp
+				LmpHammerIdOffset	= $lmpHammerIdOffset
+				LmpClassnameOffset	= $lmpClassnameOffset
 			}
+			$counterLmp = EstimateMergerInputLmp @params
 			#endregion
 
-			# 2. Merge the two hashtables
 			#region Merging LMP into VMF
-			# TODO: Make sure all the LMP contents get copied
-			# TODO: Refactor into its own function
-			$counter			= 0
-			$hammeridMatched	= 0
-			$classnameMatched	= 0
-			$matchesFailed		= 0
-			$propsEdited		= 0
-			$propsSkipped		= 0
-			$progressCounter	= 0
-			$progressStep		= $counterAll.Count / 50
-			# $vmfFile["classes"]["entity"][1459]["properties"]["spawnflags"]
-:lmpLoop	foreach ($lmpSection in $Lmp["data"].Keys) {
-				$idToMatch	= $false
-				$matchBy	= ""
-				if ($lmpSection.SubString(0,$lmpHammerIdOffset) -eq "hammerid-") {
-					$idToMatch	= $Lmp["data"][$lmpSection]["hammerid"][0]
-					$matchBy	= "id"					# Either match by id-hammerid
-				} elseif ($lmpSection.SubString(0,$lmpClassnameOffset) -eq "classname-") {
-					$idToMatch	= $Lmp["data"][$lmpSection]["classname"][0]
-					$matchBy	= "classname"			# Or by a classname
-				} else {
-					$matchesFailed++
-					Write-Host -ForegroundColor DarkYellow "This is an error"
-					Write-Host $lmpSection
-				}
-				if ($idToMatch) {
-:vmfHashLoopH		foreach ($vmfClass in $Vmf["classes"].Keys) {
-:vmfListLoopH			foreach ($classEntry in $Vmf["classes"][$vmfClass]) {
-							if ($idToMatch -eq $classEntry["properties"][$matchBy][0]) {
-								if ($matchBy -eq "id") {
-									$hammeridMatched++
-								} else {
-									$classnameMatched++
-								}
-								$params = @{
-									VmfSection	= $classEntry
-									LmpSection	= $Lmp["data"][$lmpSection]
-									PropsEdited	= [ref]$propsEdited
-									PropsSkipped = [ref]$propsSkipped
-									LogFile		= $LogFile
-									Silent		= $Silent.IsPresent
-								}
-								Copy-LmpSection @params
-								break vmfHashLoopH
-							}
-						}
-					}
-				}
-				$counter++
-
-				if ($counter -ge $progressStep -and [math]::Floor($counter / $progressStep) -gt $progressCounter) { 
-					$progressCounter++
-					$elapsedMilliseconds	= $sw.ElapsedMilliseconds
-					$estimatedMilliseconds	= ($counterAll / $counter) * $elapsedMilliseconds
-					$params = @{
-						currentLine				= $counter
-						LinesCount				= $counterAll
-						EstimatedMilliseconds	= $estimatedMilliseconds
-						ElapsedMilliseconds		= $sw.ElapsedMilliseconds
-						Activity				= "Merging..."
-					}
-					ReportProgress @params
-				}
+			$mergesCount		= @{
+				hammerid		= 0
+				classname		= 0
+				failed			= 0
+				section			= 0
+				propsEdited		= 0
+				propsSkipped	= 0
+				propsTotal		= 0
 			}
+			$params	= @{
+				Vmf				= $Vmf
+				Lmp				= $Lmp
+				MergesCount		= $mergesCount
+				CounterLmp		= $counterLmp
+			}
+			$copied = Copy-LmpIntoVmf @params
 
-			$propsAll = $propsEdited + $propsSkipped
+			$mergesCount["propsTotal"] = $mergesCount["propsEdited"] + $mergesCount["propsSkipped"]
+			if (-not $copied) {
+				Throw $_.Exception
+			}
 			#endregion
 		} catch {
 			# Pay attention to errors
@@ -122,23 +66,23 @@ function Merge-VmfLmp {
 
 			#region Logging
 			if (-not $Silent.IsPresent) {
-				$sectionsPerSecond = ($counter / $sw.ElapsedMilliseconds) * 1000
-				$propsPerSecond = ($propsAll / $sw.ElapsedMilliseconds) * 1000
+				$sectionsPerSecond = ($mergesCount["section"] / $sw.ElapsedMilliseconds) * 1000
+				$propsPerSecond = ($mergesCount["propsTotal"] / $sw.ElapsedMilliseconds) * 1000
 				$timeFormatted = "{0}m {1}s {2}ms" -f
 					$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
-				OutLog 							-Value "`nVMF-LMP | Merging: Complete"							-Path $LogFile -OneLine
-				OutLog -Property "Input hammerids"		-Value $("{0} / {1}" -f $counterHammerIds, $counterAll)	-Path $LogFile
-				OutLog -Property "Input classnames"		-Value $("{0} / {1}" -f $counterClassnames, $counterAll)	-Path $LogFile
-				if ($counterUnknown -gt 0) {
-					OutLog -Property "Unknown sections"	-Value $("{0} / {1}" -f $counterUnknown, $counterAll)	-Path $LogFile
+				OutLog 							-Value "`nVMF-LMP | Merging: Complete"														-Path $LogFile -OneLine
+				OutLog -Property "Input hammerids"		-Value $("{0} / {1}" -f $counterLmp["hammerid"], $counterLmp["total"])				-Path $LogFile
+				OutLog -Property "Input classnames"		-Value $("{0} / {1}" -f $counterLmp["classname"], $counterLmp["total"])				-Path $LogFile
+				if ($counterLmp["unknown"] -gt 0) {
+					OutLog -Property "Unknown sections"	-Value $("{0} / {1}" -f $counterLmp["unknown"], $counterLmp["total"])				-Path $LogFile
 				}
-				OutLog -Property "Merged hammerids"		-Value $("{0} / {1}" -f $hammeridMatched, $counterAll)	-Path $LogFile
-				OutLog -Property "Merged classnames"	-Value $("{0} / {1}" -f $classnameMatched, $counterAll)	-Path $LogFile
-				if ($matchesFailed -gt 0) {
-					OutLog -Property "Matches failed"	-Value $("{0} / {1}" -f $matchesFailed, $counterAll)	-Path $LogFile
+				OutLog -Property "Merged hammerids"		-Value $("{0} / {1}" -f $mergesCount["hammerid"], $counterLmp["total"])				-Path $LogFile
+				OutLog -Property "Merged classnames"	-Value $("{0} / {1}" -f $mergesCount["classname"], $counterLmp["total"])			-Path $LogFile
+				if ($mergesCount["failed"] -gt 0) {
+					OutLog -Property "Matches failed"	-Value $("{0} / {1}" -f $mergesCount["failed"], $counterLmp["total"])				-Path $LogFile
 				}
-				OutLog -Property "Properties edited"	-Value $("{0} / {1}" -f $propsEdited, $propsAll)		-Path $LogFile
-				OutLog -Property "Properties skipped"	-Value $("{0} / {1}" -f $propsSkipped, $propsAll)		-Path $LogFile
+				OutLog -Property "Properties edited"	-Value $("{0} / {1}" -f $mergesCount["propsEdited"], $mergesCount["propsTotal"])	-Path $LogFile
+				OutLog -Property "Properties skipped"	-Value $("{0} / {1}" -f $mergesCount["propsSkipped"], $mergesCount["propsTotal"])	-Path $LogFile
 				OutLog -Property "Elapsed time"			-Value $timeFormatted									-Path $LogFile
 				OutLog -Property "Speed"		-Value $("{0:n0} sections per second" -f $sectionsPerSecond)	-Path $LogFile
 				OutLog -Property "Speed"		-Value $("{0:n0} properties per second" -f $propsPerSecond)		-Path $LogFile

@@ -16,13 +16,9 @@ function Copy-LmpSection {
 
 		[Parameter(Position = 2,
 		Mandatory = $true)]
-		[ref]$PropsEdited,
+		$MergesCount,
 
 		[Parameter(Position = 3,
-		Mandatory = $true)]
-		[ref]$PropsSkipped,
-
-		[Parameter(Position = 4,
 		Mandatory = $false)]
 		[string]$LogFile,
 
@@ -34,7 +30,7 @@ function Copy-LmpSection {
 		foreach ($propertyName in $LmpSection.Keys) {
 			if ($propertyName -ne "hammerid") {				# We don't need to copy matched hammerid
 				if ($VmfSection["properties"][$propertyName] -ne $LmpSection[$propertyName]) {
-					$PropsEdited.Value++
+					$MergesCount["propsEdited"]++
 					if ($propertyName.Length -gt 3 -and ($propertyName.SubString(0,2) -eq "On") -or
 														($propertyName.SubString(0,3) -eq "Out")) {	
 						try {														# See if property name starts with "On"
@@ -51,7 +47,7 @@ function Copy-LmpSection {
 						$VmfSection["properties"][$propertyName] = $LmpSection[$propertyName]
 					}
 				} else {
-					$PropsSkipped.Value++
+					$MergesCount["propsSkipped"]++
 				}
 			}
 		}
