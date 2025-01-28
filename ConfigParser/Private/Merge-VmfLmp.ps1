@@ -40,10 +40,12 @@ function Merge-VmfLmp {
 			$mergesCount		= @{
 				hammerid		= 0
 				classname		= 0
+				new				= 0
 				failed			= 0
 				section			= 0
 				propsEdited		= 0
 				propsSkipped	= 0
+				propsNew		= 0
 				propsTotal		= 0
 			}
 			$params	= @{
@@ -54,7 +56,6 @@ function Merge-VmfLmp {
 			}
 			$copied = Copy-LmpIntoVmf @params
 
-			$mergesCount["propsTotal"] = $mergesCount["propsEdited"] + $mergesCount["propsSkipped"]
 			if (-not $copied) {
 				Throw $_.Exception
 			}
@@ -78,11 +79,15 @@ function Merge-VmfLmp {
 				}
 				OutLog -Property "Merged hammerids"		-Value $("{0} / {1}" -f $mergesCount["hammerid"], $counterLmp["total"])				-Path $LogFile
 				OutLog -Property "Merged classnames"	-Value $("{0} / {1}" -f $mergesCount["classname"], $counterLmp["total"])			-Path $LogFile
+				if ($mergesCount["new"] -gt 0) {
+					OutLog -Property "Merges new"		-Value $("{0} / {1}" -f $mergesCount["new"], $counterLmp["total"])					-Path $LogFile
+				}
 				if ($mergesCount["failed"] -gt 0) {
-					OutLog -Property "Matches failed"	-Value $("{0} / {1}" -f $mergesCount["failed"], $counterLmp["total"])				-Path $LogFile
+					OutLog -Property "Merges failed"	-Value $("{0} / {1}" -f $mergesCount["failed"], $counterLmp["total"])				-Path $LogFile
 				}
 				OutLog -Property "Properties edited"	-Value $("{0} / {1}" -f $mergesCount["propsEdited"], $mergesCount["propsTotal"])	-Path $LogFile
 				OutLog -Property "Properties skipped"	-Value $("{0} / {1}" -f $mergesCount["propsSkipped"], $mergesCount["propsTotal"])	-Path $LogFile
+				OutLog -Property "Properties new"		-Value $("{0} / {1}" -f $mergesCount["propsNew"], $mergesCount["propsTotal"])		-Path $LogFile
 				OutLog -Property "Elapsed time"			-Value $timeFormatted									-Path $LogFile
 				OutLog -Property "Speed"		-Value $("{0:n0} sections per second" -f $sectionsPerSecond)	-Path $LogFile
 				OutLog -Property "Speed"		-Value $("{0:n0} properties per second" -f $propsPerSecond)		-Path $LogFile
