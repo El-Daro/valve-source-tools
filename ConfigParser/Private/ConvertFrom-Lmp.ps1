@@ -20,7 +20,7 @@ function ConvertFrom-Lmp {
 	$sections				= [ordered]@{ }
 	$currentBlock			= [ordered]@{ }
 	$sectionsCounter		= 0
-	$estimatedMilliseconds	= 0
+	$estimatedMilliseconds	= 0			# TODO: Del
 	$progressCounter		= 0
 	$progressStep			= $Lines.Count / 10
 	#endregion
@@ -109,7 +109,7 @@ function ConvertFrom-Lmp {
 			$linesPerSecond = ($currentLine / $sw.ElapsedMilliseconds) * 1000
 			$timeFormatted = "{0}m {1}s {2}ms" -f
 				$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
-			OutLog 								-Value "`nParsing: Complete"							-Path $LogFile -OneLine
+			OutLog 								-Value "`nLMP | Parsing: Complete"							-Path $LogFile -OneLine
 			OutLog -Property "Parsed lines"		-Value $("{0} / {1}" -f $currentLine, $Lines.Count)		-Path $LogFile
 			if ($linesFaulty -gt 0) {
 				OutLog -Property "Faulty lines"		-Value $("{0} / {1}" -f $linesFaulty, $Lines.Count)		-Path $LogFile

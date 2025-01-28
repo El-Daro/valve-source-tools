@@ -20,18 +20,13 @@ function Merge-VmfLmp {
 	
 	PROCESS {
 
-		$lmpHammerIdOffset = 9
-		$lmpClassnameOffset = 10
-
+		$lmpHammerIdOffset	= 9
+		$lmpClassnameOffset	= 10
+		
 		try {
 
-			# 1. Hard-copy VMF (not entirely hard copy, but okay)
-			# $vmfMerged = [ordered]@{ }
-			# foreach ($vmfSection in $Vmf.Keys) {
-			# 	$vmfMerged[$vmfSection] = $Vmf[$vmfSection]
-			# }	
-
-			# 2. Analyze the lmp hashtable
+			# 1. Analyze the lmp hashtable
+			#region Analyzing LMP
 			$sw = [Stopwatch]::StartNew()
 			$counterHammerIds	= 0
 			$counterClassnames	= 0
@@ -49,83 +44,75 @@ function Merge-VmfLmp {
 				}
 				$counterAll++
 			}
+			#endregion
 
-			# 3. Merge the two hashtables
-			# TODO: Fix this weird shit
-			$counter = 0
-			$hammeridMatched = 0
-			$classnameMatched = 0
-			$propsEdited = 0
+			# 2. Merge the two hashtables
+			# TODO: Make sure all the LMP contents get copied
+			# TODO: Refactor into its own function
+			$counter			= 0
+			$hammeridMatched	= 0
+			$classnameMatched	= 0
+			$matchesFailed		= 0
+			$propsEdited		= 0
+			$propsSkipped		= 0
+			$progressCounter	= 0
+			$progressStep		= $counterAll.Count / 50
 			# $vmfFile["classes"]["entity"][1459]["properties"]["spawnflags"]
 :lmpLoop	foreach ($lmpSection in $Lmp["data"].Keys) {
+				$idToMatch	= $false
+				$matchBy	= ""
 				if ($lmpSection.SubString(0,$lmpHammerIdOffset) -eq "hammerid-") {
-					$hammerid = $Lmp["data"][$lmpSection]["hammerid"][0]
+					$idToMatch	= $Lmp["data"][$lmpSection]["hammerid"][0]
+					$matchBy	= "id"					# Either match by id-hammerid
+				} elseif ($lmpSection.SubString(0,$lmpClassnameOffset) -eq "classname-") {
+					$idToMatch	= $Lmp["data"][$lmpSection]["classname"][0]
+					$matchBy	= "classname"			# Or by a classname
+				} else {
+					$matchesFailed++
+					Write-Host -ForegroundColor DarkYellow "This is an error"
+					Write-Host $lmpSection
+				}
+				if ($idToMatch) {
 :vmfHashLoopH		foreach ($vmfClass in $Vmf["classes"].Keys) {
 :vmfListLoopH			foreach ($classEntry in $Vmf["classes"][$vmfClass]) {
-							if ($hammerid -eq $classEntry["properties"]["id"][0]) {
-								$hammeridMatched++
+							if ($idToMatch -eq $classEntry["properties"][$matchBy][0]) {
+								if ($matchBy -eq "id") {
+									$hammeridMatched++
+								} else {
+									$classnameMatched++
+								}
 								$params = @{
 									VmfSection	= $classEntry
 									LmpSection	= $Lmp["data"][$lmpSection]
 									PropsEdited	= [ref]$propsEdited
+									PropsSkipped = [ref]$propsSkipped
 									LogFile		= $LogFile
 									Silent		= $Silent.IsPresent
 								}
 								Copy-LmpSection @params
-
-								# Refactored into a function above ^
-								# foreach ($propertyName in $Lmp["data"][$lmpSection].Keys) {
-								# 	if ($propertyName -ne "hammerid") {				# We don't need to copy matched hammerid
-								# 		if ($classEntry["properties"][$propertyName] -ne $Lmp["data"][$lmpSection][$propertyName]) {
-								# 			$propsEdited++
-								# 		}
-								# 		$classEntry["properties"][$propertyName] = $Lmp["data"][$lmpSection][$propertyName]
-								# 	}
-								# }
-
-								# This only redirects the pointer to a new memory address
-								# $classEntry["properties"] = $Lmp["data"][$lmpSection]
-
-								# $vmfMerged["classes"][$vmfClass][$classEntry]["properties"] = $Lmp["data"][$lmpSection]
 								break vmfHashLoopH
 							}
 						}
 					}
-					
-				} elseif ($lmpSection.SubString(0,$lmpClassnameOffset) -eq "classname-") {
-					$classname = $Lmp["data"][$lmpSection]["classname"][0]
-:vmfHashLoopC		foreach ($vmfClass in $Vmf["classes"].Keys) {
-:vmfListLoopC			foreach ($classEntry in $Vmf["classes"][$vmfClass]) {
-							if ($classname -eq $classEntry["properties"]["classname"][0]) {
-								$classnameMatched++
-								
-								$params = @{
-									VmfSection	= $classEntry
-									LmpSection	= $Lmp["data"][$lmpSection]
-									PropsEdited	= [ref]$propsEdited
-									LogFile		= $LogFile
-									Silent		= $Silent.IsPresent
-								}
-								Copy-LmpSection @params
-
-								break vmfHashLoopC
-							}
-						}
-					}
-
-				} else {
-					
-					Write-Host -ForegroundColor DarkYellow "This is an error"
-					Write-Host $lmpSection
 				}
 				$counter++
-			}
-			
-			# $vmfMerged = [ordered]@{ }
-			# foreach ($vmfSection in $Vmf.Keys) {
-			# 	$vmfMerged[$vmfSection] = $Vmf[$vmfSection]
-			# }
 
+				if ($counter -ge $progressStep -and [math]::Floor($counter / $progressStep) -gt $progressCounter) { 
+					$progressCounter++
+					$elapsedMilliseconds	= $sw.ElapsedMilliseconds
+					$estimatedMilliseconds	= ($counterAll / $counter) * $elapsedMilliseconds
+					$params = @{
+						currentLine				= $counter
+						LinesCount				= $counterAll
+						EstimatedMilliseconds	= $estimatedMilliseconds
+						ElapsedMilliseconds		= $sw.ElapsedMilliseconds
+						Activity				= "Merging..."
+					}
+					ReportProgress @params
+				}
+			}
+
+			$propsAll = $propsEdited + $propsSkipped
 		} catch {
 			# Pay attention to errors
 		} finally {
@@ -135,7 +122,7 @@ function Merge-VmfLmp {
 				# $linesPerSecond = ($currentLine / $sw.ElapsedMilliseconds) * 1000
 				$timeFormatted = "{0}m {1}s {2}ms" -f
 					$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
-				OutLog 								-Value "`nParsing: Complete"								-Path $LogFile -OneLine
+				OutLog 								-Value "`nVMF-LMP | Merging: Complete"								-Path $LogFile -OneLine
 				OutLog -Property "Input hammerids"		-Value $("{0} / {1}" -f $counterHammerIds, $counterAll)	-Path $LogFile
 				OutLog -Property "Input classnames"		-Value $("{0} / {1}" -f $counterClassnames, $counterAll)	-Path $LogFile
 				if ($counterUnknown -gt 0) {
@@ -143,7 +130,11 @@ function Merge-VmfLmp {
 				}
 				OutLog -Property "Merged hammerids"		-Value $("{0} / {1}" -f $hammeridMatched, $counterAll)	-Path $LogFile
 				OutLog -Property "Merged classnames"	-Value $("{0} / {1}" -f $classnameMatched, $counterAll)	-Path $LogFile
-				OutLog -Property "Properties edited"	-Value $("{0} / {1}" -f $propsEdited, $counterAll)		-Path $LogFile
+				if ($matchesFailed -gt 0) {
+					OutLog -Property "Matches failed"	-Value $("{0} / {1}" -f $matchesFailed, $counterAll)	-Path $LogFile
+				}
+				OutLog -Property "Properties edited"	-Value $("{0} / {1}" -f $propsEdited, $propsAll)		-Path $LogFile
+				OutLog -Property "Properties skipped"	-Value $("{0} / {1}" -f $propsSkipped, $propsAll)		-Path $LogFile
 				OutLog -Property "Elapsed time"		-Value $timeFormatted										-Path $LogFile
 				# OutLog -Property "Speed"			-Value $("{0:n0} lines per second" -f $linesPerSecond)		-Path $LogFile
 			}

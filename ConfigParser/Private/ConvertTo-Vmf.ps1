@@ -44,7 +44,7 @@ function ConvertTo-Vmf {
 		[int]$estimatedLines = 0
 		if (-not $Fast) {
 			try {
-				$dictEstimatedLines = EstimateLinesCount -Vmf $Vmf -LogFile $LogFile -Silent:$Silent.IsPresent
+				$dictEstimatedLines = EstimateOutputVmf -Vmf $Vmf -LogFile $LogFile -Silent:$Silent.IsPresent
 				$estimatedLines = $dictEstimatedLines["lines"]
 			} catch {
 				$Fast = $true
@@ -72,6 +72,7 @@ function ConvertTo-Vmf {
 					# OutLog -Path $LogFile -Value $logMessage
 
 				if (-not $Silent.IsPresent) {
+					OutLog			-Value "`nVMF | Output estimation: Complete"	-Path $LogFile -OneLine
 					OutLog -Property "Rough lines estimate" -Value $roughLinesEstimate -Path $LogFile
 				}
 				# }
@@ -110,7 +111,7 @@ function ConvertTo-Vmf {
 		if (-not $Silent.IsPresent) {
 			$timeFormatted = "{0}m {1}s {2}ms" -f
 				$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
-			OutLog 							-Value "`nBuilding output: Complete"	-Path $LogFile -OneLine
+			OutLog 							-Value "`nVMF | Building output: Complete"	-Path $LogFile -OneLine
 			OutLog -Property "Elapsed time"	-Value $timeFormatted					-Path $LogFile
 		}
 

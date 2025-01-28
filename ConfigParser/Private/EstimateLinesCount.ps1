@@ -1,6 +1,6 @@
 # TODO: Cleanup
 
-function EstimateLinesCount {
+function EstimateOutputVmf {
 	[CmdletBinding()]
 	Param (
 		[Parameter(Position = 0,
