@@ -65,7 +65,7 @@ function Merge-VmfLmp {
 							if ($hammerid -eq $classEntry["properties"]["id"][0]) {
 								$hammeridMatched++
 								$params = @{
-									VmfSection	= $classEntry["properties"]
+									VmfSection	= $classEntry
 									LmpSection	= $Lmp["data"][$lmpSection]
 									PropsEdited	= [ref]$propsEdited
 									LogFile		= $LogFile
@@ -100,7 +100,7 @@ function Merge-VmfLmp {
 								$classnameMatched++
 								
 								$params = @{
-									VmfSection	= $classEntry["properties"]
+									VmfSection	= $classEntry
 									LmpSection	= $Lmp["data"][$lmpSection]
 									PropsEdited	= [ref]$propsEdited
 									LogFile		= $LogFile
