@@ -47,6 +47,7 @@ function Merge-VmfLmp {
 			#endregion
 
 			# 2. Merge the two hashtables
+			#region Merging LMP into VMF
 			# TODO: Make sure all the LMP contents get copied
 			# TODO: Refactor into its own function
 			$counter			= 0
@@ -113,16 +114,19 @@ function Merge-VmfLmp {
 			}
 
 			$propsAll = $propsEdited + $propsSkipped
+			#endregion
 		} catch {
 			# Pay attention to errors
 		} finally {
 			$sw.Stop()
 
+			#region Logging
 			if (-not $Silent.IsPresent) {
-				# $linesPerSecond = ($currentLine / $sw.ElapsedMilliseconds) * 1000
+				$sectionsPerSecond = ($counter / $sw.ElapsedMilliseconds) * 1000
+				$propsPerSecond = ($propsAll / $sw.ElapsedMilliseconds) * 1000
 				$timeFormatted = "{0}m {1}s {2}ms" -f
 					$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
-				OutLog 								-Value "`nVMF-LMP | Merging: Complete"								-Path $LogFile -OneLine
+				OutLog 							-Value "`nVMF-LMP | Merging: Complete"							-Path $LogFile -OneLine
 				OutLog -Property "Input hammerids"		-Value $("{0} / {1}" -f $counterHammerIds, $counterAll)	-Path $LogFile
 				OutLog -Property "Input classnames"		-Value $("{0} / {1}" -f $counterClassnames, $counterAll)	-Path $LogFile
 				if ($counterUnknown -gt 0) {
@@ -135,13 +139,12 @@ function Merge-VmfLmp {
 				}
 				OutLog -Property "Properties edited"	-Value $("{0} / {1}" -f $propsEdited, $propsAll)		-Path $LogFile
 				OutLog -Property "Properties skipped"	-Value $("{0} / {1}" -f $propsSkipped, $propsAll)		-Path $LogFile
-				OutLog -Property "Elapsed time"		-Value $timeFormatted										-Path $LogFile
-				# OutLog -Property "Speed"			-Value $("{0:n0} lines per second" -f $linesPerSecond)		-Path $LogFile
+				OutLog -Property "Elapsed time"			-Value $timeFormatted									-Path $LogFile
+				OutLog -Property "Speed"		-Value $("{0:n0} sections per second" -f $sectionsPerSecond)	-Path $LogFile
+				OutLog -Property "Speed"		-Value $("{0:n0} properties per second" -f $propsPerSecond)		-Path $LogFile
 			}
-			# Some harmless stats
+			#endregion
 		}
-
-		# OutLog -Property "VMF merged type" -Value $vmfMerged.GetType().FullName -Path $LogFile
 
 		return $Vmf
 	}
