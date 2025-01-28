@@ -1,3 +1,5 @@
+# TODO: Make sure all the LMP contents get copied
+
 using namespace System.Diagnostics
 
 function Copy-LmpIntoVmf {
@@ -52,7 +54,7 @@ function Copy-LmpIntoVmf {
 					$idToMatch	= $Lmp["data"][$lmpSection]["classname"][0]
 					$matchBy	= "classname"			# Or by a classname
 				} else {
-					$mergesCount["failed"]++
+					$MergesCount["failed"]++
 					Write-Host -ForegroundColor DarkYellow "This is an error"
 					Write-Host $lmpSection
 				}
@@ -61,21 +63,21 @@ function Copy-LmpIntoVmf {
 :vmfListLoopH			foreach ($classEntry in $Vmf["classes"][$vmfClass]) {
 							if ($idToMatch -eq $classEntry["properties"][$matchBy][0]) {
 								if ($matchBy -eq "id") {
-									$mergesCount["hammerid"]++
+									$MergesCount["hammerid"]++
 								} else {
-									$mergesCount["classname"]++
+									$MergesCount["classname"]++
 								}
 								$params = @{
 									VmfSection	= $classEntry
 									LmpSection	= $Lmp["data"][$lmpSection]
-									MergesCount	= $mergesCount
+									MergesCount	= $MergesCount
 									# PropsSkipped = [ref]$propsSkipped
 									LogFile		= $LogFile
 									Silent		= $Silent.IsPresent
 								}
 								Copy-LmpSection @params
 
-								#region In-house copying function (for testing)
+								#region In-house copying function (for testing purposes)
 								# foreach ($propertyName in $Lmp["data"][$lmpSection].Keys) {
 								# 	if ($propertyName -ne "hammerid") {				# We don't need to copy matched hammerid
 								# 		if ($classEntry["properties"][$propertyName] -ne $Lmp["data"][$lmpSection][$propertyName]) {
@@ -107,15 +109,15 @@ function Copy-LmpIntoVmf {
 						}
 					}
 				}
-				$mergesCount["section"]++
+				$MergesCount["section"]++
 
-				if ($mergesCount["section"] -ge $progressStep -and [math]::Floor($mergesCount["section"] / $progressStep) -gt $progressCounter) { 
+				if ($MergesCount["section"] -ge $progressStep -and [math]::Floor($MergesCount["section"] / $progressStep) -gt $progressCounter) { 
 					$progressCounter++
 					$elapsedMilliseconds	= $sw.ElapsedMilliseconds
-					$estimatedMilliseconds	= ($counterLmp["total"] / $mergesCount["section"]) * $elapsedMilliseconds
+					$estimatedMilliseconds	= ($CounterLmp["total"] / $MergesCount["section"]) * $elapsedMilliseconds
 					$params = @{
-						currentLine				= $mergesCount["section"]
-						LinesCount				= $counterLmp["total"]
+						currentLine				= $MergesCount["section"]
+						LinesCount				= $CounterLmp["total"]
 						EstimatedMilliseconds	= $estimatedMilliseconds
 						ElapsedMilliseconds		= $sw.ElapsedMilliseconds
 						Activity				= "Merging..."
@@ -124,6 +126,7 @@ function Copy-LmpIntoVmf {
 				}
 			}
 
+			$MergesCount["propsTotal"] = $MergesCount["propsEdited"] + $MergesCount["propsSkipped"]
 			return $true
 
 		} catch {
