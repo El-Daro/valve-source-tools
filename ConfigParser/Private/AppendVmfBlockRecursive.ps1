@@ -1,4 +1,6 @@
 # TODO: Cleanup
+# NOTE: VMF extracted by the BSPSource tool use CRLF for a new line (`r`n)
+#		This function currently only uses LF (`n). Edit if needed
 
 function AppendVmfBlockRecursive {
 <#

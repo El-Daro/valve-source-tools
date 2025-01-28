@@ -256,7 +256,7 @@ function Import-Lmp {
 			if (-not $Silent.IsPresent) {
 				$timeFormatted = "{0}m {1}s {2}ms" -f
 					$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
-				OutLog							-Value "`nReading: Complete"	-Path $LogFile -OneLine
+				OutLog							-Value "`nLMP | Reading: Complete"	-Path $LogFile -OneLine
 				# OutLog -Property "Lmp header"		-Value $($lmpHeader | ConvertTo-Json -Compress)	-Path $LogFile
 				$sLmpHeader	= $lmpHeader.Keys.ForEach({"{0}={1}" -f $_, $($lmpHeader[$_])}) -join ' | '
 				OutLog -Property "Lmp header"		-Value $sLmpHeader			-Path $LogFile

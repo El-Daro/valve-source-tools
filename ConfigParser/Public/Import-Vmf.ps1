@@ -242,7 +242,7 @@ function Import-Vmf {
 					$progressPercentile = "{0:N2}" -f $(($lineCount / $estimatedLines) * 100)
 					$progressMessage = "{0}% ({1} / {2})" -f $progressPercentile, $lineCount, $estimatedLines
 					$progressParameters = @{
-						Activity         = 'Reading'
+						Activity         = 'Reading...'
 						Status           = $progressMessage
 						PercentComplete  = $progressPercentile
 						CurrentOperation = 'Main Loop'
@@ -274,7 +274,7 @@ function Import-Vmf {
 			if (-not $Silent.IsPresent) {
 				$timeFormatted = "{0}m {1}s {2}ms" -f
 					$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
-				OutLog							-Value "`nReading: Complete"	-Path $LogFile -OneLine
+				OutLog							-Value "`nVMF | Reading: Complete"	-Path $LogFile -OneLine
 				OutLog -Property "Read lines"	-Value $lineCount				-Path $LogFile
 				OutLog -Property "Elapsed time"	-Value $timeFormatted			-Path $LogFile
 			}

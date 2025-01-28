@@ -86,7 +86,7 @@ function ConvertTo-Lmp {
 			if (-not $Silent.IsPresent) {
 				$timeFormatted = "{0}m {1}s {2}ms" -f
 					$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
-				OutLog 							-Value "`nBuilding output: Complete"	-Path $LogFile -OneLine
+				OutLog 							-Value "`nLMP | Building output: Complete"	-Path $LogFile -OneLine
 				OutLog -Property "Elapsed time"	-Value $timeFormatted					-Path $LogFile
 			}
 
