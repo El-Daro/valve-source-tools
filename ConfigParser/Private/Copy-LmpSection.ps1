@@ -16,13 +16,7 @@ function Copy-LmpSection {
 
 		[Parameter(Position = 2,
 		Mandatory = $true)]
-		$MergesCount,
-
-		[Parameter(Position = 3,
-		Mandatory = $false)]
-		[string]$LogFile,
-
-		[System.Management.Automation.SwitchParameter]$Silent
+		$MergesCount
 	)
 	
 	PROCESS {

@@ -219,6 +219,7 @@ function Import-Lmp {
 		# Had to do this due to a nasty bug with .NET being dependent on the context of where the script was launched from
 		$Path = $(Get-AbsolutePath -Path $Path)
 		$LogFile = $(Get-AbsolutePath -Path $LogFile)
+		OutLog	-Value "`nLMP | Input received: $Path"	-Path $LogFile -OneLine	
 
 		try {
 			$fileSize	= (Get-Item $Path).Length
