@@ -55,6 +55,7 @@ function Merge-VmfLmp {
 			$counter = 0
 			$hammeridMatched = 0
 			$classnameMatched = 0
+			$propsEdited = 0
 			# $vmfFile["classes"]["entity"][1459]["properties"]["spawnflags"]
 :lmpLoop	foreach ($lmpSection in $Lmp["data"].Keys) {
 				if ($lmpSection.SubString(0,$lmpHammerIdOffset) -eq "hammerid-") {
@@ -63,7 +64,28 @@ function Merge-VmfLmp {
 :vmfListLoopH			foreach ($classEntry in $Vmf["classes"][$vmfClass]) {
 							if ($hammerid -eq $classEntry["properties"]["id"][0]) {
 								$hammeridMatched++
-								$classEntry["properties"] = $Lmp["data"][$lmpSection]
+								$params = @{
+									VmfSection	= $classEntry["properties"]
+									LmpSection	= $Lmp["data"][$lmpSection]
+									PropsEdited	= [ref]$propsEdited
+									LogFile		= $LogFile
+									Silent		= $Silent.IsPresent
+								}
+								Copy-LmpSection @params
+
+								# Refactored into a function above ^
+								# foreach ($propertyName in $Lmp["data"][$lmpSection].Keys) {
+								# 	if ($propertyName -ne "hammerid") {				# We don't need to copy matched hammerid
+								# 		if ($classEntry["properties"][$propertyName] -ne $Lmp["data"][$lmpSection][$propertyName]) {
+								# 			$propsEdited++
+								# 		}
+								# 		$classEntry["properties"][$propertyName] = $Lmp["data"][$lmpSection][$propertyName]
+								# 	}
+								# }
+
+								# This only redirects the pointer to a new memory address
+								# $classEntry["properties"] = $Lmp["data"][$lmpSection]
+
 								# $vmfMerged["classes"][$vmfClass][$classEntry]["properties"] = $Lmp["data"][$lmpSection]
 								break vmfHashLoopH
 							}
@@ -76,8 +98,16 @@ function Merge-VmfLmp {
 :vmfListLoopC			foreach ($classEntry in $Vmf["classes"][$vmfClass]) {
 							if ($classname -eq $classEntry["properties"]["classname"][0]) {
 								$classnameMatched++
-								$classEntry["properties"] = $Lmp["data"][$lmpSection]
-								# $vmfMerged["classes"][$vmfClass][$classEntry]["properties"] = $Lmp["data"][$lmpSection]
+								
+								$params = @{
+									VmfSection	= $classEntry["properties"]
+									LmpSection	= $Lmp["data"][$lmpSection]
+									PropsEdited	= [ref]$propsEdited
+									LogFile		= $LogFile
+									Silent		= $Silent.IsPresent
+								}
+								Copy-LmpSection @params
+
 								break vmfHashLoopC
 							}
 						}
@@ -111,8 +141,9 @@ function Merge-VmfLmp {
 				if ($counterUnknown -gt 0) {
 					OutLog -Property "Unknown sections"	-Value $("{0} / {1}" -f $counterUnknown, $counterAll)	-Path $LogFile
 				}
-				OutLog -Property "Merge hammerids"		-Value $("{0} / {1}" -f $hammeridMatched, $counterAll)	-Path $LogFile
-				OutLog -Property "Merge classnames"		-Value $("{0} / {1}" -f $classnameMatched, $counterAll)	-Path $LogFile
+				OutLog -Property "Merged hammerids"		-Value $("{0} / {1}" -f $hammeridMatched, $counterAll)	-Path $LogFile
+				OutLog -Property "Merged classnames"	-Value $("{0} / {1}" -f $classnameMatched, $counterAll)	-Path $LogFile
+				OutLog -Property "Properties edited"	-Value $("{0} / {1}" -f $propsEdited, $counterAll)		-Path $LogFile
 				OutLog -Property "Elapsed time"		-Value $timeFormatted										-Path $LogFile
 				# OutLog -Property "Speed"			-Value $("{0:n0} lines per second" -f $linesPerSecond)		-Path $LogFile
 			}
