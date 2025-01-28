@@ -24,7 +24,7 @@ function EstimateMergerInputLmp {
 			hammerid	= 0
 			classname	= 0
 			unknown		= 0
-			total		= 0
+			total		= $Lmp["data"].Count
 		}
 		
 		foreach ($lmpSection in $Lmp["data"].Keys) {
@@ -37,7 +37,7 @@ function EstimateMergerInputLmp {
 				Write-Host -ForegroundColor DarkYellow "This is an error"
 				Write-Host $lmpSection
 			}
-			$counterLmp["total"]++
+			# $counterLmp["total"]++
 		}
 
 		return $counterLmp
