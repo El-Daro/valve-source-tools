@@ -56,7 +56,7 @@ function Copy-LmpIntoVmf {
 					$idToMatch	= $Lmp["data"][$lmpSection]["classname"][0]
 					$matchBy	= "classname"			# Or by a classname
 				} else {
-					$MergesCount["failed"]++
+					$MergesCount["failed"]++			# You're not supposed to be here, but just in case
 					Write-Host -ForegroundColor DarkYellow "This is an error"
 					Write-Host $lmpSection
 				}
