@@ -50,8 +50,8 @@ function Write-Log {
 			New-Item -Path $FailSafePath -Force | Out-Null
 		}
 	}
-	Write-Debug		"$($MyInvocation.MyCommand): Path: $(Get-AbsolutePath -Path $Path)"
-	Write-Verbose	"$($MyInvocation.MyCommand): Path: $(Get-AbsolutePath -Path $Path)"
+	# Write-Debug		"$($MyInvocation.MyCommand): Path: $(Get-AbsolutePath -Path $Path)"
+	# Write-Verbose	"$($MyInvocation.MyCommand): Path: $(Get-AbsolutePath -Path $Path)"
 	
 	if ($NoNewLine.IsPresent) {
 		Add-Content -Path $Path -Value $Value -Force:$Force -NoNewLine

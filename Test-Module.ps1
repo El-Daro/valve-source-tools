@@ -251,6 +251,17 @@ Try {
 				Export-Lmp -InputObject $lmpParsed -Path $outputFilePath -LogFile $logFile -Silent:$Silent.IsPresent -AsText:$AsText.IsPresent -Force:$Force.IsPresent
 			}
 		}
+	} elseif ($Extension -eq ".cfg") {
+		$stripperParsed = Import-Stripper -Path $InputFilePath -LogFile $logFile -Silent:$Silent.IsPresent -Debug
+		if ($stripperParsed) {
+			Write-Host "YAY! WE DID IT!"
+			
+			# if ($debugPassed) {
+			# 	Export-Lmp -InputObject $lmpParsed -DebugOutput $outputFilePath -LogFile $logFile -Silent:$Silent.IsPresent -AsText:$AsText.IsPresent -Force:$Force.IsPresent -Debug
+			# } else {
+			# 	Export-Lmp -InputObject $lmpParsed -Path $outputFilePath -LogFile $logFile -Silent:$Silent.IsPresent -AsText:$AsText.IsPresent -Force:$Force.IsPresent
+			# }
+		}
 	} else {
 
 	}
