@@ -1,6 +1,6 @@
 using namespace System.Diagnostics
 
-function ConvertFrom-Stripper {
+function ConvertFrom-StripperRegex {
 	Param (
 		[Parameter(Position = 0,
 		Mandatory = $true)]
@@ -11,7 +11,7 @@ function ConvertFrom-Stripper {
 		[string]$LogFile,
 
 		[System.Management.Automation.SwitchParameter]$Silent
-		)
+	)
 
 	#region Preparing shared variables
 	$linesFaulty		= 0
@@ -35,7 +35,6 @@ function ConvertFrom-Stripper {
 		$sw = [Stopwatch]::StartNew()
 		
 		while ($currentLine -lt $Lines.count) {
-
 			# Write-Debug "$($currentLine + 1): $Lines[$currentLine]"
 			$line = $Lines[$currentLine].Trim()
 			if ($line.Length -lt 1) {
@@ -43,9 +42,9 @@ function ConvertFrom-Stripper {
 				continue
 			}
 
-			if ($line[0] -eq "`"") {
-				# Key-value
-				if ($line -match "$($regex.keyValue)") {
+			switch -regex ($line) {
+				# A key-value pair
+				"$($regex.keyValue)" {
 					$key	= $Matches["key"]
 					$value	= $Matches["value"]
 					if (-not $currentBlock.Contains($key)) {
@@ -54,49 +53,51 @@ function ConvertFrom-Stripper {
 					$currentBlock[$key].Add($value)
 				}
 
-			} elseif ($line[0] -eq '{') {
-				$Depth++
-				if ($Depth -gt 1) {
-					$stackBlocks.Push($currentBlock)
-				}
-				if ($currentMode -eq "modify" -and $Depth -eq 1) {
-					$currentBlock	= [ordered]@{
-						match	= [ordered]@{};
-						replace	= [ordered]@{};
-						delete	= [ordered]@{};
-						insert	= [ordered]@{}
+				# An open bracket
+				"$($regex.bracketOpen)" {
+					$Depth++
+					if ($Depth -gt 1) {
+						$stackBlocks.Push($currentBlock)
 					}
-				} else {
-					$currentBlock	= [ordered]@{ }
+					if ($currentMode -eq "modify" -and $Depth -eq 1) {
+						$currentBlock	= [ordered]@{
+							match	= [ordered]@{};
+							replace	= [ordered]@{};
+							delete	= [ordered]@{};
+							insert	= [ordered]@{}
+						}
+					} else {
+						$currentBlock	= [ordered]@{ }
+					}
 				}
 
-			} elseif ($line[0] -eq '}') {
-				$Depth--
-				if ($Depth -lt 0) {
-					Write-Debug "Unexpected '}'"
-					continue
-				}
-				if ($currentMode -eq "modify" -and $Depth -ne 0) {	# If we are in the modify block and just populated a new block
-					$parentBlock = $stackBlocks.Pop()				# Return one level up
-					$parentBlock[$currentSubmode] = $currentBlock	# Add the newly populated block
-					$stackBlocks.Push($parentBlock)					# And push it back to the stack
-					$currentSubmode = "none"
-				} else {
-					$stripper[$currentMode].Add($currentBlock)
-				}
-				if ($Depth -gt 0 -and $stackBlocks.Count -gt 0) {
-					$currentBlock = $stackBlocks.Pop()
+				# A close bracket
+				"$($regex.bracketClose)" {
+					$Depth--
+					if ($Depth -lt 0) {
+						Write-Debug "Unexpected '}'"
+						continue
+					}
+					if ($currentMode -eq "modify" -and $Depth -ne 0) {	# If we are in the modify block and just populated a new block
+						$parentBlock = $stackBlocks.Pop()				# Return one level up
+						$parentBlock[$currentSubmode] = $currentBlock	# Add the newly populated block
+						$stackBlocks.Push($parentBlock)					# And push it back to the stack
+						$currentSubmode = "none"
+					} else {
+						$stripper[$currentMode].Add($currentBlock)
+					}
+					if ($Depth -gt 0 -and $stackBlocks.Count -gt 0) {
+						$currentBlock = $stackBlocks.Pop()
+					}
 				}
 
-			} elseif (($line[0] -eq ';') -or
-					  ($line[0] -eq '#') -or
-					  ($line.Length -gt 1 -and $line[0] -eq '/' -and $line[1] -eq '/')) {
-	  			# Comments are ignored (for now)
-				
-			} else {
-				if ($line -match "$($regex.mode)") {
+				# Mode identificator
+				"$($regex.mode)" {
 					$currentMode = $Matches["mode"]
-				} elseif ($line -match "$($regex.subMode)") {
+				}
+
+				# Sub-mode identificator
+				"$($regex.subMode)" {
 					if ($currentMode -ne "modify") {
 						# Ignore? currentMode should point to "none"
 						# The hashtable will still be populated, but it will be ignored later during the processing
@@ -106,8 +107,22 @@ function ConvertFrom-Stripper {
 						$currentSubmode	= $Matches["subMode"]
 					}
 				}
+
+				"$($regex.comment)" {
+					# Comments are ignored (for now)
+				}
+
+				default {
+					if ($line -notmatch "$($regex.emptyLine)") {
+						$linesFaulty++
+						Write-Verbose "An unidentified content on line $($currentLine + 1): $line"
+						if (-not $PSBoundParameters.ContainsKey('Verbose')) {
+							Write-Debug "UNDEFINED (line $($currentLine + 1)): $line"
+						}
+					}
+				}
 			}
-			
+
 			$CurrentLine += 1
 	
 			if ($Lines.Count -gt 10000 -and $currentLine -ge $progressStep -and [math]::Floor($currentLine / $progressStep) -gt $progressCounter) { 

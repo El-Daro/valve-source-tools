@@ -20,17 +20,17 @@ function Set-LmpHeader {
 
 	try {
 
-		$header				= [byte[]]::new(0)
-		$headerOld			= [byte[]]::new(0)
-		$header				+= [BitConverter]::GetBytes([Int32]20)		# Header offset
-		$header				+= [BitConverter]::GetBytes([Int32]$Lmp["header"]["Id"])
-		$header				+= [BitConverter]::GetBytes([Int32]$Lmp["header"]["Version"])
-		$header				+= [BitConverter]::GetBytes([Int32]$Size)
-		$header				+= [BitConverter]::GetBytes([Int32]$Lmp["header"]["Revision"])
+		$header			= [byte[]]::new(0)
+		$headerOld		= [byte[]]::new(0)
+		$header			+= [BitConverter]::GetBytes([Int32]20)		# Header offset
+		$header			+= [BitConverter]::GetBytes([Int32]$Lmp["header"]["Id"])
+		$header			+= [BitConverter]::GetBytes([Int32]$Lmp["header"]["Version"])
+		$header			+= [BitConverter]::GetBytes([Int32]$Size)
+		$header			+= [BitConverter]::GetBytes([Int32]$Lmp["header"]["Revision"])
 		
 		foreach ($headerEntry in $Lmp["header"].Keys) {
 			$strValue	= $Lmp["header"][$headerEntry]
-			$headerOld		+= [BitConverter]::GetBytes([Int32]$strValue)
+			$headerOld	+= [BitConverter]::GetBytes([Int32]$strValue)
 			# [Array]::Copy($headerBytes, 0, $header, $offset, $length)
 		}
 

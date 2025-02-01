@@ -252,7 +252,7 @@ Try {
 			}
 		}
 	} elseif ($Extension -eq ".cfg") {
-		$stripperParsed = Import-Stripper -Path $InputFilePath -LogFile $logFile -Silent:$Silent.IsPresent -Debug
+		$stripperParsed = Import-Stripper -Path $InputFilePath -LogFile $logFile -Silent:$Silent.IsPresent -Fast:$Fast
 		if ($stripperParsed) {
 			Write-Host "YAY! WE DID IT!"
 			
