@@ -18,11 +18,17 @@ function ConvertFrom-Stripper {
 	$currentLine		= 0
 	$currentMode		= 'filter'		# filter=remove | add | modify=replace
 	$currentSubmode		= 'none'		# none | match | replace | delete=remove | insert
-	$currentBlock		= [ordered]@{}
+	$currentBlock		= [ordered]@{
+		properties	= [ordered]@{};
+		modes		= [ordered]@{}
+	}
 	$stripper			= [ordered]@{	# This gets populated with currentBlock on bracket close
-		filter			= [System.Collections.Generic.List[ordered]]::new()
-		add				= [System.Collections.Generic.List[ordered]]::new()
-		modify			= [System.Collections.Generic.List[ordered]]::new()
+		properties		= [ordered]@{};
+		modes			= [ordered]@{
+			filter	= [System.Collections.Generic.List[ordered]]::new()
+			add		= [System.Collections.Generic.List[ordered]]::new()
+			modify	= [System.Collections.Generic.List[ordered]]::new()
+		}
 	}
 	$stackBlocks		= [System.Collections.Generic.Stack[ordered]]::new()
 	$progressCounter	= 0
@@ -49,9 +55,9 @@ function ConvertFrom-Stripper {
 					$key	= $Matches["key"]
 					$value	= $Matches["value"]
 					if (-not $currentBlock.Contains($key)) {
-						$currentBlock[$key] = [System.Collections.Generic.List[string]]::new()
+						$currentBlock["properties"][$key] = [System.Collections.Generic.List[string]]::new()
 					}
-					$currentBlock[$key].Add($value)
+					$currentBlock["properties"][$key].Add($value)
 				}
 
 			} elseif ($line[0] -eq '{') {
@@ -60,14 +66,29 @@ function ConvertFrom-Stripper {
 					$stackBlocks.Push($currentBlock)
 				}
 				if ($currentMode -eq "modify" -and $Depth -eq 1) {
+					# Initially contained ordered dictionaries 
+					# $currentBlock	= [ordered]@{
+					# 	match	= [ordered]@{};
+					# 	replace	= [ordered]@{};
+					# 	delete	= [ordered]@{};
+					# 	insert	= [ordered]@{}
+					# }
+
+					# Now contains Lists of ordered dictionaries populated with one element each 
 					$currentBlock	= [ordered]@{
-						match	= [ordered]@{};
-						replace	= [ordered]@{};
-						delete	= [ordered]@{};
-						insert	= [ordered]@{}
+						properties	= [ordered]@{};
+						modes		= [ordered]@{
+							match	= [System.Collections.Generic.List[ordered]]::new();
+							replace	= [System.Collections.Generic.List[ordered]]::new();
+							delete	= [System.Collections.Generic.List[ordered]]::new();
+							insert	= [System.Collections.Generic.List[ordered]]::new()
+						}
 					}
 				} else {
-					$currentBlock	= [ordered]@{ }
+					$currentBlock	= [ordered]@{
+						properties	= [ordered]@{};
+						modes		= [ordered]@{}
+					}
 				}
 
 			} elseif ($line[0] -eq '}') {
@@ -76,13 +97,15 @@ function ConvertFrom-Stripper {
 					Write-Debug "Unexpected '}'"
 					continue
 				}
-				if ($currentMode -eq "modify" -and $Depth -ne 0) {	# If we are in the modify block and just populated a new block
-					$parentBlock = $stackBlocks.Pop()				# Return one level up
-					$parentBlock[$currentSubmode] = $currentBlock	# Add the newly populated block
-					$stackBlocks.Push($parentBlock)					# And push it back to the stack
-					$currentSubmode = "none"
+				if ($currentMode -eq "modify" -and $Depth -ne 0) {		# If we are in the modify block and just populated a new block
+					$parentBlock = $stackBlocks.Pop()					# Return one level up
+					# Initial implementation:
+					# $parentBlock[$currentSubmode] = $currentBlock		# Add the newly populated block
+					$parentBlock["modes"][$currentSubmode].Add($currentBlock)	# Add the newly populated block
+					$stackBlocks.Push($parentBlock)						# And push it back to the stack
+					# $currentSubmode = "none"
 				} else {
-					$stripper[$currentMode].Add($currentBlock)
+					$stripper["modes"][$currentMode].Add($currentBlock)
 				}
 				if ($Depth -gt 0 -and $stackBlocks.Count -gt 0) {
 					$currentBlock = $stackBlocks.Pop()

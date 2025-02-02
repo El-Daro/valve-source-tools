@@ -82,7 +82,7 @@ function ConvertFrom-StripperRegex {
 						$parentBlock = $stackBlocks.Pop()				# Return one level up
 						$parentBlock[$currentSubmode] = $currentBlock	# Add the newly populated block
 						$stackBlocks.Push($parentBlock)					# And push it back to the stack
-						$currentSubmode = "none"
+						# $currentSubmode = "none"
 					} else {
 						$stripper[$currentMode].Add($currentBlock)
 					}

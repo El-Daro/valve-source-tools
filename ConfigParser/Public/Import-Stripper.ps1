@@ -105,22 +105,29 @@ function Import-Stripper {
 	.EXAMPLE
 	PS> $stripperFile = Import-Stripper -Path ".\c5m3_cemetery.cfg"
 	PS> $stripperFile["modify"][0]["replace"]
+
 		Name                           Value
 		----                           -----
 		spawnflags                     {257}
 		angles                         {7 15 0}
 		origin                         {5498.43 -124.58 18.3698}
+
 	PS> $stripperFile["modify"][0]["replace"]["spawnflags"].GetType()
+
 		IsPublic IsSerial Name                                     BaseType
 		-------- -------- ----                                     --------
 		True     True     List`1                                   System.Object
+
 	PS> $stripperFile["modify"][0]["replace"]["spawnflags"][0] = 1
 	PS> $stripperFile["modify"][0]["replace"]
+
 		Name                           Value
 		----                           -----
 		spawnflags                     {1}
 		angles                         {7 15 0}
 		origin                         {5498.43 -124.58 18.3698}
+		
+	PS> Export-Stripper -InputObject $stripperFile -Path ".\c5m3_cemetery_1.cfg"
 
 	.EXAMPLE
 	PS> $stripperFile = Import-Stripper -Path ".\c5m3_cemetery.cfg"

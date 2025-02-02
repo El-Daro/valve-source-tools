@@ -44,6 +44,9 @@ function Import-Vmf {
 	Export-Lmp
 
 	.LINK
+	Export-Stripper
+
+	.LINK
 	Export-Vdf
 
 	.LINK
@@ -51,6 +54,9 @@ function Import-Vmf {
 
 	.LINK
 	Import-Lmp
+
+	.LINK
+	Import-Stripper
 
 	.LINK
 	Import-Vdf
@@ -102,6 +108,8 @@ function Import-Vmf {
 
 	PS> $vmfFile["classes"]["entity"].Count	
 	6648
+
+	PS> Export-Vmf -InputObject $vmfFile -Path ".\c5m3_cemetery_d_1.vmf"
 		
 	.EXAMPLE
 	PS> $vmfFile = Import-Vmf -Path ".\c5m3_cemetery_d.vmf"

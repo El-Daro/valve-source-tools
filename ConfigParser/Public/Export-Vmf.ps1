@@ -31,10 +31,13 @@ function Export-Vmf {
 		use the `-Path` parameter.
 
 	.LINK
+	Import-Vmf
+
+	.LINK
 	Import-Lmp
 
 	.LINK
-	Import-Vmf
+	Import-Stripper
 
 	.LINK
 	Import-Vdf
@@ -43,7 +46,10 @@ function Export-Vmf {
 	Import-Ini
 	
 	.LINK
-	Export-Vmf
+	Export-Lmp
+
+	.LINK
+	Export-Stripper
 	
 	.LINK
 	Export-Vdf
@@ -92,6 +98,8 @@ function Export-Vmf {
 
 	PS> $vmfFile["classes"]["entity"].Count	
 	6648
+
+	PS> Export-Vmf -InputObject $vmfFile -Path ".\c5m3_cemetery_d_1.vmf"
 
 	.EXAMPLE
 	PS> $vmfFile = Import-Vmf -Path ".\c5m3_cemetery_d.vmf"

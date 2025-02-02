@@ -256,11 +256,11 @@ Try {
 		if ($stripperParsed) {
 			Write-Host "YAY! WE DID IT!"
 			
-			# if ($debugPassed) {
-			# 	Export-Lmp -InputObject $lmpParsed -DebugOutput $outputFilePath -LogFile $logFile -Silent:$Silent.IsPresent -AsText:$AsText.IsPresent -Force:$Force.IsPresent -Debug
-			# } else {
-			# 	Export-Lmp -InputObject $lmpParsed -Path $outputFilePath -LogFile $logFile -Silent:$Silent.IsPresent -AsText:$AsText.IsPresent -Force:$Force.IsPresent
-			# }
+			if ($debugPassed) {
+				Export-Stripper -InputObject $stripperParsed -DebugOutput $outputFilePath -LogFile $logFile -Silent:$Silent.IsPresent -AsText:$AsText.IsPresent -Force:$Force.IsPresent -Debug
+			} else {
+				Export-Stripper -InputObject $stripperParsed -Path $outputFilePath -LogFile $logFile -Silent:$Silent.IsPresent -AsText:$AsText.IsPresent -Force:$Force.IsPresent
+			}
 		}
 	} else {
 

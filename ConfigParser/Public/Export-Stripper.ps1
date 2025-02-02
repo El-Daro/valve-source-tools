@@ -1,29 +1,25 @@
-function Export-Lmp {
+# TODO: Cleanup
+
+function Export-Stripper {
 <#
 	.SYNOPSIS
-	Converts a hashtable into a binary .lmp file and outputs it in a file.
+	Converts a hashtable into a stripper .cfg file format string and outputs it in a file, if specified.
 
 	.DESCRIPTION
-	Converts a hashtable into a single string, formatted specifically for .lmp files.
+	Converts a hashtable into a single string, formatted specifically for stripper .cfg files.
 	This function is designed to work with ordered and unordered hashtables.
 
 	.PARAMETER InputObject
-	The object to convert. It can be ordered or unordered hashtable. Must contain 'header' and 'data' hashtables inside.
+	The object to convert. It can be ordered or unordered hashtable.
 
 	.PARAMETER Path
-	Specifies the path to the output .lmp file. Accepts absolute and relative paths. Does NOT accept wildcards.
-
-	.PARAMETER AsText
-	If specified, output file is written as plain text without header
-	
-	.PARAMETER Silent
-	If specified, suppresses console output
+	Specifies the path to the output stripper .cfg file. Accepts absolute and relative paths. Does NOT accept wildcards.
 
 	.PARAMETER Force
 	If specified, forces the over-write of an existing file. This paramater has no effect, if `-Path` parameter was not specified.
 
 	.PARAMETER PassThru
-	If specified, returns the resulting .lmp formatted string even if `-Path` parameter was used.
+	If specified, returns the resulting stripper .cfg formatted string even if `-Path` parameter was used.
 
 	.INPUTS
 	System.Collections.IDictionary
@@ -31,13 +27,11 @@ function Export-Lmp {
 
 	.OUTPUTS
 	System.String
-		Only returns string if both `-AsText` and `-PassThru` are specified
+		Note that by default this function returns only the stripper .cfg formatted string. If you want to output to a file instead,
+		use the `-Path` parameter.
 
-	.NOTES
-	Input must contain 'header' and 'data' hashtables inside.
-	'Data' hashtable should contain other hashtable entries — sections.
-	Sections describe sets of parameters (key-value pairs).
-	Note that keys are not necessarily unique. 
+	.LINK
+	Import-Stripper
 
 	.LINK
 	Import-Lmp
@@ -46,19 +40,16 @@ function Export-Lmp {
 	Import-Vmf
 
 	.LINK
-	Import-Stripper
-
-	.LINK
 	Import-Vdf
 
 	.LINK
 	Import-Ini
+
+	.LINK
+	Export-Lmp
 	
 	.LINK
 	Export-Vmf
-
-	.LINK
-	Export-Stripper
 	
 	.LINK
 	Export-Vdf
@@ -72,49 +63,37 @@ function Export-Lmp {
 	.LINK
 	Export-CliXml
 	
-	.LINK
-	about_Hash_Tables
-
 	.EXAMPLE
-	PS> $lmpFile = Import-Lmp -Path ".\c5m3_cemetery_l_0.lmp"
-	PS> $lmpFile["data"]["hammerid-2935785"]
+	PS> $stripperFile = Import-Stripper -Path ".\c5m3_cemetery.cfg"
+	PS> $stripperFile["modify"][0]["replace"]
+	
 		Name                           Value
 		----                           -----
-		SunSpreadAngle                 {0}
-		pitch                          {-45}
-		angles                         {0 150 0}
-		_lightscaleHDR                 {1}
-		_lightHDR                      {-1 -1 -1 1}
-		_light                         {202 214 227 100}
-		classname                      {light_directional}
-		hammerid                       {2935785}
+		spawnflags                     {257}
+		angles                         {7 15 0}
+		origin                         {5498.43 -124.58 18.3698}
 
-	PS> $lmpFile["data"]["hammerid-2935785"]["angles"].GetType()
-		
+	PS> $stripperFile["modify"][0]["replace"]["spawnflags"].GetType()
+
 		IsPublic IsSerial Name                                     BaseType
 		-------- -------- ----                                     --------
 		True     True     List`1                                   System.Object
 
-	PS> $lmpFile["data"]["hammerid-2935785"]["angles"][0] = "45 120 0"
-	PS> $lmpFile["data"]["hammerid-2935785"]
+	PS> $stripperFile["modify"][0]["replace"]["spawnflags"][0] = 1
+	PS> $stripperFile["modify"][0]["replace"]
+
 		Name                           Value
 		----                           -----
-		SunSpreadAngle                 {0}
-		pitch                          {-45}
-		angles                         {45 120 0}
-		_lightscaleHDR                 {1}
-		_lightHDR                      {-1 -1 -1 1}
-		_light                         {202 214 227 100}
-		classname                      {light_directional}
-		hammerid                       {2935785}
-		
-	PS> Export-Lmp -InputObject $lmpFile -Path ".\c5m3_cemetery_d_1.lmp"
-	
-	.EXAMPLE
-	PS> $lmpFile = Import-Lmp -Path ".\c5m3_cemetery_l_0.lmp"
-	PS> $lmpFile["data"]["hammerid-2935785"]["angles"][0] = "45 120 0"
-	PS> Export-Lmp -InputObject $lmpFile -Path ".\c5m3_cemetery_d_1.lmp"
+		spawnflags                     {1}
+		angles                         {7 15 0}
+		origin                         {5498.43 -124.58 18.3698}
 
+	PS> Export-Stripper -InputObject $stripperFile -Path ".\c5m3_cemetery_1.cfg"
+
+	.EXAMPLE
+	PS> $stripperFile = Import-Stripper -Path ".\c5m3_cemetery.cfg"
+	PS> $stripperFile["modify"][0]["replace"]["spawnflags"][0] = 1
+	PS> Export-Stripper -InputObject $stripperFile -Path ".\c5m3_cemetery_1.cfg"
 #>
 	
 		[CmdletBinding()]
@@ -125,23 +104,27 @@ function Export-Lmp {
 			[System.Collections.IDictionary]$InputObject,
 	
 			[Parameter(Position = 1,
-			Mandatory = $true)]
+			Mandatory = $false)]
 			[string]$Path,
-
+	
 			[Parameter(Position = 2,
 			Mandatory = $false)]
+			[bool]$Fast = $false,
+	
+			[Parameter(Position = 3,
+			Mandatory = $false)]
 			[string]$LogFile,
-
+	
 			[System.Management.Automation.SwitchParameter]$Silent,
 
 			[System.Management.Automation.SwitchParameter]$AsText,
-			
+	
 			[System.Management.Automation.SwitchParameter]$Force,
 	
 			[System.Management.Automation.SwitchParameter]$PassThru,
 	
 			[Parameter(DontShow)]
-			[string]$DebugOutput = ".\output_debug.lmp"
+			[string]$DebugOutput = ".\output_debug.cfg"
 		)
 	
 		BEGIN {
@@ -186,40 +169,25 @@ function Export-Lmp {
 			if ($InputObject -and
 				$InputObject.GetType().ImplementedInterfaces.Contains([System.Collections.IDIctionary]) ) {
 				Write-Debug "Input: $($InputObject.GetType().FullName)"
-				if (-not ($InputObject.Contains("header") -and
-				$InputObject["header"].GetType().ImplementedInterfaces.Contains([System.Collections.IDIctionary]))) {
-					# Header will be recreated
-					# Write-Debug "Input hashtable does not contain header"
-					Write-Error "Input hashtable does not contain header"
-					Throw "$($MyInvocation.MyCommand): $($PSItem)"
-				}
-				if ((-not $InputObject.Contains("data") -and
-				$InputObject["data"].GetType().ImplementedInterfaces.Contains([System.Collections.IDIctionary]))) {
-					# Write-Debug "InputObject does not contain data hashtable"
-					# Write-Debug "InputObject is assumed to be only containing data"
-					Write-Error "InputObject does not contain data hashtable"
-					Throw "$($MyInvocation.MyCommand): $($PSItem)"
-				}
 			}
 			#endregion
 			$LogFile = $(Get-AbsolutePath -Path $LogFile)		# Just a precaution
 	
-			$lmp = ConvertTo-Lmp -Lmp $InputObject -LogFile $LogFile -Silent:$Silent.IsPresent -AsText:$AsText.IsPresent
+			$stripper = ConvertTo-Stripper -Stripper $InputObject -LogFile $LogFile -Fast $Fast -Silent:$Silent.IsPresent
 	
 			$params = @{
-				Content			= $lmp
+				Content			= $stripper
 				Path			= $Path
 				Force 			= $Force.IsPresent
 				PassThru		= $PassThru.IsPresent
-				Extension		= ".lmp"
-				AsByteStream	= $(-not $AsText.IsPresent)
+				Extension		= ".cfg"
 				DebugOutput		= $DebugOutput
 				Silent			= $Silent.IsPresent
 			}
 			Out-Config @params
 	
 			if (-not $Silent.IsPresent) {
-				OutLog -Value "`nLMP | Exporting file: Complete `n" -Path $LogFile -OneLine
+				OutLog -Value "`nStripper | Exporting file: Complete `n" -Path $LogFile -OneLine
 			}
 		}
 	
