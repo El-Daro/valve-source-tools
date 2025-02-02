@@ -1,25 +1,23 @@
 # TODO: Cleanup
-# NOTE: VMF extracted by the BSPSource tool use CRLF for a new line (`r`n)
-#		This function currently only uses LF (`n). Edit if needed
 
-function AppendVmfBlockRecursive {
+function AppendStripperBlock {
 <#
 	.SYNOPSIS
-	Converts a single block of a hashtable to a VMF-formatted string
+	Converts a single block of a hashtable to a stripper .cfg formatted string
 
 	.DESCRIPTION
-	Converts a hashtable into a single string, formatted specifically for .vmf files.
+	Converts a hashtable into a single string, formatted specifically for stripper .cfg files.
 	This function is designed to work with ordered and unordered hashtables.
 
 	.PARAMETER StringBuilder
-	StringBuilder object contains the whole .vmf formatted string that needs to be modified. (ref)
+	StringBuilder object contains the whole stripper .cfg formatted string that needs to be modified. (ref)
 
-	.PARAMETER VmfSection
+	.PARAMETER StripperSection
 	The object to convert. It can be ordered or unordered hashtable. The content is invariably treated as a hashtable
-	containing key-value pairs or other blocks of the .vmf format.
+	containing key-value pairs or other blocks of the stripper .cfg format.
 
 	.PARAMETER Depth
-	Indicates the current depth inside a VMF-formatted object (a hashtable). (ref)
+	Indicates the current depth inside a stripper .cfg formatted object (a hashtable). (ref)
 #>
 
 	Param (
@@ -29,64 +27,71 @@ function AppendVmfBlockRecursive {
 
 		[Parameter(Position = 1,
 		Mandatory = $true)]
-		[System.Collections.IDictionary]$VmfSection,
-
+		[System.Collections.IDictionary]$StripperSection,
+		
 		[Parameter(Position = 2,
 		Mandatory = $true)]
 		[ref]$Depth = [ref]0,
 			
-		[Parameter(Position = 3,
+		[Parameter(Position = 4,
 		Mandatory = $false)]
 		[ref]$StopWatch,
 
-		[Parameter(Position = 4,
-		Mandatory = $false)]
-		[ref]$EstimatedLines,
-
 		[Parameter(Position = 5,
 		Mandatory = $false)]
+		$EstimatedOutput,
+
+		[Parameter(Position = 6,
+		Mandatory = $false)]
 		[System.Collections.IDictionary]$LinesOut = [ordered]@{
-			properties	= 0;
-			classes		= 0;
-			lines		= 0
+			filter	= 0;
+			add		= 0;
+			modify	= 0;
+			lines	= 0
 		},
 		
-		[Parameter(Position = 6,
+		[Parameter(Position = 7,
 		Mandatory = $false)]
 		[ref]$ProgressCounter = [ref]0,
 		
-		[Parameter(Position = 7,
+		[Parameter(Position = 8,
 		Mandatory = $false)]
 		$ProgressStep = 10000
 	)
 
 	$tabsKey	= "".PadRight($Depth.Value, "`t")
 	
-	foreach ($propertyName in $VmfSection["properties"].Keys) {
-		foreach ($propertyValue in $VmfSection["properties"][$propertyName]) {
+	foreach ($propertyName in $StripperSection["properties"].Keys) {
+		foreach ($propertyValue in $StripperSection["properties"][$propertyName]) {
 			[void]$StringBuilder.Value.AppendFormat('{0}"{1}" "{2}"{3}', $tabsKey, $propertyName, $propertyValue, "`n")
 			$LinesOut["properties"]++
 			$LinesOut["lines"]++
 		}
 	}
 		
-	foreach ($class in $VmfSection["classes"].Keys) {
-		foreach ($classEntry in $VmfSection["classes"][$class]) {
-			[void]$StringBuilder.Value.AppendFormat('{0}{1}{2}{0}{3}', $tabsKey, $class, "`n", "{`n")
+	foreach ($mode in $StripperSection["modes"].Keys) {
+		if ($StripperSection["modes"][$mode].Count -eq 0) {
+			continue
+		}
+		$LinesOut[$Mode] = 0
+		[void]$StringBuilder.Value.AppendFormat('{0}{1}:{2}', $tabsKey, $mode, "`n")
+		$LinesOut["lines"]++
+		foreach ($modeEntry in $StripperSection["modes"][$mode]) {
+			[void]$StringBuilder.Value.AppendFormat('{0}{1}{2}', $tabsKey, "{", "`n")
 			$Depth.Value++
-			$LinesOut["classes"]++
+			$LinesOut["modes"]++
 			$LinesOut["lines"]++
 			$params = @{
 				StringBuilder			= $StringBuilder
-				VmfSection				= $classEntry
+				StripperSection			= $modeEntry
 				Depth					= $Depth
 				StopWatch				= $StopWatch
-				EstimatedLines			= $EstimatedLines
 				LinesOut				= $LinesOut
+				EstimatedOutput			= $EstimatedOutput
 				ProgressCounter			= $ProgressCounter
 				ProgressStep			= $ProgressStep
 			}
-			AppendVmfBlockRecursive @params
+			AppendStripperBlock @params
 		}
 	}
 
@@ -96,12 +101,12 @@ function AppendVmfBlockRecursive {
 		[void]$StringBuilder.Value.AppendFormat('{0}{1}{2}', $tabsKey, "}", "`n")
 	}
 
-	if ($EstimatedLines.Value -gt 0 -and ($LinesOut["lines"] -gt $ProgressStep -and [math]::Floor($LinesOut["lines"] / $ProgressStep) -gt $ProgressCounter.Value)) {
+	if ($EstimatedOutput["lines"] -gt 0 -and ($LinesOut["lines"] -gt $ProgressStep -and [math]::Floor($LinesOut["lines"] / $ProgressStep) -gt $ProgressCounter.Value)) {
 		$elapsedMilliseconds		= $StopWatch.Value.ElapsedMilliseconds
-		$estimatedMilliseconds		= ($EstimatedLines.Value / $LinesOut["lines"]) * $elapsedMilliseconds
+		$estimatedMilliseconds		= ($EstimatedOutput["lines"] / $LinesOut["lines"]) * $elapsedMilliseconds
 		$params = @{
 			CurrentLine				= $LinesOut["lines"]
-			LinesCount				= $EstimatedLines.Value
+			LinesCount				= $EstimatedOutput["lines"]
 			EstimatedMilliseconds	= $estimatedMilliseconds
 			ElapsedMilliseconds		= $StopWatch.Value.ElapsedMilliseconds
 			Activity				= "Building..."

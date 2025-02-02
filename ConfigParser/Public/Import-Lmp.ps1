@@ -30,7 +30,7 @@ function Import-Lmp {
 	
 	Note that key-value pairs are not always unique:
 	it is possible to define the same key multiple times with different values
-	(i)n practice only seen in the implied 'connections' class that defines outcoming script actions).
+	In practice only seen in the implied 'connections' class that defines outcoming script actions).
 	Connections are not defined as their own class, but rather as properties of a parent class.
 	Because of that, every dictionary entry that defines a class or a property is initialized as a Generic.List type.
 
@@ -45,6 +45,9 @@ function Import-Lmp {
 	Export-Vmf
 
 	.LINK
+	Export-Stripper
+
+	.LINK
 	Export-Vdf
 
 	.LINK
@@ -52,6 +55,9 @@ function Import-Lmp {
 
 	.LINK
 	Import-Vmf
+
+	.LINK
+	Import-Stripper
 
 	.LINK
 	Import-Vdf
@@ -138,6 +144,8 @@ function Import-Lmp {
 		_light                         {202 214 227 100}
 		classname                      {light_directional}
 		hammerid                       {2935785}
+		
+	PS> Export-Lmp -InputObject $lmpFile -Path ".\c5m3_cemetery_d_1.lmp"
 
 	.EXAMPLE
 	PS> $lmpFile = Import-Lmp -Path ".\c5m3_cemetery_l_0.lmp"

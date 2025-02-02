@@ -1,5 +1,3 @@
-# TODO: Edit the docs
-
 using namespace System.Diagnostics
 
 function Import-Stripper {
@@ -13,6 +11,9 @@ function Import-Stripper {
 	.PARAMETER Path
 	Specifies the path to the stripper .cfg file. Accepts absolute and relative paths. Does NOT accept wildcards.
 
+	.PARAMETER Fast
+	If specified, a faster algorithm is used that only relies on regex where it is absolutely necessary 
+
 	.INPUTS
 	System.String
 		You can pipe a string containing a path to this function.
@@ -22,7 +23,7 @@ function Import-Stripper {
 
 	.NOTES
 	Empty lines and comments are ignored.
-	Comments start with one of the following: `;`, `//`, `#` or `\0` (ESC)
+	Comments start with one of the following: `;`, `//` or `#`.
 	A key cannot be empty or contain symbols `"` and `//`.
 	Values formatted as "/string/" are assumed to be a regexp.
 	Note that original format expects a Perl syntax regexp, which is NOT fully compatible with .NET syntax.
@@ -73,69 +74,65 @@ function Import-Stripper {
 	about_Hash_Tables
 	
 	.EXAMPLE
-	PS> $stripperFile = Import-Stripper -Path ".\c5m3_cemetery_d.cfg"
+	PS> $stripperFile = Import-Stripper -Path ".\c5m3_cemetery.cfg"
 	PS> $stripperFile
 
 		Name                           Value
 		----                           -----
-		properties                     {}
-		classes                        {[world, System.Collections.Generic.List`1[System.Collections.Specialized.OrderedDictionary]], [entity, System.Collecti…
+		filter                         {System.Collections.Specialized.OrderedDictionary, System.Collections.Specialized.OrderedDictiona…
+		add                            {System.Collections.Specialized.OrderedDictionary, System.Collections.Specialized.OrderedDictiona…
+		modify                         {System.Collections.Specialized.OrderedDictionary, System.Collections.Specialized.OrderedDictiona…
 	
-	PS> $stripperFile["classes"]
+	PS> $stripperFile["filter"]
 
 		Name                           Value
 		----                           -----
-		world                          {System.Collections.Specialized.OrderedDictionary}
-		entity                         {System.Collections.Specialized.OrderedDictionary, System.Collections.Specialized.OrderedDictionary, System.Collections…
-		cameras                        {System.Collections.Specialized.OrderedDictionary}
+		classname                      {func_playerinfected_clip}
+		classname                      {trigger_hurt_ghost}
+		hammerid                       {2131720}
+		hammerid                       {2131722}
+		hammerid                       {2131730}
 
-	PS> $stripperFile["classes"]["world"][0]["properties"]
+	PS> $stripperFile["filter"].Count
+	5
 
+	PS> $stripperFile["filter"][1]
+	
 		Name                           Value
 		----                           -----
-		id                             {1}
-		timeofday                      {2}
-		startmusictype                 {1}
-		skyname                        {sky_l4d_c5_1_hdr}
-		musicpostfix                   {BigEasy}
-		maxpropscreenwidth             {-1}
-		detailvbsp                     {detail.vbsp}
-		detailmaterial                 {detail/detailsprites_overgrown}
-		mapversion                     {5359}
-		comment                        {Decompiled by BSPSource v1.4.6.1 from c5m3_cemetery}
-		classname                      {worldspawn}
-
-	PS> $stripperFile["classes"]["entity"].Count	
-	6648
+		classname                      {trigger_hurt_ghost}
 		
 	.EXAMPLE
-	PS> $stripperFile = Import-Stripper -Path ".\c5m3_cemetery_d.cfg"
-	PS> $stripperFile["classes"]["entity"][1459]["properties"]
+	PS> $stripperFile = Import-Stripper -Path ".\c5m3_cemetery.cfg"
+	PS> $stripperFile["modify"][0]["replace"]
+
 		Name                           Value
 		----                           -----
-		id                             {2976892}
-		angles                         {-0 -90 0}
-		origin                         {5913 -1680 183}
-		spawnflags                     {1}
-		classname                      {logic_auto}
-	PS> $stripperFile["classes"]["entity"][1459]["properties"]["spawnflags"].GetType()
+		spawnflags                     {257}
+		angles                         {7 15 0}
+		origin                         {5498.43 -124.58 18.3698}
+
+	PS> $stripperFile["modify"][0]["replace"]["spawnflags"].GetType()
+
 		IsPublic IsSerial Name                                     BaseType
 		-------- -------- ----                                     --------
 		True     True     List`1                                   System.Object
-	PS> $stripperFile["classes"]["entity"][1459]["properties"]["spawnflags"][0] = 0
-	PS> $stripperFile["classes"]["entity"][1459]["properties"]
+
+	PS> $stripperFile["modify"][0]["replace"]["spawnflags"][0] = 1
+	PS> $stripperFile["modify"][0]["replace"]
+
 		Name                           Value
 		----                           -----
-		id                             {2976892}
-		angles                         {-0 -90 0}
-		origin                         {5913 -1680 183}
-		spawnflags                     {0}
-		classname                      {logic_auto}
+		spawnflags                     {1}
+		angles                         {7 15 0}
+		origin                         {5498.43 -124.58 18.3698}
+		
+	PS> Export-Stripper -InputObject $stripperFile -Path ".\c5m3_cemetery_1.cfg"
 
 	.EXAMPLE
-	PS> $stripperFile = Import-Stripper -Path ".\c5m3_cemetery_d.cfg"
-	PS> $stripperFile["classes"]["entity"][1459]["properties"]["spawnflags"][0] = 0
-	PS> Export-Stripper -InputObject $stripperFile -Path ".\c5m3_cemetery_d_1.cfg"
+	PS> $stripperFile = Import-Stripper -Path ".\c5m3_cemetery.cfg"
+	PS> $stripperFile["modify"][0]["replace"]["spawnflags"][0] = 1
+	PS> Export-Stripper -InputObject $stripperFile -Path ".\c5m3_cemetery_1.cfg"
 #>
 
 	[CmdletBinding()]
@@ -149,7 +146,9 @@ function Import-Stripper {
 		Mandatory = $false)]
 		[string]$LogFile,
 
-		[System.Management.Automation.SwitchParameter]$Silent
+		[System.Management.Automation.SwitchParameter]$Silent,
+		
+		[System.Management.Automation.SwitchParameter]$Fast
 	)
 
 	BEGIN {
@@ -273,7 +272,11 @@ function Import-Stripper {
 				return $false
 			} else {
 				# MAIN EXIT ROUTE
-				return ConvertFrom-Stripper -Lines $stripperContent -LogFile $LogFile -Silent:$Silent.IsPresent
+				if ($Fast.IsPresent) {
+					return ConvertFrom-Stripper -Lines $stripperContent -LogFile $LogFile -Silent:$Silent.IsPresent
+				} else {
+					return ConvertFrom-StripperRegex -Lines $stripperContent -LogFile $LogFile -Silent:$Silent.IsPresent
+				}
 			}
 		} catch [System.IO.FileNotFoundException], [System.IO.IOException] {
 			Write-HostError -ForegroundColor Red -NoNewline		"  File ("
