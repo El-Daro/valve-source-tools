@@ -1,3 +1,5 @@
+# TODO: Make a better approximation
+
 function EstimateOutputStripper {
 	[CmdletBinding()]
 	Param (
@@ -18,7 +20,7 @@ function EstimateOutputStripper {
 	$estimatedLines = 0
 	try {
 
-		# TODO: Make a better approximation
+		# TODO: Make a better approximation 
 		$estimatedModes	= $Stripper["modes"]["filter"].Count +
 						  $Stripper["modes"]["add"].Count +
 						  $Stripper["modes"]["modify"].Count
