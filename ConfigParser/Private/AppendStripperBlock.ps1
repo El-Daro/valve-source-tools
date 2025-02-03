@@ -1,5 +1,3 @@
-# TODO: Cleanup
-
 function AppendStripperBlock {
 <#
 	.SYNOPSIS
@@ -101,7 +99,10 @@ function AppendStripperBlock {
 		[void]$StringBuilder.Value.AppendFormat('{0}{1}{2}', $tabsKey, "}", "`n")
 	}
 
-	if ($EstimatedOutput["lines"] -gt 0 -and ($LinesOut["lines"] -gt $ProgressStep -and [math]::Floor($LinesOut["lines"] / $ProgressStep) -gt $ProgressCounter.Value)) {
+	if ($EstimatedOutput["lines"] -gt $ProgressStep -and
+			$EstimatedOutput["lines"] -gt 10000 -and
+			($LinesOut["lines"] -gt $ProgressStep -and
+			[math]::Floor($LinesOut["lines"] / $ProgressStep) -gt $ProgressCounter.Value)) {
 		$elapsedMilliseconds		= $StopWatch.Value.ElapsedMilliseconds
 		$estimatedMilliseconds		= ($EstimatedOutput["lines"] / $LinesOut["lines"]) * $elapsedMilliseconds
 		$params = @{

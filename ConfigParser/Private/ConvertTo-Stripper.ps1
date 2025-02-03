@@ -10,6 +10,7 @@ function ConvertTo-Stripper {
 	.PARAMETER Block
 	The object to convert. It can be ordered or unordered hashtable. The content is invariably treated as a hashtable
 	containing blocks of the stripper .cfg format.
+	Data is stored in the 'properties' hashtables, while modes and sub-modes are stored in the 'modes' hashtables.
 	
 	.INPUTS
 	System.Collections.IDictionary
@@ -29,17 +30,13 @@ function ConvertTo-Stripper {
 		Mandatory = $false)]
 		[string]$LogFile,
 
-		[Parameter(Position = 2,
-		Mandatory = $false)]
-		[bool]$Fast = $False,
-
 		[System.Management.Automation.SwitchParameter]$Silent
 	)
 
 	#region PROCESS
 	try {
 
-		$estimatedOuput	= EstimateOutputStripper -Stripper $Stripper -LogFile $LogFile -Silent:$Silent.IsPresent
+		$estimatedOutput	= EstimateOutputStripper -Stripper $Stripper -LogFile $LogFile -Silent:$Silent.IsPresent
 
 		#region Variables
 		# Note: using an Int32 as a constructor parameter will define the starting capacity (def.: 16)
@@ -53,15 +50,14 @@ function ConvertTo-Stripper {
 		$sw = [System.Diagnostics.Stopwatch]::StartNew()
 		#endregion
 		
-		# The convertion logic is supposed to be here.
 		$params = @{
 			StringBuilder			= [ref]$stringBuilder
 			StripperSection			= $Stripper
 			LinesOut				= $linesOut
 			Depth					= [ref]0
 			StopWatch				= [ref]$sw
-			EstimatedOutput			= $estimatedOuput
-			# ProgressStep			= $($estimatedOuput / 50)
+			EstimatedOutput			= $estimatedOutput
+			ProgressStep			= $($estimatedOutput["lines"] / 50)
 		}
 		AppendStripperBlock @params
 		

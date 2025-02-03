@@ -257,9 +257,9 @@ Try {
 			Write-Host "YAY! WE DID IT!"
 			
 			if ($debugPassed) {
-				Export-Stripper -InputObject $stripperParsed -DebugOutput $outputFilePath -LogFile $logFile -Silent:$Silent.IsPresent -AsText:$AsText.IsPresent -Force:$Force.IsPresent -Debug
+				Export-Stripper -InputObject $stripperParsed -DebugOutput $outputFilePath -LogFile $logFile -Silent:$Silent.IsPresent -Force:$Force.IsPresent -Debug
 			} else {
-				Export-Stripper -InputObject $stripperParsed -Path $outputFilePath -LogFile $logFile -Silent:$Silent.IsPresent -AsText:$AsText.IsPresent -Force:$Force.IsPresent
+				Export-Stripper -InputObject $stripperParsed -Path $outputFilePath -LogFile $logFile -Silent:$Silent.IsPresent -Force:$Force.IsPresent
 			}
 		}
 	} else {

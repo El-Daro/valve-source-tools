@@ -31,6 +31,8 @@ function Import-Stripper {
 	Both key and value should be enclosed in double quotes (`" "`) and separated by whitespaces.
 	Mode names are not enclosed in double quotes.
 	Every mode is defined in curly brackets.
+	Unlike VMF structure, in stripper configs there is usually only one mode definition with multiple blocks,
+	enclosed in curly brackets.
 	
 	Note that key-value pairs, as well as modes, are not unique:
 	it is possible to define the same key multiple times with different values
@@ -79,11 +81,18 @@ function Import-Stripper {
 
 		Name                           Value
 		----                           -----
+		properties                     {}
+		modes                          {[filter, System.Collections.Generic.List`1[System.Collections.Specialized.OrderedDictionary]], […
+
+	PS> $stripperFile["modes"]
+
+		Name                           Value
+		----                           -----
 		filter                         {System.Collections.Specialized.OrderedDictionary, System.Collections.Specialized.OrderedDictiona…
 		add                            {System.Collections.Specialized.OrderedDictionary, System.Collections.Specialized.OrderedDictiona…
 		modify                         {System.Collections.Specialized.OrderedDictionary, System.Collections.Specialized.OrderedDictiona…
 	
-	PS> $stripperFile["filter"]
+	PS> foreach ($filter in $stripperFile["modes"]["filter"]) { $filter["properties"] }
 
 		Name                           Value
 		----                           -----
@@ -93,18 +102,21 @@ function Import-Stripper {
 		hammerid                       {2131722}
 		hammerid                       {2131730}
 
-	PS> $stripperFile["filter"].Count
+	PS> $stripperFile["modes"]["filter"].Count
 	5
 
-	PS> $stripperFile["filter"][1]
+	PS> $stripperFile["modes"]["filter"][1]["properties"]
 	
 		Name                           Value
 		----                           -----
 		classname                      {trigger_hurt_ghost}
+
+	PS> $stripperFile["modes"]["filter"][1]["properties"][0]
+	trigger_hurt_ghost
 		
 	.EXAMPLE
 	PS> $stripperFile = Import-Stripper -Path ".\c5m3_cemetery.cfg"
-	PS> $stripperFile["modify"][0]["replace"]
+	PS> $stripperFile["modes"]["modify"][0]["modes"]["replace"][0]["properties"]
 
 		Name                           Value
 		----                           -----
@@ -112,14 +124,14 @@ function Import-Stripper {
 		angles                         {7 15 0}
 		origin                         {5498.43 -124.58 18.3698}
 
-	PS> $stripperFile["modify"][0]["replace"]["spawnflags"].GetType()
+	PS> $stripperFile["modes"]["modify"][0]["modes"]["replace"][0]["properties"]["spawnflags"].GetType()
 
 		IsPublic IsSerial Name                                     BaseType
 		-------- -------- ----                                     --------
 		True     True     List`1                                   System.Object
 
-	PS> $stripperFile["modify"][0]["replace"]["spawnflags"][0] = 1
-	PS> $stripperFile["modify"][0]["replace"]
+	PS> $stripperFile["modes"]["modify"][0]["modes"]["replace"][0]["properties"]["spawnflags"][0] = 1
+	PS> $stripperFile["modes"]["modify"][0]["modes"]["replace"][0]["properties"]
 
 		Name                           Value
 		----                           -----
@@ -131,7 +143,7 @@ function Import-Stripper {
 
 	.EXAMPLE
 	PS> $stripperFile = Import-Stripper -Path ".\c5m3_cemetery.cfg"
-	PS> $stripperFile["modify"][0]["replace"]["spawnflags"][0] = 1
+	PS> $stripperFile["modes"]["modify"][0]["modes"]["replace"][0]["properties"]["spawnflags"][0] = 1
 	PS> Export-Stripper -InputObject $stripperFile -Path ".\c5m3_cemetery_1.cfg"
 #>
 

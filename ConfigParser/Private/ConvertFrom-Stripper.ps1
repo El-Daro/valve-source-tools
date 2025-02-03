@@ -128,6 +128,8 @@ function ConvertFrom-Stripper {
 					} else {
 						$currentSubmode	= $Matches["subMode"]
 					}
+				} else {
+					$linesFaulty++
 				}
 			}
 			
