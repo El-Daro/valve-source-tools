@@ -55,7 +55,7 @@ function ConvertFrom-StripperRegex {
 				"$($regex.keyValue)" {
 					$key	= $Matches["key"]
 					$value	= $Matches["value"]
-					if (-not $currentBlock.Contains($key)) {
+					if (-not $currentBlock["properties"].Contains($key)) {
 						$currentBlock["properties"][$key] = [System.Collections.Generic.List[string]]::new()
 					}
 					$currentBlock["properties"][$key].Add($value)
@@ -107,6 +107,10 @@ function ConvertFrom-StripperRegex {
 					}
 				}
 
+				"$($regex.comment)" {
+					# Comments are ignored (for now)
+				}
+
 				# Mode identificator
 				"$($regex.mode)" {
 					$currentMode = $Matches["mode"]
@@ -122,10 +126,6 @@ function ConvertFrom-StripperRegex {
 					} else {
 						$currentSubmode	= $Matches["subMode"]
 					}
-				}
-
-				"$($regex.comment)" {
-					# Comments are ignored (for now)
 				}
 
 				default {

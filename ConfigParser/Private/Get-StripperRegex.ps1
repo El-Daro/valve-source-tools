@@ -21,19 +21,19 @@ function Get-StripperRegex {
 		(?<valueQuoted>[`"]		# This is a group that might or might not occur in the file
 			(?<value>.*)		# Values can actually occupy a few lines, so everything is allowed, ~~as long as it is not a quote char~~
 		[`"])					#
-		[\s]*`$					# The empty space in the end might really be unnecessary to match
+		[\s]*					# The empty space in the end might really be unnecessary to match
 		)";
 
 		mode		= "(?mnx:
-		(?<mode>add|filter|modify):)";
+		^(?<mode>add|filter|modify):)";
 
 		subMode		= "(?mnx:
-		(?<subMode>match|replace|delete|insert):)";
+		^(?<subMode>match|replace|delete|insert):)";
 
 		# An open bracket
-		bracketOpen = "[{]";
+		bracketOpen = "^[{]";
 
 		# A close bracket
-		bracketClose = "[}]"
+		bracketClose = "^[}]"
 	}
 }
