@@ -54,7 +54,7 @@ function ConvertFrom-Stripper {
 				if ($line -match "$($regex.keyValue)") {
 					$key	= $Matches["key"]
 					$value	= $Matches["value"]
-					if (-not $currentBlock.Contains($key)) {
+					if (-not $currentBlock["properties"].Contains($key)) {
 						$currentBlock["properties"][$key] = [System.Collections.Generic.List[string]]::new()
 					}
 					$currentBlock["properties"][$key].Add($value)

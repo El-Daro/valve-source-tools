@@ -14,9 +14,12 @@ function EstimateOutputStripper {
 	)
 
 	$estimatedOutput = @{
-		lines = 0;
-		modes = 0;
-		props = 0
+		lines	= 0;
+		modes	= 0;
+		props	= 0;
+		filter	= 0;
+		add		= 0;
+		modify	= 0
 	}
 	try {
 
@@ -36,9 +39,10 @@ function EstimateOutputStripper {
 		if ($Stripper["modes"]["filter"].Count -gt 0) {
 			$estimatedOutput["lines"]++
 			foreach ($mode in $Stripper["modes"]["filter"]) {
-				$estimatedOutput["lines"] += $mode["properties"].Count + 2
-				$estimatedOutput["props"] += $mode["properties"].Count
-				$estimatedOutput["modes"] += 1
+				$estimatedOutput["lines"]	+= $mode["properties"].Count + 2
+				$estimatedOutput["props"]	+= $mode["properties"].Count
+				$estimatedOutput["modes"]	+= 1
+				$estimatedOutput["filter"]	+= 1
 			}
 		}
 
@@ -48,6 +52,7 @@ function EstimateOutputStripper {
 				$estimatedOutput["lines"] += $mode["properties"].Count + 2
 				$estimatedOutput["props"] += $mode["properties"].Count
 				$estimatedOutput["modes"] += 1
+				$estimatedOutput["add"]	+= 1
 			}
 		}
 
@@ -60,8 +65,9 @@ function EstimateOutputStripper {
 				# 				   $mode["modes"]["delete"].Count * 3 + 1 +
 				# 				   $mode["modes"]["insert"].Count * 3 + 1
 				# $estimatedLines += 2		#  Counting the brackets here
-				$estimatedOutput["modes"]++
-				$estimatedOutput["lines"] += 2
+				$estimatedOutput["modes"]	+= 1
+				$estimatedOutput["modify"]	+= 1
+				$estimatedOutput["lines"]	+= 2
 				if ($mode["modes"]["match"].Count -gt 0) {
 					$estimatedOutput["lines"]++
 					foreach ($subMode in $mode["modes"]["match"]) {
@@ -105,7 +111,7 @@ function EstimateOutputStripper {
 	} finally {
 		if (-not $Silent.IsPresent) {
 			if ($estimatedOutput["lines"] -gt 0) {
-				OutLog								-Value "`nOutput estimation: Complete"	-Path $LogFile -OneLine
+				OutLog					-Value "`nStripper | Output estimation: Complete"	-Path $LogFile -OneLine
 				OutLog -Property "Lines estimate"		-Value $estimatedOutput["lines"]	-Path $LogFile
 				OutLog -Property "Sections estimate"	-Value $estimatedOutput["modes"]	-Path $LogFile
 				OutLog -Property "Properties estimate"	-Value $estimatedOutput["props"]	-Path $LogFile

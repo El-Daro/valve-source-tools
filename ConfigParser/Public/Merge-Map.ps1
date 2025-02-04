@@ -71,10 +71,14 @@ function Merge-Map {
 			[System.Collections.IDictionary]$Vmf,
 
 			[Parameter(Position = 1,
-			Mandatory = $true)]
+			Mandatory = $false)]
 			[System.Collections.IDictionary]$Lmp,
-	
+
 			[Parameter(Position = 2,
+			Mandatory = $false)]
+			[System.Collections.IDictionary]$Stripper,
+	
+			[Parameter(Position = 3,
 			Mandatory = $false)]
 			[string]$LogFile,
 	
@@ -148,13 +152,25 @@ function Merge-Map {
 			#endregion
 			$LogFile = $(Get-AbsolutePath -Path $LogFile)		# Just a precaution
 	
-			$params = @{
-				Vmf		= $Vmf
-				Lmp		= $Lmp
-				LogFile	= $LogFile
-				Silent	= $Silent.IsPresent
+			$vmfMerged = $Vmf						# This is the structure we'll be working with
+			if ($PSBoundParameters.ContainsKey('Lmp')) {
+				$params = @{
+					Vmf		= $vmfMerged
+					Lmp		= $Lmp
+					LogFile	= $LogFile
+					Silent	= $Silent.IsPresent
+				}
+				$vmfMerged = Merge-VmfLmp @params
 			}
-			$vmfMerged = Merge-VmfLmp @params
+			if ($PSBoundParameters.ContainsKey('Stripper')) {
+				$params = @{
+					Vmf			= $vmfMerged
+					Stripper	= $Stripper
+					LogFile		= $LogFile
+					Silent		= $Silent.IsPresent
+				}
+				$vmfMerged = Merge-VmfStripper @params
+			}
 			
 			return $vmfMerged
 			
