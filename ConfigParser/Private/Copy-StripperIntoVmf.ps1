@@ -34,6 +34,9 @@ function Copy-StripperIntoVmf {
 			$MergesCount["filter"]			= 0
 			$MergesCount["add"]				= 0
 			$MergesCount["modify"]			= 0
+			$MergesCount["filterSkipped"]	= 0
+			$MergesCount["addSkipped"]		= 0
+			$MergesCount["modifySkipped"]	= 0
 			$MergesCount["new"]				= 0
 			$MergesCount["failed"]			= 0
 			$MergesCount["section"]			= 0
@@ -72,17 +75,21 @@ function Copy-StripperIntoVmf {
 						CounterStripper	= $CounterStripper
 					}
 					$addProcessed = ProcessStripperAdd @params
-					if ($addProcessed) {
-						$MergesCount["add"]++
-					} else {
+					# $MergesCount["add"]++
+					# $MergesCount["propsNew"] += $add["properties"].Count
+					# $Vmf["classes"]["entity"].Add($add)
+
+					if (-not $addProcessed) {
 						$MergesCount["failed"]++
 					}
 				}
 			}
+			# TEMP
+			return $true
 
 			# Different approach to modifies
 			if ($Stripper["modes"]["modify"].Count -gt 0) {
-:addLoop		foreach ($modify in $Stripper["modes"]["modify"]) {
+:modLoop		foreach ($modify in $Stripper["modes"]["modify"]) {
 					$modifyProcessed = $false
 					$params	= @{
 						Vmf				= $Vmf
@@ -98,6 +105,7 @@ function Copy-StripperIntoVmf {
 					}
 				}
 			}
+			return $true
 
 :lmpLoop	foreach ($lmpSection in $Stripper["data"].Keys) {
 				$idToMatch	= $false
