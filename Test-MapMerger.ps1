@@ -145,9 +145,13 @@ Try {
 	#endregion
 	
 	$vmfParsed		= Import-Vmf -Path $VmfPath	-LogFile $logFile -Silent:$Silent.IsPresent
-	$lmpParsed		= Import-Lmp -Path $LmpPath	-LogFile $logFile -Silent:$Silent.IsPresent
-	$stripperParsed	= Import-Stripper -Path $StripperPath -LogFile $logFile -Silent:$Silent.IsPresent
-	
+	if ($PSBoundParameters.ContainsKey('LmpPath')) {
+		$lmpParsed		= Import-Lmp -Path $LmpPath	-LogFile $logFile -Silent:$Silent.IsPresent
+	}
+	if ($PSBoundParameters.ContainsKey('StripperPath')) {
+		$stripperParsed	= Import-Stripper -Path $StripperPath -LogFile $logFile -Silent:$Silent.IsPresent
+	}
+
 	if ($vmfParsed -and $lmpParsed -and $stripperParsed) {
 		$vmfMerged = Merge-Map -Vmf $vmfParsed -Lmp $lmpParsed -Stripper $stripperParsed -LogFile $logFile -Silent:$Silent.IsPresent
 
