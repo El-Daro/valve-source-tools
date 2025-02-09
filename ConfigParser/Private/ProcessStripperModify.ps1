@@ -41,6 +41,7 @@ function ProcessStripperModify {
 :mainL	foreach ($vmfClass in $Vmf["classes"].Keys) {
 :vmfClassL	foreach ($vmfClassEntry in $Vmf["classes"][$vmfClass]) {
 				$matchCounter = 0
+				#region MATCH
 :stripperMainL	foreach ($stripperProp in $Modify["modes"]["match"][0]["properties"].Keys) {
 					if ($stripperProp -eq "hammerid") {
 						$key = "id"
@@ -51,7 +52,6 @@ function ProcessStripperModify {
 					foreach ($value in $stripperValues) {
 						# The new code for the matches
 						if ($value.Length -gt 2 -and $value[0] -eq "/" -and $value[$value.Length - 1] -eq "/") {
-							Write-Host -ForegroundColor DarkCyan "This is a regex"
 							$stripperValueRegex = $value.SubString(1, $value.Length - 2) 
 							if ($vmfClassEntry["properties"].Contains($key)) {
 								try {
@@ -77,75 +77,82 @@ function ProcessStripperModify {
 							}
 						}
 					}
-				} # If all the props in the 'match' section have matched
+				}
+				#endregion
+				# If all the props in the 'match' section have matched
 				if ($matchCounter -eq $Modify["modes"]["match"][0]["properties"].Count) {
 					#region REPLACE
-					foreach ($stripperProp in $Modify["modes"]["replace"][0]["properties"].Keys) {
-						if ($stripperProp -eq "hammerid") {
-							$key = "id"
-						} else {
-							$key = $stripperProp
-						}
-						$stripperValues = $Modify["modes"]["replace"][0]["properties" ][$stripperProp]
-						foreach ($value in $stripperValues) {
-							# The new code for the matches
-							if ($vmfClassEntry["properties"].Contains($key)) {
-								$vmfClassEntry["properties"][$key] = [Collections.Generic.List[string]]::new()
-								$vmfClassEntry["properties"][$key].Add($value)
-								$MergesCount["modifyReplaced"]++
-								$MergesCount["propsEdited"]++
+					if ($Modify["modes"]["replace"].get_Count() -gt 0) {
+						foreach ($stripperProp in $Modify["modes"]["replace"][0]["properties"].Keys) {
+							if ($stripperProp -eq "hammerid") {
+								$key = "id"
 							} else {
-								break
+								$key = $stripperProp
+							}
+							$stripperValues = $Modify["modes"]["replace"][0]["properties" ][$stripperProp]
+							foreach ($value in $stripperValues) {
+								# The new code for the matches
+								if ($vmfClassEntry["properties"].Contains($key)) {
+									$vmfClassEntry["properties"][$key] = [Collections.Generic.List[string]]::new()
+									$vmfClassEntry["properties"][$key].Add($value)
+									$MergesCount["modifyReplaced"]++
+									$MergesCount["propsEdited"]++
+								} else {
+									break
+								}
 							}
 						}
 					}
 					#endregion
 
 					#region DELETE
-					foreach ($stripperProp in $Modify["modes"]["delete"][0]["properties"].Keys) {
-						if ($stripperProp -eq "hammerid") {
-							$key = "id"
-						} else {
-							$key = $stripperProp
-						}
-						$stripperValues = $Modify["modes"]["delete"][0]["properties"][$stripperProp]
-						foreach ($value in $stripperValues) {
-							# The new code for the matches
-							if ($vmfClassEntry["properties"].Contains($key) -and
-								$vmfClassEntry["properties"][$key].Contains($value)) {
-								$vmfClassEntry["properties"].Remove($key)
-								$MergesCount["modifyDeleted"]++
-								$MergesCount["propsDeleted"]++
+					if ($Modify["modes"]["delete"].get_Count() -gt 0) {
+						foreach ($stripperProp in $Modify["modes"]["delete"][0]["properties"].Keys) {
+							if ($stripperProp -eq "hammerid") {
+								$key = "id"
+							} else {
+								$key = $stripperProp
+							}
+							$stripperValues = $Modify["modes"]["delete"][0]["properties"][$stripperProp]
+							foreach ($value in $stripperValues) {
+								# The new code for the matches
+								if ($vmfClassEntry["properties"].Contains($key) -and
+									$vmfClassEntry["properties"][$key].Contains($value)) {
+									$vmfClassEntry["properties"].Remove($key)
+									$MergesCount["modifyDeleted"]++
+									$MergesCount["propsDeleted"]++
+								}
 							}
 						}
 					}
 					#endregion
 
 					#region INSERT
-					foreach ($stripperProp in $Modify["modes"]["insert"][0]["properties"].Keys) {
-						if ($stripperProp -eq "hammerid") {
-							$key = "id"
-						} else {
-							$key = $stripperProp
-						}
-						$stripperValues = $Modify["modes"]["insert"][0]["properties"][$stripperProp]
-						foreach ($value in $stripperValues) {
-							# The new code for the matches
-							if ($vmfClassEntry["properties"].Contains($key) -and
-								$vmfClassEntry["properties"][$key].Contains($value)) {
-								break
+					if ($Modify["modes"]["insert"].get_Count() -gt 0) {
+						foreach ($stripperProp in $Modify["modes"]["insert"][0]["properties"].Keys) {
+							if ($stripperProp -eq "hammerid") {
+								$key = "id"
 							} else {
-								$vmfClassEntry["properties"][$key].Add($value)
-								$MergesCount["modifyInserted"]++
-								$MergesCount["propsNew"]++
+								$key = $stripperProp
+							}
+							$stripperValues = $Modify["modes"]["insert"][0]["properties"][$stripperProp]
+							foreach ($value in $stripperValues) {
+								# The new code for the matches
+								if ($vmfClassEntry["properties"].Contains($key) -and
+									$vmfClassEntry["properties"][$key].Contains($value)) {
+									break
+								} else {
+									$vmfClassEntry["properties"][$key] = [Collections.Generic.List[string]]::new()
+									$vmfClassEntry["properties"][$key].Add($value)
+									$MergesCount["modifyInserted"]++
+									$MergesCount["propsNew"]++
+								}
 							}
 						}
 					}
 					#endregion
 
 					$MergesCount["modify"]++
-				} else {
-					$MergesCount["modifySkipped"]++
 				}
 			}
 		}

@@ -71,7 +71,7 @@ function EstimateOutputStripper {
 				if ($mode["modes"]["match"].get_Count() -gt 0) {
 					$estimatedOutput["lines"]++
 					foreach ($subMode in $mode["modes"]["match"]) {
-						$estimatedOutput["modes"]++
+						# $estimatedOutput["modes"]++
 						$estimatedOutput["lines"] += $subMode["properties"].get_Count() + 2
 						$estimatedOutput["props"] += $subMode["properties"].get_Count()
 					}
@@ -80,7 +80,7 @@ function EstimateOutputStripper {
 				if ($mode["modes"]["replace"].get_Count() -gt 0) {
 					$estimatedOutput["lines"]++
 					foreach ($subMode in $mode["modes"]["replace"]) {
-						$estimatedOutput["modes"]++
+						# $estimatedOutput["modes"]++
 						$estimatedOutput["lines"] += $subMode["properties"].get_Count() + 2
 						$estimatedOutput["props"] += $subMode["properties"].get_Count()
 					}
@@ -89,7 +89,7 @@ function EstimateOutputStripper {
 				if ($mode["modes"]["delete"].get_Count() -gt 0) {
 					$estimatedOutput["lines"]++
 					foreach ($subMode in $mode["modes"]["delete"]) {
-						$estimatedOutput["modes"]++
+						# $estimatedOutput["modes"]++
 						$estimatedOutput["lines"] += $subMode["properties"].get_Count() + 2
 						$estimatedOutput["props"] += $subMode["properties"].get_Count()
 					}
@@ -98,7 +98,7 @@ function EstimateOutputStripper {
 				if ($mode["modes"]["insert"].get_Count() -gt 0) {
 					$estimatedOutput["lines"]++
 					foreach ($subMode in $mode["modes"]["insert"]) {
-						$estimatedOutput["modes"]++
+						# $estimatedOutput["modes"]++
 						$estimatedOutput["lines"] += $subMode["properties"].get_Count() + 2
 						$estimatedOutput["props"] += $subMode["properties"].get_Count()
 					}

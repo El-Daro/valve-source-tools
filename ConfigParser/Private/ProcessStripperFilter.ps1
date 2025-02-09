@@ -51,7 +51,6 @@ function ProcessStripperFilter {
 					foreach ($value in $stripperValues) {
 						# The new code for the matches
 						if ($value.Length -gt 2 -and $value[0] -eq "/" -and $value[$value.Length - 1] -eq "/") {
-							Write-Host -ForegroundColor DarkCyan "This is a regex"
 							$stripperValueRegex = $value.SubString(1, $value.Length - 2) 
 							if ($vmfClassEntry["properties"].Contains($key)) {
 								try {
@@ -91,11 +90,12 @@ function ProcessStripperFilter {
 				$MergesCount["filterSkipped"]++
 			}
 			for ($i = $indexesToRemove.Count - 1; $i -ge 0; $i--) {
-				Write-Host -ForegroundColor DarkYellow $("Removing at {0} / {1}" -f
+				Write-Debug $("Filter: Removing at {0} / {1}" -f
 					$indexesToRemove[$i], $($Vmf["classes"][$vmfClass].Count))
 				$Vmf["classes"][$vmfClass].RemoveAt($indexesToRemove[$i])
 			}
 		}
+		
 		# if ($MergesCount["section"] -ge $progressStep -and [math]::Floor($MergesCount["section"] / $progressStep) -gt $progressCounter) { 
 		# 	$progressCounter++
 		# 	$elapsedMilliseconds	= $sw.ElapsedMilliseconds

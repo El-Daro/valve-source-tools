@@ -31,22 +31,27 @@ function Copy-StripperIntoVmf {
 		try {
 
 			#region VARIABLES
-			$MergesCount["filter"]			= 0
-			$MergesCount["add"]				= 0
-			$MergesCount["modify"]			= 0
-			$MergesCount["modifyReplaced"]	= 0
-			$MergesCount["modifyDeleted"]	= 0
-			$MergesCount["modifyInserted"]	= 0
-			$MergesCount["filterSkipped"]	= 0
-			$MergesCount["addSkipped"]		= 0
-			$MergesCount["modifySkipped"]	= 0
-			$MergesCount["new"]				= 0
-			$MergesCount["failed"]			= 0
-			$MergesCount["section"]			= 0
-			$MergesCount["propsNew"]		= 0
-			$MergesCount["propsEdited"]		= 0
-			$MergesCount["propsDeleted"]	= 0
-			$MergesCount["propsSkipped"]	= 0
+			$MergesCount["filter"]			= 0			# +
+			$MergesCount["add"]				= 0			# +
+			$MergesCount["modify"]			= 0			# +
+			$MergesCount["modifyReplaced"]	= 0			# +
+			$MergesCount["modifyDeleted"]	= 0			# +
+			$MergesCount["modifyInserted"]	= 0			# +
+
+			$MergesCount["filterSkipped"]	= 0			# +
+			$MergesCount["addSkipped"]		= 0			# +
+			$MergesCount["modifySkipped"]	= 0			# +
+
+			$MergesCount["new"]				= 0			# -
+			$MergesCount["addFailed"]		= 0			# +
+			$MergesCount["modifyFailed"]	= 0			# +
+			$MergesCount["failed"]			= 0			# +
+			$MergesCount["section"]			= 0			# - (*)
+
+			$MergesCount["propsNew"]		= 0			# + (?)
+			$MergesCount["propsEdited"]		= 0			# +
+			$MergesCount["propsDeleted"]	= 0			# + (?)
+			$MergesCount["propsSkipped"]	= 0			# -
 			$MergesCount["propsTotal"]		= 0
 			$progressCounter				= 0
 			$progressStep					= $CounterStripper["total"] / 10
@@ -62,11 +67,9 @@ function Copy-StripperIntoVmf {
 						CounterStripper	= $CounterStripper
 					}
 					$filterProcessed = ProcessStripperFilter @params
-					if ($filterProcessed) {
-						$MergesCount["filter"]++
-					} else {
-						$MergesCount["failed"]++
-					}
+					# if (-not $filterProcessed) {
+					# 	$MergesCount["failed"]++
+					# }
 				}
 			}
 
@@ -80,12 +83,9 @@ function Copy-StripperIntoVmf {
 						CounterStripper	= $CounterStripper
 					}
 					$addProcessed = ProcessStripperAdd @params
-					# $MergesCount["add"]++
-					# $MergesCount["propsNew"] += $add["properties"].Count
-					# $Vmf["classes"]["entity"].Add($add)
 
 					if (-not $addProcessed) {
-						$MergesCount["failed"]++
+						$MergesCount["addFailed"]++
 					}
 				}
 			}
@@ -101,15 +101,13 @@ function Copy-StripperIntoVmf {
 						CounterStripper	= $CounterStripper
 					}
 					$modifyProcessed = ProcessStripperModify @params
-					if ($modifyProcessed) {
-						$MergesCount["modify"]++
-					} else {
-						$MergesCount["failed"]++
+					if (-not $modifyProcessed) {
+						$MergesCount["modifyFailed"]++
 					}
 				}
 			}
-			return $true
 
+			#region LMP code
 # :lmpLoop	foreach ($lmpSection in $Stripper["data"].Keys) {
 # 				$idToMatch	= $false
 # 				$matchBy	= ""
@@ -174,8 +172,9 @@ function Copy-StripperIntoVmf {
 # 					ReportProgress @params
 # 				}
 # 			}
-
-			$MergesCount["propsTotal"] = $MergesCount["propsEdited"] + $MergesCount["propsSkipped"] + $MergesCount["propsNew"]
+			#endregion
+			$MergesCount["failed"] = $MergesCount["addFailed"] + $MergesCount["modifyFailed"]
+			$MergesCount["propsTotal"] = $MergesCount["propsEdited"] + $MergesCount["propsSkipped"] + $MergesCount["propsNew"] + $MergesCount["propsDeleted"]
 			return $true
 
 		} catch {

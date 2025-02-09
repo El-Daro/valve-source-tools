@@ -1,3 +1,4 @@
+# TODO: Update
 # A simple test script for merging .vmf and .lmp files into a new .vmf
 
 using namespace System.Diagnostics
@@ -103,7 +104,7 @@ Write-Debug "Input stripper file: $StripperPath"
 Write-Debug "Output vmf file: $outputFilePath"
 Write-Debug "Log file: $logFile"
 if (-not $Silent.IsPresent) {
-	Write-Host -ForegroundColor Magenta -NoNewline	$("{0,20}: " -f "NOTE")
+	Write-Host -ForegroundColor Magenta -NoNewline	$("{0,25}: " -f "NOTE")
 	Write-Host -ForegroundColor Cyan				$("{0}" -f $additionalLog)
 }
 #endregion
