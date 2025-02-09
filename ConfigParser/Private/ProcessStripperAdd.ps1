@@ -42,6 +42,7 @@ function ProcessStripperAdd {
 					}
 			}
 
+			# We need to swap 'hammerid' with 'id' for VMF structure
 			$newBlock = [ordered]@{
 				properties	= [ordered]@{}
 				classes		= [ordered]@{}

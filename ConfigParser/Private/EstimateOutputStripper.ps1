@@ -25,82 +25,82 @@ function EstimateOutputStripper {
 
 		#region Rough approximation
 		# With the right coefficients might be worth it on large inputs
-		# $estimatedOutput["props"] = $Stripper["modes"]["filter"].Count +
-		# 				 			$Stripper["modes"]["add"].Count
-		# $estimatedOutput["modes"] = $Stripper["modes"]["filter"].Count +
-		# 							$Stripper["modes"]["add"].Count +
-		# 							$Stripper["modes"]["modify"].Count
-		# $estimatedOutput["lines"] = $Stripper["modes"]["filter"].Count * 3 + 1 +
-		# 							$Stripper["modes"]["add"].Count * 3 + 1 +
-		# 						#   $Stripper["modes"]["modify"].Count * 4 * 4 +
-		# 							$Stripper["modes"]["modify"].Count * 2 + 1
+		# $estimatedOutput["props"] = $Stripper["modes"]["filter"].get_Count() +
+		# 				 			$Stripper["modes"]["add"].get_Count()
+		# $estimatedOutput["modes"] = $Stripper["modes"]["filter"].get_Count() +
+		# 							$Stripper["modes"]["add"].get_Count() +
+		# 							$Stripper["modes"]["modify"].get_Count()
+		# $estimatedOutput["lines"] = $Stripper["modes"]["filter"].get_Count() * 3 + 1 +
+		# 							$Stripper["modes"]["add"].get_Count() * 3 + 1 +
+		# 						#   $Stripper["modes"]["modify"].get_Count() * 4 * 4 +
+		# 							$Stripper["modes"]["modify"].get_Count() * 2 + 1
 		#endregion
 		
-		if ($Stripper["modes"]["filter"].Count -gt 0) {
+		if ($Stripper["modes"]["filter"].get_Count() -gt 0) {
 			$estimatedOutput["lines"]++
 			foreach ($mode in $Stripper["modes"]["filter"]) {
-				$estimatedOutput["lines"]	+= $mode["properties"].Count + 2
-				$estimatedOutput["props"]	+= $mode["properties"].Count
+				$estimatedOutput["lines"]	+= $mode["properties"].get_Count() + 2
+				$estimatedOutput["props"]	+= $mode["properties"].get_Count()
 				$estimatedOutput["modes"]	+= 1
 				$estimatedOutput["filter"]	+= 1
 			}
 		}
 
-		if ($Stripper["modes"]["add"].Count -gt 0) {
+		if ($Stripper["modes"]["add"].get_Count() -gt 0) {
 			$estimatedOutput["lines"]++
 			foreach ($mode in $Stripper["modes"]["add"]) {
-				$estimatedOutput["lines"] += $mode["properties"].Count + 2
-				$estimatedOutput["props"] += $mode["properties"].Count
+				$estimatedOutput["lines"] += $mode["properties"].get_Count() + 2
+				$estimatedOutput["props"] += $mode["properties"].get_Count()
 				$estimatedOutput["modes"] += 1
 				$estimatedOutput["add"]	+= 1
 			}
 		}
 
-		if ($Stripper["modes"]["modify"].Count -gt 0) {
+		if ($Stripper["modes"]["modify"].get_Count() -gt 0) {
 			$estimatedOutput["lines"]++
 			foreach ($mode in $Stripper["modes"]["modify"]) {
 				# Rough approximation
-				# $estimatedLines += $mode["modes"]["match"].Count * 3 + 1 +
-				# 				   $mode["modes"]["replace"].Count * 3 + 1 +
-				# 				   $mode["modes"]["delete"].Count * 3 + 1 +
-				# 				   $mode["modes"]["insert"].Count * 3 + 1
+				# $estimatedLines += $mode["modes"]["match"].get_Count() * 3 + 1 +
+				# 				   $mode["modes"]["replace"].get_Count() * 3 + 1 +
+				# 				   $mode["modes"]["delete"].get_Count() * 3 + 1 +
+				# 				   $mode["modes"]["insert"].get_Count() * 3 + 1
 				# $estimatedLines += 2		#  Counting the brackets here
 				$estimatedOutput["modes"]	+= 1
 				$estimatedOutput["modify"]	+= 1
 				$estimatedOutput["lines"]	+= 2
-				if ($mode["modes"]["match"].Count -gt 0) {
+				if ($mode["modes"]["match"].get_Count() -gt 0) {
 					$estimatedOutput["lines"]++
 					foreach ($subMode in $mode["modes"]["match"]) {
 						$estimatedOutput["modes"]++
-						$estimatedOutput["lines"] += $subMode["properties"].Count + 2
-						$estimatedOutput["props"] += $subMode["properties"].Count
+						$estimatedOutput["lines"] += $subMode["properties"].get_Count() + 2
+						$estimatedOutput["props"] += $subMode["properties"].get_Count()
 					}
 				}
 
-				if ($mode["modes"]["replace"].Count -gt 0) {
+				if ($mode["modes"]["replace"].get_Count() -gt 0) {
 					$estimatedOutput["lines"]++
 					foreach ($subMode in $mode["modes"]["replace"]) {
 						$estimatedOutput["modes"]++
-						$estimatedOutput["lines"] += $subMode["properties"].Count + 2
-						$estimatedOutput["props"] += $subMode["properties"].Count
+						$estimatedOutput["lines"] += $subMode["properties"].get_Count() + 2
+						$estimatedOutput["props"] += $subMode["properties"].get_Count()
 					}
 				}
 
-				if ($mode["modes"]["delete"].Count -gt 0) {
+				if ($mode["modes"]["delete"].get_Count() -gt 0) {
 					$estimatedOutput["lines"]++
 					foreach ($subMode in $mode["modes"]["delete"]) {
 						$estimatedOutput["modes"]++
-						$estimatedOutput["lines"] += $subMode["properties"].Count + 2
-						$estimatedOutput["props"] += $subMode["properties"].Count
+						$estimatedOutput["lines"] += $subMode["properties"].get_Count() + 2
+						$estimatedOutput["props"] += $subMode["properties"].get_Count()
 					}
 				}
 
-				if ($mode["modes"]["insert"].Count -gt 0) {
+				if ($mode["modes"]["insert"].get_Count() -gt 0) {
 					$estimatedOutput["lines"]++
 					foreach ($subMode in $mode["modes"]["insert"]) {
 						$estimatedOutput["modes"]++
-						$estimatedOutput["lines"] += $subMode["properties"].Count + 2
-						$estimatedOutput["props"] += $subMode["properties"].Count
+						$estimatedOutput["lines"] += $subMode["properties"].get_Count() + 2
+						$estimatedOutput["props"] += $subMode["properties"].get_Count()
 					}
 				}
 			}

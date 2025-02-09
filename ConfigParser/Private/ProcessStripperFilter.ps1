@@ -1,6 +1,5 @@
 # TODO: IMPROVE
 #		- Consider recursive structure
-#		- Implement regex matching
 
 # TODO: REFACTOR
 #		- Incorporate the filter loop inside this function. Should save some time
