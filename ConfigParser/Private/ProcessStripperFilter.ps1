@@ -1,8 +1,10 @@
-# TODO: Consider recursive structure
-# TODO: Implement regex matching
+# TODO: IMPROVE
+#		- Consider recursive structure
+
 # TODO: REFACTOR
 #		- Incorporate the filter loop inside this function. Should save some time
 #		REASONING: We don't need to remove the same element twice. One match = add&skip
+#		OCCURENCE: Very rare
 
 using namespace System.Diagnostics
 
@@ -27,6 +29,14 @@ function ProcessStripperFilter {
 
 		[Parameter(Position = 4,
 		Mandatory = $false)]
+		[ref]$StopWatch,
+
+		[Parameter(Position = 5,
+		Mandatory = $false)]
+		$ProcessCounter,
+
+		[Parameter(Position = 6,
+		Mandatory = $false)]
 		[string]$LogFile,
 
 		[System.Management.Automation.SwitchParameter]$Silent
@@ -34,18 +44,12 @@ function ProcessStripperFilter {
 	
 	PROCESS {
 
-		#region VARIABLES
-		
-		#endregion
-
-		# foreach ($property in $Filter["properties"].Keys) {
-			# 'property' is 'classname'
-			# $Filter["properties"][$property] is func_playerinfected_clip
-			# PROCESS FILTERS
-			
-			# $vmfSectionFound = $false
 :mainL	foreach ($vmfClass in $Vmf["classes"].Keys) {
-			$indexesRemove = @()
+			$indexesToRemove	= @()
+			$vmfClassCount		= $Vmf["classes"][$vmfClass].get_Count()
+			$progressStep		= [math]::Ceiling($vmfClassCount / 5)
+			$vmfCounter			= 0
+			$progressCounter	= 0
 :vmfClassL	foreach ($vmfClassEntry in $Vmf["classes"][$vmfClass]) {
 				# $toRemove = $false
 				$matchCounter = 0
@@ -57,12 +61,33 @@ function ProcessStripperFilter {
 					}
 					$stripperValues = $Filter["properties"][$stripperProp]
 					foreach ($value in $stripperValues) {
-						if ($vmfClassEntry["properties"].Contains($key) -and
-							$vmfClassEntry["properties"][$key].Contains($value)) {
-							$matchCounter++	
-						# $vmfSectionFound = $true
+						# The new code for the matches
+						if ($value.Length -gt 2 -and $value[0] -eq "/" -and $value[$value.Length - 1] -eq "/") {
+							$stripperValueRegex = $value.SubString(1, $value.Length - 2) 
+							if ($vmfClassEntry["properties"].Contains($key)) {
+								try {
+									foreach ($vmfPropValue in $vmfClassEntry["properties"][$key]) {
+										if ($vmfPropValue -match $stripperValueRegex) {
+											$matchCounter++
+											break
+										}
+									}
+								} catch {
+									Write-Debug "$($MyInvocation.MyCommand):  Failed to do a regex check"
+								}
+							} else {
+								break stripperMainL
+							}
 						} else {
-							break stripperMainL
+
+							# The original code for the matches
+							if ($vmfClassEntry["properties"].Contains($key) -and
+								$vmfClassEntry["properties"][$key].Contains($value)) {
+								$matchCounter++	
+							# $vmfSectionFound = $true
+							} else {
+								break stripperMainL
+							}
 						}
 					}
 				}
@@ -70,47 +95,39 @@ function ProcessStripperFilter {
 					# $toRemove = $true
 					$MergesCount["filter"]++
 					$index = $Vmf["classes"][$vmfClass].IndexOf($VmfClassEntry)
-					$indexesRemove += $index
+					$indexesToRemove += $index
 				}
+
+				#region Time estimation
+				if ($VmfClassCount -gt 1 -and
+						$vmfCounter -ge $progressStep -and [math]::Floor($vmfCounter / $progressStep) -gt $progressCounter) { 
+					$progressCounter++
+					$elapsedMilliseconds	= $StopWatch.Value.ElapsedMilliseconds
+					$estimatedMilliseconds	= ($VmfClassCount / $vmfCounter) * $elapsedMilliseconds
+					$params = @{
+						currentLine				= $vmfCounter
+						LinesCount				= $VmfClassCount
+						EstimatedMilliseconds	= $estimatedMilliseconds
+						ElapsedMilliseconds		= $StopWatch.Value.ElapsedMilliseconds
+						Activity				= $("Stripper: Merging filter {0} / {1} ..." -f
+														$ProcessCounter["counter"], $ProcessCounter["total"])
+					}
+					ReportProgress @params
+				}
+				#endregion
+				$vmfCounter++
+
 			}
-			for ($i = $indexesRemove.Count - 1; $i -ge 0; $i--) {
-				Write-Host -ForegroundColor DarkYellow $("Removing at {0} / {1}" -f
-					$indexesRemove[$i], $($Vmf["classes"][$vmfClass].Count))
-				$Vmf["classes"][$vmfClass].RemoveAt($indexesRemove[$i])
+			if ($indexesToRemove.Count -eq 0) {
+				$MergesCount["filterSkipped"]++
 			}
-			# foreach ($index in $indexesRemove) {
-			# 	Write-Host -ForegroundColor DarkYellow "Removing at $index out of $($Vmf["classes"][$vmfClass].Count)"
-			# 	$Vmf["classes"][$vmfClass].RemoveAt($index)
-			# }
+			for ($i = $indexesToRemove.Count - 1; $i -ge 0; $i--) {
+				Write-Debug $("Filter: Removing at {0} / {1}" -f
+					$indexesToRemove[$i], $($Vmf["classes"][$vmfClass].Count))
+				$Vmf["classes"][$vmfClass].RemoveAt($indexesToRemove[$i])
+			}
 		}
-			# if (-not $vmfSectionFound) {
-			# 	$MergesCount["new"]++
-			# 	# Add a new section to VMF file
-			# 	$newBlock = [ordered]@{
-			# 		properties = $Stripper["data"][$lmpSection]
-			# 		classes    = [ordered]@{}
-			# 	}
-			# 	$MergesCount["propsNew"] += $newBlock["properties"].Count
-			# 	$Vmf["classes"]["entity"].Add($newBlock)
-			# }
-			# $MergesCount["section"]++
-
-			# if ($MergesCount["section"] -ge $progressStep -and [math]::Floor($MergesCount["section"] / $progressStep) -gt $progressCounter) { 
-			# 	$progressCounter++
-			# 	$elapsedMilliseconds	= $sw.ElapsedMilliseconds
-			# 	$estimatedMilliseconds	= ($CounterStripper["total"] / $MergesCount["section"]) * $elapsedMilliseconds
-			# 	$params = @{
-			# 		currentLine				= $MergesCount["section"]
-			# 		LinesCount				= $CounterStripper["total"]
-			# 		EstimatedMilliseconds	= $estimatedMilliseconds
-			# 		ElapsedMilliseconds		= $sw.ElapsedMilliseconds
-			# 		Activity				= "Merging..."
-			# 	}
-			# 	ReportProgress @params
-			# }
-		# }
-
-		# $MergesCount["propsTotal"] = $MergesCount["propsEdited"] + $MergesCount["propsSkipped"] + $MergesCount["propsNew"]
+		
 		return $true
 	}
 

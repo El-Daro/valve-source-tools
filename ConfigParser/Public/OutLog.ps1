@@ -11,7 +11,7 @@ function OutLog {
 
 		[Parameter(Position = 2,
 		Mandatory = $false)]
-		$ColumnWidth = 20,
+		$ColumnWidth = 25,
 
 		[Parameter(Position = 3,
 		Mandatory = $false)]

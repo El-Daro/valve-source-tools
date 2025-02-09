@@ -1,6 +1,8 @@
 # TODO: Make sure all the LMP contents get copied
 #		Some LMP ids are completely new — copy the pointer in this case
 
+# TODO: Swap 'hammerid' with 'id' when adding a new element
+
 using namespace System.Diagnostics
 
 function Copy-LmpIntoVmf {

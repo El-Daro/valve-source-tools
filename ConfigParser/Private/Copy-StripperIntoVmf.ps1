@@ -19,6 +19,10 @@ function Copy-StripperIntoVmf {
 		Mandatory = $true)]
 		$CounterStripper,
 
+		[Parameter(Position = 3,
+		Mandatory = $true)]
+		[ref]$StopWatch,
+
 		[Parameter(Position = 4,
 		Mandatory = $false)]
 		[string]$LogFile,
@@ -31,20 +35,37 @@ function Copy-StripperIntoVmf {
 		try {
 
 			#region VARIABLES
-			$MergesCount["filter"]			= 0
-			$MergesCount["add"]				= 0
-			$MergesCount["modify"]			= 0
-			$MergesCount["new"]				= 0
-			$MergesCount["failed"]			= 0
-			$MergesCount["section"]			= 0
-			$MergesCount["propsEdited"]		= 0
-			$MergesCount["propsSkipped"]	= 0
+			$MergesCount["filter"]			= 0			# +
+			$MergesCount["add"]				= 0			# +
+			$MergesCount["modify"]			= 0			# +
+			$MergesCount["modifyReplaced"]	= 0			# +
+			$MergesCount["modifyDeleted"]	= 0			# +
+			$MergesCount["modifyInserted"]	= 0			# +
+
+			$MergesCount["filterSkipped"]	= 0			# +
+			$MergesCount["addSkipped"]		= 0			# +
+			$MergesCount["modifySkipped"]	= 0			# +
+
+			$MergesCount["new"]				= 0			# -
+			$MergesCount["addFailed"]		= 0			# +
+			$MergesCount["modifyFailed"]	= 0			# +
+			$MergesCount["failed"]			= 0			# +
+			$MergesCount["section"]			= 0			# - (*)
+
+			$MergesCount["propsNew"]		= 0			# + (?)
+			$MergesCount["propsEdited"]		= 0			# +
+			$MergesCount["propsDeleted"]	= 0			# + (?)
+			$MergesCount["propsSkipped"]	= 0			# -
 			$MergesCount["propsTotal"]		= 0
 			$progressCounter				= 0
 			$progressStep					= $CounterStripper["total"] / 10
 			#endregion
 
-			if ($Stripper["modes"]["filter"].Count -gt 0) {
+			if ($Stripper["modes"]["filter"].get_Count() -gt 0) {
+				$filterCounter	= @{
+					total		= $Stripper["modes"]["filter"].get_Count()
+					counter		= 0
+				}
 :filterLoop		foreach ($filter in $Stripper["modes"]["filter"]) {
 					$filterProcessed = $false
 					$params	= @{
@@ -52,17 +73,22 @@ function Copy-StripperIntoVmf {
 						Filter			= $filter
 						MergesCount		= $MergesCount
 						CounterStripper	= $CounterStripper
+						StopWatch		= $StopWatch
+						ProcessCounter	= $filterCounter
 					}
 					$filterProcessed = ProcessStripperFilter @params
-					if ($filterProcessed) {
-						$MergesCount["filter"]++
-					} else {
-						$MergesCount["failed"]++
-					}
+					$filterCounter["counter"]++
+					# if (-not $filterProcessed) {
+					# 	$MergesCount["failed"]++
+					# }
 				}
 			}
 
-			if ($Stripper["modes"]["add"].Count -gt 0) {
+			if ($Stripper["modes"]["add"].get_Count() -gt 0) {
+				$addCounter	= @{
+					total		= $Stripper["modes"]["add"].get_Count()
+					counter		= 0
+				}
 :addLoop		foreach ($add in $Stripper["modes"]["add"]) {
 					$addProcessed = $false
 					$params	= @{
@@ -70,101 +96,109 @@ function Copy-StripperIntoVmf {
 						Add				= $add
 						MergesCount		= $MergesCount
 						CounterStripper	= $CounterStripper
+						StopWatch		= $StopWatch
+						ProcessCounter	= $addCounter
 					}
 					$addProcessed = ProcessStripperAdd @params
-					if ($addProcessed) {
-						$MergesCount["add"]++
-					} else {
-						$MergesCount["failed"]++
+					$addCounter["counter"]++
+					if (-not $addProcessed) {
+						$MergesCount["addFailed"]++
 					}
 				}
 			}
 
 			# Different approach to modifies
-			if ($Stripper["modes"]["modify"].Count -gt 0) {
-:addLoop		foreach ($modify in $Stripper["modes"]["modify"]) {
+			if ($Stripper["modes"]["modify"].get_Count() -gt 0) {
+				$modifyCounter	= @{
+					total		= $Stripper["modes"]["modify"].get_Count()
+					counter		= 0
+				}
+:modLoop		foreach ($modify in $Stripper["modes"]["modify"]) {
 					$modifyProcessed = $false
 					$params	= @{
 						Vmf				= $Vmf
 						Modify			= $modify
 						MergesCount		= $MergesCount
 						CounterStripper	= $CounterStripper
+						StopWatch		= $StopWatch
+						ProcessCounter	= $modifyCounter
 					}
 					$modifyProcessed = ProcessStripperModify @params
-					if ($modifyProcessed) {
-						$MergesCount["modify"]++
-					} else {
-						$MergesCount["failed"]++
+					$modifyCounter["counter"]++
+					if (-not $modifyProcessed) {
+						$MergesCount["modifyFailed"]++
 					}
 				}
 			}
 
-:lmpLoop	foreach ($lmpSection in $Stripper["data"].Keys) {
-				$idToMatch	= $false
-				$matchBy	= ""
-				if ($lmpSection.SubString(0,$lmpHammerIdOffset) -eq "hammerid-") {
-					$idToMatch	= $Stripper["data"][$lmpSection]["hammerid"][0]
-					$matchBy	= "id"					# Either match by id-hammerid
-				} elseif ($lmpSection.SubString(0,$lmpClassnameOffset) -eq "classname-") {
-					$idToMatch	= $Stripper["data"][$lmpSection]["classname"][0]
-					$matchBy	= "classname"			# Or by a classname
-				} else {
-					$MergesCount["failed"]++			# You're not supposed to be here, but just in case
-					Write-Host -ForegroundColor DarkYellow "This is an error"
-					Write-Host $lmpSection
-				}
-				if ($idToMatch) {
-					$vmfSectionFound = $false
-:vmfHashLoopH		foreach ($vmfClass in $Vmf["classes"].Keys) {
-:vmfListLoopH			foreach ($vmfClassEntry in $Vmf["classes"][$vmfClass]) {
-							if ($vmfClassEntry["properties"].Contains($matchBy) -and
-								$idToMatch -eq $vmfClassEntry["properties"][$matchBy][0]) {
-								$vmfSectionFound = $true
-								if ($matchBy -eq "id") {
-									$MergesCount["hammerid"]++
-								} else {
-									$MergesCount["classname"]++
-								}
-								$params = @{
-									VmfSection	= $vmfClassEntry
-									StripperSection	= $Stripper["data"][$lmpSection]
-									MergesCount	= $MergesCount
-								}
-								Copy-StripperSection @params
+			#region LMP code
+# :lmpLoop	foreach ($lmpSection in $Stripper["data"].Keys) {
+# 				$idToMatch	= $false
+# 				$matchBy	= ""
+# 				if ($lmpSection.SubString(0,$lmpHammerIdOffset) -eq "hammerid-") {
+# 					$idToMatch	= $Stripper["data"][$lmpSection]["hammerid"][0]
+# 					$matchBy	= "id"					# Either match by id-hammerid
+# 				} elseif ($lmpSection.SubString(0,$lmpClassnameOffset) -eq "classname-") {
+# 					$idToMatch	= $Stripper["data"][$lmpSection]["classname"][0]
+# 					$matchBy	= "classname"			# Or by a classname
+# 				} else {
+# 					$MergesCount["failed"]++			# You're not supposed to be here, but just in case
+# 					Write-Host -ForegroundColor DarkYellow "This is an error"
+# 					Write-Host $lmpSection
+# 				}
+# 				if ($idToMatch) {
+# 					$vmfSectionFound = $false
+# :vmfHashLoopH		foreach ($vmfClass in $Vmf["classes"].Keys) {
+# :vmfListLoopH			foreach ($vmfClassEntry in $Vmf["classes"][$vmfClass]) {
+# 							if ($vmfClassEntry["properties"].Contains($matchBy) -and
+# 								$idToMatch -eq $vmfClassEntry["properties"][$matchBy][0]) {
+# 								$vmfSectionFound = $true
+# 								if ($matchBy -eq "id") {
+# 									$MergesCount["hammerid"]++
+# 								} else {
+# 									$MergesCount["classname"]++
+# 								}
+# 								$params = @{
+# 									VmfSection	= $vmfClassEntry
+# 									StripperSection	= $Stripper["data"][$lmpSection]
+# 									MergesCount	= $MergesCount
+# 								}
+# 								Copy-StripperSection @params
 
-								break vmfHashLoopH
-							}
-						}
-					}
-					if (-not $vmfSectionFound) {
-						$MergesCount["new"]++
-						# Add a new section to VMF file
-						$newBlock = [ordered]@{
-							properties = $Stripper["data"][$lmpSection]
-							classes    = [ordered]@{}
-						}
-						$MergesCount["propsNew"] += $newBlock["properties"].Count
-						$Vmf["classes"]["entity"].Add($newBlock)
-					}
-				}
-				$MergesCount["section"]++
+# 								break vmfHashLoopH
+# 							}
+# 						}
+# 					}
+# 					if (-not $vmfSectionFound) {
+# 						$MergesCount["new"]++
+# 						# Add a new section to VMF file
+# 						$newBlock = [ordered]@{
+# 							properties = $Stripper["data"][$lmpSection]
+# 							classes    = [ordered]@{}
+# 						}
+# 						$MergesCount["propsNew"] += $newBlock["properties"].Count
+# 						$Vmf["classes"]["entity"].Add($newBlock)
+# 					}
+# 				}
+# 				$MergesCount["section"]++
 
-				if ($MergesCount["section"] -ge $progressStep -and [math]::Floor($MergesCount["section"] / $progressStep) -gt $progressCounter) { 
-					$progressCounter++
-					$elapsedMilliseconds	= $sw.ElapsedMilliseconds
-					$estimatedMilliseconds	= ($CounterStripper["total"] / $MergesCount["section"]) * $elapsedMilliseconds
-					$params = @{
-						currentLine				= $MergesCount["section"]
-						LinesCount				= $CounterStripper["total"]
-						EstimatedMilliseconds	= $estimatedMilliseconds
-						ElapsedMilliseconds		= $sw.ElapsedMilliseconds
-						Activity				= "Merging..."
-					}
-					ReportProgress @params
-				}
-			}
-
-			$MergesCount["propsTotal"] = $MergesCount["propsEdited"] + $MergesCount["propsSkipped"] + $MergesCount["propsNew"]
+# 				if ($MergesCount["section"] -ge $progressStep -and [math]::Floor($MergesCount["section"] / $progressStep) -gt $progressCounter) { 
+# 					$progressCounter++
+# 					$elapsedMilliseconds	= $sw.ElapsedMilliseconds
+# 					$estimatedMilliseconds	= ($CounterStripper["total"] / $MergesCount["section"]) * $elapsedMilliseconds
+# 					$params = @{
+# 						currentLine				= $MergesCount["section"]
+# 						LinesCount				= $CounterStripper["total"]
+# 						EstimatedMilliseconds	= $estimatedMilliseconds
+# 						ElapsedMilliseconds		= $sw.ElapsedMilliseconds
+# 						Activity				= "Merging..."
+# 					}
+# 					ReportProgress @params
+# 				}
+# 			}
+			#endregion
+			$MergesCount["failed"] = $MergesCount["addFailed"] + $MergesCount["modifyFailed"]
+			$MergesCount["propsTotal"] = $MergesCount["propsEdited"] + $MergesCount["propsSkipped"] + $MergesCount["propsNew"] + $MergesCount["propsDeleted"]
 			return $true
 
 		} catch {

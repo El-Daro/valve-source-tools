@@ -1,3 +1,4 @@
+# TODO: Update 
 # A simple test script for merging .vmf and .lmp files into a new .vmf
 
 using namespace System.Diagnostics
@@ -6,15 +7,18 @@ using namespace System.Diagnostics
 Param (
 	[Parameter(Position = 0,
 	Mandatory = $true)]
-	[string]$VmfPath = "..\configs\vmf-lmp-stripper\mergeTest.vmf",
+	# [string]$VmfPath = "..\configs\vmf-lmp-stripper\mergeTest.vmf",
+	[string]$VmfPath = "..\configs\vmf-lmp-stripper\c5m3_cemetery_d.vmf",
 
 	[Parameter(Position = 1,
 	Mandatory = $false)]
-	[string]$LmpPath = "..\configs\vmf-lmp-stripper\mergeTest.lmp",
+	# [string]$LmpPath = "..\configs\vmf-lmp-stripper\mergeTest.lmp",
+	[string]$LmpPath = "..\configs\vmf-lmp-stripper\c5m3_cemetery_l_0.lmp",
 
 	[Parameter(Position = 2,
 	Mandatory = $false)]
-	[string]$StripperPath = "..\configs\vmf-lmp-stripper\mergeTest.cfg",
+	# [string]$StripperPath = "..\configs\vmf-lmp-stripper\mergeTest.cfg",
+	[string]$StripperPath = "..\configs\vmf-lmp-stripper\c5m3_cemetery.cfg",
 
 	[Parameter(Position = 3)]
 	[string]$OutputFilePath,
@@ -103,7 +107,7 @@ Write-Debug "Input stripper file: $StripperPath"
 Write-Debug "Output vmf file: $outputFilePath"
 Write-Debug "Log file: $logFile"
 if (-not $Silent.IsPresent) {
-	Write-Host -ForegroundColor Magenta -NoNewline	$("{0,20}: " -f "NOTE")
+	Write-Host -ForegroundColor Magenta -NoNewline	$("{0,25}: " -f "NOTE")
 	Write-Host -ForegroundColor Cyan				$("{0}" -f $additionalLog)
 }
 #endregion
