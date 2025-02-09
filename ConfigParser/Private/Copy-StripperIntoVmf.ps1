@@ -66,6 +66,7 @@ function Copy-StripperIntoVmf {
 					total		= $Stripper["modes"]["filter"].get_Count()
 					counter		= 0
 				}
+				$sw = [Stopwatch]::StartNew()
 :filterLoop		foreach ($filter in $Stripper["modes"]["filter"]) {
 					$filterProcessed = $false
 					$params	= @{
@@ -73,7 +74,7 @@ function Copy-StripperIntoVmf {
 						Filter			= $filter
 						MergesCount		= $MergesCount
 						CounterStripper	= $CounterStripper
-						StopWatch		= $StopWatch
+						StopWatch		= [ref]$sw
 						ProcessCounter	= $filterCounter
 					}
 					$filterProcessed = ProcessStripperFilter @params
@@ -82,6 +83,7 @@ function Copy-StripperIntoVmf {
 					# 	$MergesCount["failed"]++
 					# }
 				}
+				$sw.Stop()
 			}
 
 			if ($Stripper["modes"]["add"].get_Count() -gt 0) {
@@ -89,6 +91,7 @@ function Copy-StripperIntoVmf {
 					total		= $Stripper["modes"]["add"].get_Count()
 					counter		= 0
 				}
+				$sw = [Stopwatch]::StartNew()
 :addLoop		foreach ($add in $Stripper["modes"]["add"]) {
 					$addProcessed = $false
 					$params	= @{
@@ -96,15 +99,17 @@ function Copy-StripperIntoVmf {
 						Add				= $add
 						MergesCount		= $MergesCount
 						CounterStripper	= $CounterStripper
-						StopWatch		= $StopWatch
+						StopWatch		= [ref]$sw
 						ProcessCounter	= $addCounter
 					}
+					# Adding is O(1), so we don't need to create progress bar. Params passed for future use
 					$addProcessed = ProcessStripperAdd @params
 					$addCounter["counter"]++
 					if (-not $addProcessed) {
 						$MergesCount["addFailed"]++
 					}
 				}
+				$sw.Stop()
 			}
 
 			# Different approach to modifies
@@ -113,6 +118,7 @@ function Copy-StripperIntoVmf {
 					total		= $Stripper["modes"]["modify"].get_Count()
 					counter		= 0
 				}
+				$sw = [Stopwatch]::StartNew()
 :modLoop		foreach ($modify in $Stripper["modes"]["modify"]) {
 					$modifyProcessed = $false
 					$params	= @{
@@ -120,7 +126,7 @@ function Copy-StripperIntoVmf {
 						Modify			= $modify
 						MergesCount		= $MergesCount
 						CounterStripper	= $CounterStripper
-						StopWatch		= $StopWatch
+						StopWatch		= [ref]$sw
 						ProcessCounter	= $modifyCounter
 					}
 					$modifyProcessed = ProcessStripperModify @params
@@ -129,6 +135,7 @@ function Copy-StripperIntoVmf {
 						$MergesCount["modifyFailed"]++
 					}
 				}
+				$sw.Stop()
 			}
 
 			#region LMP code
@@ -197,8 +204,8 @@ function Copy-StripperIntoVmf {
 # 				}
 # 			}
 			#endregion
-			$MergesCount["failed"] = $MergesCount["addFailed"] + $MergesCount["modifyFailed"]
-			$MergesCount["propsTotal"] = $MergesCount["propsEdited"] + $MergesCount["propsSkipped"] + $MergesCount["propsNew"] + $MergesCount["propsDeleted"]
+			$MergesCount["failed"]		= $MergesCount["addFailed"] + $MergesCount["modifyFailed"]
+			$MergesCount["propsTotal"]	= $MergesCount["propsEdited"] + $MergesCount["propsSkipped"] + $MergesCount["propsNew"] + $MergesCount["propsDeleted"]
 			return $true
 
 		} catch {

@@ -134,7 +134,7 @@ function Copy-LmpIntoVmf {
 						LinesCount				= $CounterLmp["total"]
 						EstimatedMilliseconds	= $estimatedMilliseconds
 						ElapsedMilliseconds		= $sw.ElapsedMilliseconds
-						Activity				= "Merging..."
+						Activity				= "Merging LMP into VMF..."
 					}
 					ReportProgress @params
 				}

@@ -215,7 +215,9 @@ function Import-Vmf {
 		# Had to do this due to a nasty bug with .NET being dependent on the context of where the script was launched from
 		$Path = $(Get-AbsolutePath -Path $Path)
 		$LogFile = $(Get-AbsolutePath -Path $LogFile)
-		OutLog	-Value "`nVMF | Input received: $Path"	-Path $LogFile -OneLine
+		if (-not $Silent.IsPresent) {
+			OutLog	-Value "`nVMF | Input received: $Path"	-Path $LogFile -OneLine
+		}
 
 		try {
 			$fileSize	= (Get-Item $Path).Length
@@ -226,7 +228,7 @@ function Import-Vmf {
 				$paramsLog	= @{
 					Property	= "File size"
 					Value		= $("{0,$digitsFileSize}Kb" -f $fileSizeKB)
-					ColumnWidth	= 20				# Should be default
+					# ColumnWidth	= 25				# Should be default
 					Path		= $LogFile
 				}
 				OutLog @paramsLog

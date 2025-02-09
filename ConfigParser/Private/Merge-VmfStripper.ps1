@@ -59,7 +59,7 @@ function Merge-VmfStripper {
 			$copied = Copy-StripperIntoVmf @params
 
 			if (-not $copied) {
-				Throw $_.Exception
+				Throw "$($MyInvocation.MyCommand):  Failed to copy Stripper into VMF"
 			}
 			#endregion
 		} catch {
@@ -80,9 +80,9 @@ function Merge-VmfStripper {
 				OutLog -Property "Merge: filters processed"	-Value $("{0}" -f $mergesCount["filter"])										-Path $LogFile
 				OutLog -Property "Merge: add processed"		-Value $("{0} / {1}" -f $mergesCount["add"], $counterStripper["add"])											-Path $LogFile
 				OutLog -Property "Merge: modify processed"	-Value $("{0}" -f $mergesCount["modify"])										-Path $LogFile
-				OutLog -Property "Merged modify: replace"	-Value $("{0}" -f $mergesCount["modifyReplaced"])								-Path $LogFile
-				OutLog -Property "Merged modify: delete"	-Value $("{0}" -f $mergesCount["modifyDeleted"])								-Path $LogFile
-				OutLog -Property "Merged modify: insert"	-Value $("{0}" -f $mergesCount["modifyInserted"])								-Path $LogFile
+				OutLog -Property "Merged modify - replace"	-Value $("{0}" -f $mergesCount["modifyReplaced"])								-Path $LogFile
+				OutLog -Property "Merged modify - delete"	-Value $("{0}" -f $mergesCount["modifyDeleted"])								-Path $LogFile
+				OutLog -Property "Merged modify - insert"	-Value $("{0}" -f $mergesCount["modifyInserted"])								-Path $LogFile
 				OutLog -Property "Skipped filter"			-Value $("{0}" -f $mergesCount["filterSkipped"])								-Path $LogFile
 				OutLog -Property "Skipped add"				-Value $("{0}" -f $mergesCount["addSkipped"])									-Path $LogFile
 				OutLog -Property "Skipped modify"			-Value $("{0}" -f $mergesCount["modifySkipped"])								-Path $LogFile

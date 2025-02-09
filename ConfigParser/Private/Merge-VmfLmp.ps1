@@ -88,9 +88,9 @@ function Merge-VmfLmp {
 				OutLog -Property "Properties edited"	-Value $("{0} / {1}" -f $mergesCount["propsEdited"], $mergesCount["propsTotal"])	-Path $LogFile
 				OutLog -Property "Properties skipped"	-Value $("{0} / {1}" -f $mergesCount["propsSkipped"], $mergesCount["propsTotal"])	-Path $LogFile
 				OutLog -Property "Properties new"		-Value $("{0} / {1}" -f $mergesCount["propsNew"], $mergesCount["propsTotal"])		-Path $LogFile
-				OutLog -Property "Elapsed time"			-Value $timeFormatted									-Path $LogFile
-				OutLog -Property "Speed"		-Value $("{0:n0} sections per second" -f $sectionsPerSecond)	-Path $LogFile
-				OutLog -Property "Speed"		-Value $("{0:n0} properties per second" -f $propsPerSecond)		-Path $LogFile
+				OutLog -Property "Elapsed time"			-Value $timeFormatted																-Path $LogFile
+				OutLog -Property "Speed"				-Value $("{0:n0} sections per second" -f $sectionsPerSecond)						-Path $LogFile
+				OutLog -Property "Speed"				-Value $("{0:n0} properties per second" -f $propsPerSecond)							-Path $LogFile
 			}
 			#endregion
 		}

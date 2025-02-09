@@ -1,4 +1,4 @@
-# TODO: Update 
+# TODO: Update
 # A simple test script for merging .vmf and .lmp files into a new .vmf
 
 using namespace System.Diagnostics
@@ -143,19 +143,14 @@ Try {
 		OutLog -Property "Verbose"				-Value $PSBoundParameters.ContainsKey('Verbose').ToString()	-Path $logFile -NoConsole
 	}
 	#endregion
-
-	# Add properties to it
-	# $err = New-Object System.Management.Automation.ErrorRecord "Line 1 `n Line 2", $null, 'NotSpecified', $null
-	# $PSCmdlet.WriteError(($err))	
+	
 	$vmfParsed		= Import-Vmf -Path $VmfPath	-LogFile $logFile -Silent:$Silent.IsPresent
 	$lmpParsed		= Import-Lmp -Path $LmpPath	-LogFile $logFile -Silent:$Silent.IsPresent
 	$stripperParsed	= Import-Stripper -Path $StripperPath -LogFile $logFile -Silent:$Silent.IsPresent
-
 	
 	if ($vmfParsed -and $lmpParsed -and $stripperParsed) {
-		# TODO: Write the stripper merger
 		$vmfMerged = Merge-Map -Vmf $vmfParsed -Lmp $lmpParsed -Stripper $stripperParsed -LogFile $logFile -Silent:$Silent.IsPresent
-		
+
 		if ($vmfMerged) {
 			if ($debugPassed) {
 				Export-Vmf -InputObject $vmfMerged -DebugOutput $outputFilePath -LogFile $logFile -Fast $Fast -Silent:$Silent.IsPresent -Force:$Force.IsPresent -Debug
@@ -188,6 +183,7 @@ Try {
 		$logMessage += "$timestamp `n"
 		$logMessage += "=" * 40 + "`n`n"
 		OutLog -Value $logMessage -Path $logFile -NoConsole
+		Write-Host ""
 	}
 	#endregion
 

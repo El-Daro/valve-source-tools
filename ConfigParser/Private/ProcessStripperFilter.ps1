@@ -47,7 +47,7 @@ function ProcessStripperFilter {
 :mainL	foreach ($vmfClass in $Vmf["classes"].Keys) {
 			$indexesToRemove	= @()
 			$vmfClassCount		= $Vmf["classes"][$vmfClass].get_Count()
-			$progressStep		= [math]::Ceiling($vmfClassCount / 5)
+			$progressStep		= [math]::Ceiling($vmfClassCount / 3)
 			$vmfCounter			= 0
 			$progressCounter	= 0
 :vmfClassL	foreach ($vmfClassEntry in $Vmf["classes"][$vmfClass]) {
@@ -99,11 +99,12 @@ function ProcessStripperFilter {
 				}
 
 				#region Time estimation
-				if ($VmfClassCount -gt 1 -and
+				if ($VmfClassCount -gt 1000 -and
 						$vmfCounter -ge $progressStep -and [math]::Floor($vmfCounter / $progressStep) -gt $progressCounter) { 
 					$progressCounter++
 					$elapsedMilliseconds	= $StopWatch.Value.ElapsedMilliseconds
-					$estimatedMilliseconds	= ($VmfClassCount / $vmfCounter) * $elapsedMilliseconds
+					$estimatedMilliseconds	= $elapsedMilliseconds *
+						(($VmfClassCount * $ProcessCounter["total"]) / ($vmfCounter + $VmfClassCount * $ProcessCounter["counter"]))
 					$params = @{
 						currentLine				= $vmfCounter
 						LinesCount				= $VmfClassCount

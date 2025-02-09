@@ -41,7 +41,7 @@ function EstimateOutputVmf {
 			if ($estimatedLines -gt 0) {
 				$timeFormatted = "{0}m {1}s {2}ms" -f
 					$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
-				OutLog								-Value "`nOutput estimation: Complete"	-Path $LogFile -OneLine
+				OutLog								-Value "`nVMF | Output estimation: Complete"	-Path $LogFile -OneLine
 				OutLog -Property "Properties"		-Value $properties						-Path $LogFile
 				OutLog -Property "Classes"			-Value $classes							-Path $LogFile
 				OutLog -Property "Estimated lines"	-Value $estimatedLines					-Path $LogFile

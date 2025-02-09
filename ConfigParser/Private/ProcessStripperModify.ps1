@@ -50,17 +50,17 @@ function ProcessStripperModify {
 
 :mainL	foreach ($vmfClass in $Vmf["classes"].Keys) {
 			$vmfClassCount		= $Vmf["classes"][$vmfClass].get_Count()
-			$progressStep		= [math]::Ceiling($vmfClassCount / 5)
+			$progressStep		= [math]::Ceiling($vmfClassCount / 3)
 			$vmfCounter			= 0
 			$progressCounter	= 0
 :vmfClassL	foreach ($vmfClassEntry in $Vmf["classes"][$vmfClass]) {
-				$matchCounter = 0
+				$matchCounter	= 0
 				#region 1. MATCH
 				$params = @{
 					VmfClassEntry	= $vmfClassEntry
 					Modify			= $Modify
 				}
-				$matchCounter = ProcessStripperModMatch @params
+				$matchCounter	= ProcessStripperModMatch @params
 				#endregion
 				# If all the props in the 'match' section have matched
 				if ($matchCounter -eq $Modify["modes"]["match"][0]["properties"].Count) {
@@ -101,11 +101,12 @@ function ProcessStripperModify {
 				}
 
 				#region Time estimation
-				if ($VmfClassCount -gt 1 -and
+				if ($VmfClassCount -gt 1000 -and
 						$vmfCounter -ge $progressStep -and [math]::Floor($vmfCounter / $progressStep) -gt $progressCounter) { 
 					$progressCounter++
 					$elapsedMilliseconds	= $StopWatch.Value.ElapsedMilliseconds
-					$estimatedMilliseconds	= ($VmfClassCount / $vmfCounter) * $elapsedMilliseconds
+					$estimatedMilliseconds	= $elapsedMilliseconds *
+						(($VmfClassCount * $ProcessCounter["total"]) / ($vmfCounter + $VmfClassCount * $ProcessCounter["counter"]))
 					$params = @{
 						currentLine				= $vmfCounter
 						LinesCount				= $VmfClassCount
