@@ -29,6 +29,14 @@ function ProcessStripperFilter {
 
 		[Parameter(Position = 4,
 		Mandatory = $false)]
+		[ref]$StopWatch,
+
+		[Parameter(Position = 5,
+		Mandatory = $false)]
+		$ProcessCounter,
+
+		[Parameter(Position = 6,
+		Mandatory = $false)]
 		[string]$LogFile,
 
 		[System.Management.Automation.SwitchParameter]$Silent
@@ -37,7 +45,11 @@ function ProcessStripperFilter {
 	PROCESS {
 
 :mainL	foreach ($vmfClass in $Vmf["classes"].Keys) {
-			$indexesToRemove = @()
+			$indexesToRemove	= @()
+			$vmfClassCount		= $Vmf["classes"][$vmfClass].get_Count()
+			$progressStep		= [math]::Ceiling($vmfClassCount / 5)
+			$vmfCounter			= 0
+			$progressCounter	= 0
 :vmfClassL	foreach ($vmfClassEntry in $Vmf["classes"][$vmfClass]) {
 				# $toRemove = $false
 				$matchCounter = 0
@@ -85,6 +97,26 @@ function ProcessStripperFilter {
 					$index = $Vmf["classes"][$vmfClass].IndexOf($VmfClassEntry)
 					$indexesToRemove += $index
 				}
+
+				#region Time estimation
+				if ($VmfClassCount -gt 1 -and
+						$vmfCounter -ge $progressStep -and [math]::Floor($vmfCounter / $progressStep) -gt $progressCounter) { 
+					$progressCounter++
+					$elapsedMilliseconds	= $StopWatch.Value.ElapsedMilliseconds
+					$estimatedMilliseconds	= ($VmfClassCount / $vmfCounter) * $elapsedMilliseconds
+					$params = @{
+						currentLine				= $vmfCounter
+						LinesCount				= $VmfClassCount
+						EstimatedMilliseconds	= $estimatedMilliseconds
+						ElapsedMilliseconds		= $StopWatch.Value.ElapsedMilliseconds
+						Activity				= $("Stripper: Merging filter {0} / {1} ..." -f
+														$ProcessCounter["counter"], $ProcessCounter["total"])
+					}
+					ReportProgress @params
+				}
+				#endregion
+				$vmfCounter++
+
 			}
 			if ($indexesToRemove.Count -eq 0) {
 				$MergesCount["filterSkipped"]++
@@ -96,20 +128,6 @@ function ProcessStripperFilter {
 			}
 		}
 		
-		# if ($MergesCount["section"] -ge $progressStep -and [math]::Floor($MergesCount["section"] / $progressStep) -gt $progressCounter) { 
-		# 	$progressCounter++
-		# 	$elapsedMilliseconds	= $sw.ElapsedMilliseconds
-		# 	$estimatedMilliseconds	= ($CounterStripper["total"] / $MergesCount["section"]) * $elapsedMilliseconds
-		# 	$params = @{
-		# 		currentLine				= $MergesCount["section"]
-		# 		LinesCount				= $CounterStripper["total"]
-		# 		EstimatedMilliseconds	= $estimatedMilliseconds
-		# 		ElapsedMilliseconds		= $sw.ElapsedMilliseconds
-		# 		Activity				= "Merging..."
-		# 	}
-		# 	ReportProgress @params
-		# }
-
 		return $true
 	}
 

@@ -54,6 +54,7 @@ function Merge-VmfStripper {
 				Stripper		= $Stripper
 				MergesCount		= $mergesCount
 				CounterStripper	= $counterStripper
+				StopWatch		= [ref]$sw
 			}
 			$copied = Copy-StripperIntoVmf @params
 

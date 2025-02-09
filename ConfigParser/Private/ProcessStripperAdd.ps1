@@ -21,6 +21,14 @@ function ProcessStripperAdd {
 
 		[Parameter(Position = 4,
 		Mandatory = $false)]
+		[ref]$StopWatch,
+
+		[Parameter(Position = 5,
+		Mandatory = $false)]
+		$ProcessCounter,
+
+		[Parameter(Position = 6,
+		Mandatory = $false)]
 		[string]$LogFile,
 
 		[System.Management.Automation.SwitchParameter]$Silent

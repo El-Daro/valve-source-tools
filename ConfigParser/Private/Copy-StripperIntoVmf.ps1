@@ -19,6 +19,10 @@ function Copy-StripperIntoVmf {
 		Mandatory = $true)]
 		$CounterStripper,
 
+		[Parameter(Position = 3,
+		Mandatory = $true)]
+		[ref]$StopWatch,
+
 		[Parameter(Position = 4,
 		Mandatory = $false)]
 		[string]$LogFile,
@@ -57,7 +61,11 @@ function Copy-StripperIntoVmf {
 			$progressStep					= $CounterStripper["total"] / 10
 			#endregion
 
-			if ($Stripper["modes"]["filter"].Count -gt 0) {
+			if ($Stripper["modes"]["filter"].get_Count() -gt 0) {
+				$filterCounter	= @{
+					total		= $Stripper["modes"]["filter"].get_Count()
+					counter		= 0
+				}
 :filterLoop		foreach ($filter in $Stripper["modes"]["filter"]) {
 					$filterProcessed = $false
 					$params	= @{
@@ -65,15 +73,22 @@ function Copy-StripperIntoVmf {
 						Filter			= $filter
 						MergesCount		= $MergesCount
 						CounterStripper	= $CounterStripper
+						StopWatch		= $StopWatch
+						ProcessCounter	= $filterCounter
 					}
 					$filterProcessed = ProcessStripperFilter @params
+					$filterCounter["counter"]++
 					# if (-not $filterProcessed) {
 					# 	$MergesCount["failed"]++
 					# }
 				}
 			}
 
-			if ($Stripper["modes"]["add"].Count -gt 0) {
+			if ($Stripper["modes"]["add"].get_Count() -gt 0) {
+				$addCounter	= @{
+					total		= $Stripper["modes"]["add"].get_Count()
+					counter		= 0
+				}
 :addLoop		foreach ($add in $Stripper["modes"]["add"]) {
 					$addProcessed = $false
 					$params	= @{
@@ -81,9 +96,11 @@ function Copy-StripperIntoVmf {
 						Add				= $add
 						MergesCount		= $MergesCount
 						CounterStripper	= $CounterStripper
+						StopWatch		= $StopWatch
+						ProcessCounter	= $addCounter
 					}
 					$addProcessed = ProcessStripperAdd @params
-
+					$addCounter["counter"]++
 					if (-not $addProcessed) {
 						$MergesCount["addFailed"]++
 					}
@@ -91,7 +108,11 @@ function Copy-StripperIntoVmf {
 			}
 
 			# Different approach to modifies
-			if ($Stripper["modes"]["modify"].Count -gt 0) {
+			if ($Stripper["modes"]["modify"].get_Count() -gt 0) {
+				$modifyCounter	= @{
+					total		= $Stripper["modes"]["modify"].get_Count()
+					counter		= 0
+				}
 :modLoop		foreach ($modify in $Stripper["modes"]["modify"]) {
 					$modifyProcessed = $false
 					$params	= @{
@@ -99,8 +120,11 @@ function Copy-StripperIntoVmf {
 						Modify			= $modify
 						MergesCount		= $MergesCount
 						CounterStripper	= $CounterStripper
+						StopWatch		= $StopWatch
+						ProcessCounter	= $modifyCounter
 					}
 					$modifyProcessed = ProcessStripperModify @params
+					$modifyCounter["counter"]++
 					if (-not $modifyProcessed) {
 						$MergesCount["modifyFailed"]++
 					}
