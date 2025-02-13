@@ -57,8 +57,8 @@ function Copy-StripperIntoVmf {
 			$MergesCount["propsDeleted"]	= 0			# + (?)
 			$MergesCount["propsSkipped"]	= 0			# -
 			$MergesCount["propsTotal"]		= 0
-			$progressCounter				= 0
-			$progressStep					= $CounterStripper["total"] / 10
+			# $progressCounter				= 0
+			# $progressStep					= $CounterStripper["total"] / 10
 			#endregion
 
 			if ($Stripper["modes"]["filter"].get_Count() -gt 0) {
@@ -138,72 +138,6 @@ function Copy-StripperIntoVmf {
 				$sw.Stop()
 			}
 
-			#region LMP code
-# :lmpLoop	foreach ($lmpSection in $Stripper["data"].Keys) {
-# 				$idToMatch	= $false
-# 				$matchBy	= ""
-# 				if ($lmpSection.SubString(0,$lmpHammerIdOffset) -eq "hammerid-") {
-# 					$idToMatch	= $Stripper["data"][$lmpSection]["hammerid"][0]
-# 					$matchBy	= "id"					# Either match by id-hammerid
-# 				} elseif ($lmpSection.SubString(0,$lmpClassnameOffset) -eq "classname-") {
-# 					$idToMatch	= $Stripper["data"][$lmpSection]["classname"][0]
-# 					$matchBy	= "classname"			# Or by a classname
-# 				} else {
-# 					$MergesCount["failed"]++			# You're not supposed to be here, but just in case
-# 					Write-Host -ForegroundColor DarkYellow "This is an error"
-# 					Write-Host $lmpSection
-# 				}
-# 				if ($idToMatch) {
-# 					$vmfSectionFound = $false
-# :vmfHashLoopH		foreach ($vmfClass in $Vmf["classes"].Keys) {
-# :vmfListLoopH			foreach ($vmfClassEntry in $Vmf["classes"][$vmfClass]) {
-# 							if ($vmfClassEntry["properties"].Contains($matchBy) -and
-# 								$idToMatch -eq $vmfClassEntry["properties"][$matchBy][0]) {
-# 								$vmfSectionFound = $true
-# 								if ($matchBy -eq "id") {
-# 									$MergesCount["hammerid"]++
-# 								} else {
-# 									$MergesCount["classname"]++
-# 								}
-# 								$params = @{
-# 									VmfSection	= $vmfClassEntry
-# 									StripperSection	= $Stripper["data"][$lmpSection]
-# 									MergesCount	= $MergesCount
-# 								}
-# 								Copy-StripperSection @params
-
-# 								break vmfHashLoopH
-# 							}
-# 						}
-# 					}
-# 					if (-not $vmfSectionFound) {
-# 						$MergesCount["new"]++
-# 						# Add a new section to VMF file
-# 						$newBlock = [ordered]@{
-# 							properties = $Stripper["data"][$lmpSection]
-# 							classes    = [ordered]@{}
-# 						}
-# 						$MergesCount["propsNew"] += $newBlock["properties"].Count
-# 						$Vmf["classes"]["entity"].Add($newBlock)
-# 					}
-# 				}
-# 				$MergesCount["section"]++
-
-# 				if ($MergesCount["section"] -ge $progressStep -and [math]::Floor($MergesCount["section"] / $progressStep) -gt $progressCounter) { 
-# 					$progressCounter++
-# 					$elapsedMilliseconds	= $sw.ElapsedMilliseconds
-# 					$estimatedMilliseconds	= ($CounterStripper["total"] / $MergesCount["section"]) * $elapsedMilliseconds
-# 					$params = @{
-# 						currentLine				= $MergesCount["section"]
-# 						LinesCount				= $CounterStripper["total"]
-# 						EstimatedMilliseconds	= $estimatedMilliseconds
-# 						ElapsedMilliseconds		= $sw.ElapsedMilliseconds
-# 						Activity				= "Merging..."
-# 					}
-# 					ReportProgress @params
-# 				}
-# 			}
-			#endregion
 			$MergesCount["failed"]		= $MergesCount["addFailed"] + $MergesCount["modifyFailed"]
 			$MergesCount["propsTotal"]	= $MergesCount["propsEdited"] + $MergesCount["propsSkipped"] + $MergesCount["propsNew"] + $MergesCount["propsDeleted"]
 			return $true

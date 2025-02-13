@@ -36,8 +36,13 @@ function ProcessStripperAdd {
 	
 	PROCESS {
 
-		# Add a new section to VMF file
+		$newBlock = [ordered]@{
+			properties	= [ordered]@{}
+			classes		= [ordered]@{}
+		}
+		#region hammerid
 		if ($Add["properties"].Contains("hammerid")) {
+			#region with HammerID
 			$idKey = "id"
 			$idValue = $add["properties"]["hammerid"][0]
 			foreach ($vmfClassEntry in $Vmf["classes"]["entity"]) {
@@ -49,25 +54,32 @@ function ProcessStripperAdd {
 						return $false
 					}
 			}
-
 			# We need to swap 'hammerid' with 'id' for VMF structure
-			$newBlock = [ordered]@{
-				properties	= [ordered]@{}
-				classes		= [ordered]@{}
-			}
 			$newBlock["properties"].Add($idKey, [Collections.Generic.List[string]]::new())
 			$newBlock["properties"][$idKey].Add($idValue)
-			foreach ($propKey in $Add["properties"].Keys) {
-				if ($propKey -ne "hammerid") {
-					$newBlock["properties"].Add($propKey, $Add["properties"][$propKey])
-				}
-			}
-			$Vmf["classes"]["entity"].Add($newBlock)
-		} else {
-			$Vmf["classes"]["entity"].Add($Add)
 		}
+		#endregion
+		foreach ($stripperProp in $Add["properties"].Keys) {
+			if ($stripperProp.Length -gt 3 -and ($stripperProp.SubString(0,2) -eq "On") -or
+												($stripperProp.SubString(0,3) -eq "Out")) {	
+				try {					# See if property name starts with "On" or "Out"
+					$newBlock["classes"]["connections"] = [System.Collections.Generic.List[ordered]]::new()
+					$newBlock["classes"]["connections"].Add([ordered]@{
+						properties	= [ordered]@{ }
+						classes		= [ordered]@{ }
+					})
+					$newBlock["classes"]["connections"][0]["properties"].Add($stripperProp, $Add["properties"][$stripperProp])
+				} catch {
+					# Do nothing
+					Write-Host -ForegroundColor DarkYellow "Failed to copy connections: `"$stripperProp`" `"$($Add["properties"][$stripperProp])`""
+				}
+			} else {
+				$newBlock["properties"].Add($stripperProp, $Add["properties"][$stripperProp])
+			}
+		}
+		$Vmf["classes"]["entity"].Add($newBlock)
 		$MergesCount["add"]++
-		$MergesCount["propsNew"] += $Add["properties"].Count
+		$MergesCount["propsNew"] += $Add["properties"].get_Count()
 		return $true
 
 	}

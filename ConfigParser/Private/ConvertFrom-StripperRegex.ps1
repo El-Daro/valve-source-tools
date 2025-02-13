@@ -34,7 +34,7 @@ function ConvertFrom-StripperRegex {
 	}
 	$stackBlocks		= [System.Collections.Generic.Stack[ordered]]::new()
 	$progressCounter	= 0
-	$progressStep		= $Lines.Count / 5
+	$progressStep		= [math]::Ceiling($Lines.Count / 5)
 	$regex				= Get-StripperRegex
 	#endregion
 
@@ -59,6 +59,7 @@ function ConvertFrom-StripperRegex {
 						$currentBlock["properties"][$key] = [System.Collections.Generic.List[string]]::new()
 					}
 					$currentBlock["properties"][$key].Add($value)
+					break
 				}
 
 				# An open bracket
@@ -83,6 +84,7 @@ function ConvertFrom-StripperRegex {
 							modes		= [ordered]@{}
 						}
 					}
+					break
 				}
 
 				# A close bracket
@@ -105,15 +107,18 @@ function ConvertFrom-StripperRegex {
 					if ($Depth -gt 0 -and $stackBlocks.Count -gt 0) {
 						$currentBlock = $stackBlocks.Pop()
 					}
+					break
 				}
 
 				"$($regex.comment)" {
 					# Comments are ignored (for now)
+					break
 				}
 
 				# Mode identificator
 				"$($regex.mode)" {
 					$currentMode = $Matches["mode"]
+					break
 				}
 
 				# Sub-mode identificator
@@ -126,6 +131,7 @@ function ConvertFrom-StripperRegex {
 					} else {
 						$currentSubmode	= $Matches["subMode"]
 					}
+					break
 				}
 
 				default {
@@ -136,6 +142,7 @@ function ConvertFrom-StripperRegex {
 							Write-Debug "UNDEFINED (line $($currentLine + 1)): $line"
 						}
 					}
+					break
 				}
 			}
 

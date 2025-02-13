@@ -78,7 +78,7 @@ function Merge-VmfStripper {
 				OutLog -Property "Input: adds / modes"		-Value $("{0} / {1}" -f $counterStripper["add"], $counterStripper["modes"])		-Path $LogFile
 				OutLog -Property "Input: modify / modes"	-Value $("{0} / {1}" -f $counterStripper["modify"], $counterStripper["modes"])	-Path $LogFile
 				OutLog -Property "Merge: filters processed"	-Value $("{0}" -f $mergesCount["filter"])										-Path $LogFile
-				OutLog -Property "Merge: add processed"		-Value $("{0} / {1}" -f $mergesCount["add"], $counterStripper["add"])											-Path $LogFile
+				OutLog -Property "Merge: add processed"		-Value $("{0} / {1}" -f $mergesCount["add"], $counterStripper["add"])			-Path $LogFile
 				OutLog -Property "Merge: modify processed"	-Value $("{0}" -f $mergesCount["modify"])										-Path $LogFile
 				OutLog -Property "Merged modify - replace"	-Value $("{0}" -f $mergesCount["modifyReplaced"])								-Path $LogFile
 				OutLog -Property "Merged modify - delete"	-Value $("{0}" -f $mergesCount["modifyDeleted"])								-Path $LogFile

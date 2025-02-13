@@ -1,6 +1,8 @@
 # TODO: IMPROVE
 #		- Consider recursive structure
-
+# DONE:
+#		- Utilize the ProcessStripperModMatch function
+#
 # TODO: REFACTOR
 #		- Incorporate the filter loop inside this function. Should save some time
 #		REASONING: We don't need to remove the same element twice. One match = add&skip
@@ -44,54 +46,21 @@ function ProcessStripperFilter {
 	
 	PROCESS {
 
-:mainL	foreach ($vmfClass in $Vmf["classes"].Keys) {
+:main	foreach ($vmfClass in $Vmf["classes"].Keys) {
 			$indexesToRemove	= @()
 			$vmfClassCount		= $Vmf["classes"][$vmfClass].get_Count()
 			$progressStep		= [math]::Ceiling($vmfClassCount / 3)
 			$vmfCounter			= 0
 			$progressCounter	= 0
-:vmfClassL	foreach ($vmfClassEntry in $Vmf["classes"][$vmfClass]) {
-				# $toRemove = $false
-				$matchCounter = 0
-:stripperMainL	foreach ($stripperProp in $Filter["properties"].Keys) {
-					if ($stripperProp -eq "hammerid") {
-						$key = "id"
-					} else {
-						$key = $stripperProp
-					}
-					$stripperValues = $Filter["properties"][$stripperProp]
-					foreach ($value in $stripperValues) {
-						# The new code for the matches
-						if ($value.Length -gt 2 -and $value[0] -eq "/" -and $value[$value.Length - 1] -eq "/") {
-							$stripperValueRegex = $value.SubString(1, $value.Length - 2) 
-							if ($vmfClassEntry["properties"].Contains($key)) {
-								try {
-									foreach ($vmfPropValue in $vmfClassEntry["properties"][$key]) {
-										if ($vmfPropValue -match $stripperValueRegex) {
-											$matchCounter++
-											break
-										}
-									}
-								} catch {
-									Write-Debug "$($MyInvocation.MyCommand):  Failed to do a regex check"
-								}
-							} else {
-								break stripperMainL
-							}
-						} else {
+:vmfClass	foreach ($vmfClassEntry in $Vmf["classes"][$vmfClass]) {
 
-							# The original code for the matches
-							if ($vmfClassEntry["properties"].Contains($key) -and
-								$vmfClassEntry["properties"][$key].Contains($value)) {
-								$matchCounter++	
-							# $vmfSectionFound = $true
-							} else {
-								break stripperMainL
-							}
-						}
-					}
+				$params = @{
+					VmfClassEntry	= $vmfClassEntry
+					StripperBlock	= $Filter
 				}
-				if ($matchCounter -eq $Filter["properties"].Count) {
+				$matchCounter	= ProcessStripperModMatch @params
+
+				if ($matchCounter -eq $Filter["properties"].get_Count()) {
 					# $toRemove = $true
 					$MergesCount["filter"]++
 					$index = $Vmf["classes"][$vmfClass].IndexOf($VmfClassEntry)
@@ -124,7 +93,7 @@ function ProcessStripperFilter {
 			}
 			for ($i = $indexesToRemove.Count - 1; $i -ge 0; $i--) {
 				Write-Debug $("Filter: Removing at {0} / {1}" -f
-					$indexesToRemove[$i], $($Vmf["classes"][$vmfClass].Count))
+					$indexesToRemove[$i], $($Vmf["classes"][$vmfClass].get_Count()))
 				$Vmf["classes"][$vmfClass].RemoveAt($indexesToRemove[$i])
 			}
 		}

@@ -12,7 +12,7 @@
 RootModule = 'ConfigParser.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.9.4.310'
+ModuleVersion = '0.9.5.001'
 
 # ID used to uniquely identify this module
 GUID = 'ee86abf1-c36e-47e9-9bee-d975fbbea1ad'
@@ -104,7 +104,7 @@ PrivateData = @{
         # ReleaseNotes = ''
 
         # Prerelease string of this module
-        Prerelease = 'Trying to merge separate models into one'
+        Prerelease = 'Trying to merge separate models into one. Added map-merger tool'
 
         # Flag to indicate whether the module requires explicit user acceptance for install/update/save
         # RequireLicenseAcceptance = $false

@@ -147,7 +147,7 @@ foreach ($vmf in $Vmfs) {
 
 		if ($success) {
 			Write-Host -ForegroundColor Green "$mapBaseName merged successfully" 
-			Write-Host -ForegroundColor Green "`tOutput: $outputFilePath" 
+			Write-Host -ForegroundColor Green "  Output: $outputFilePath" 
 		}
 	} catch {
 		Write-Host -ForegroundColor Red "$mapBaseName failed to merge"

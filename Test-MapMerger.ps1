@@ -1,5 +1,4 @@
-# TODO: Update
-# A simple test script for merging .vmf and .lmp files into a new .vmf
+# A simple test script for merging .vmf, .lmp and Stripper's .cfg files into a new .vmf
 
 using namespace System.Diagnostics
 
@@ -144,16 +143,30 @@ Try {
 	}
 	#endregion
 	
-	$vmfParsed		= Import-Vmf -Path $VmfPath	-LogFile $logFile -Silent:$Silent.IsPresent
+	$vmfParsed			= Import-Vmf -Path $VmfPath	-LogFile $logFile -Silent:$Silent.IsPresent
+	$lmpParsed			= $false
 	if ($PSBoundParameters.ContainsKey('LmpPath')) {
 		$lmpParsed		= Import-Lmp -Path $LmpPath	-LogFile $logFile -Silent:$Silent.IsPresent
 	}
+	$stripperParsed		= $false
 	if ($PSBoundParameters.ContainsKey('StripperPath')) {
 		$stripperParsed	= Import-Stripper -Path $StripperPath -LogFile $logFile -Silent:$Silent.IsPresent
 	}
 
-	if ($vmfParsed -and $lmpParsed -and $stripperParsed) {
-		$vmfMerged = Merge-Map -Vmf $vmfParsed -Lmp $lmpParsed -Stripper $stripperParsed -LogFile $logFile -Silent:$Silent.IsPresent
+	if ($vmfParsed) {
+		if ($lmpParsed) {
+			if ($stripperParsed) {
+				$vmfMerged = Merge-Map -Vmf $vmfParsed -Lmp $lmpParsed -Stripper $stripperParsed -LogFile $logFile -Silent:$Silent.IsPresent
+			} else {
+				$vmfMerged = Merge-Map -Vmf $vmfParsed -Lmp $lmpParsed -LogFile $logFile -Silent:$Silent.IsPresent
+			}
+		} elseif ($stripperParsed) {
+			$vmfMerged = Merge-Map -Vmf $vmfParsed -Stripper $stripperParsed -LogFile $logFile -Silent:$Silent.IsPresent
+		} else {
+			$vmfMerged = $false
+			$success = $false
+			OutLog -Value "Neither LMP, nor Stripper config were provided" -Path $LogFile -OneLine
+		}
 
 		if ($vmfMerged) {
 			if ($debugPassed) {

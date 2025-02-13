@@ -43,7 +43,7 @@ function ProcessStripperModify {
 	
 	PROCESS {
 
-		if ($Modify["modes"]["match"][0].Count -eq 0) {
+		if ($Modify["modes"]["match"][0].get_Count() -eq 0) {
 			$MergesCount["modifySkipped"]++
 			return $False
 		}
@@ -58,17 +58,17 @@ function ProcessStripperModify {
 				#region 1. MATCH
 				$params = @{
 					VmfClassEntry	= $vmfClassEntry
-					Modify			= $Modify
+					StripperBlock	= $Modify["modes"]["match"][0]
 				}
 				$matchCounter	= ProcessStripperModMatch @params
 				#endregion
 				# If all the props in the 'match' section have matched
-				if ($matchCounter -eq $Modify["modes"]["match"][0]["properties"].Count) {
+				if ($matchCounter -eq $Modify["modes"]["match"][0]["properties"].get_Count()) {
 					#region 2. REPLACE
 					if ($Modify["modes"]["replace"].get_Count() -gt 0) {
 						$params = @{
 							VmfClassEntry	= $vmfClassEntry
-							Modify			= $Modify
+							Modify			= $Modify["modes"]["replace"][0]
 							MergesCount		= $MergesCount
 						}
 						ProcessStripperModReplace @params
@@ -79,7 +79,7 @@ function ProcessStripperModify {
 					if ($Modify["modes"]["delete"].get_Count() -gt 0) {
 						$params = @{
 							VmfClassEntry	= $vmfClassEntry
-							Modify			= $Modify
+							Modify			= $Modify["modes"]["delete"][0]
 							MergesCount		= $MergesCount
 						}
 						ProcessStripperModDelete @params
@@ -90,7 +90,7 @@ function ProcessStripperModify {
 					if ($Modify["modes"]["insert"].get_Count() -gt 0) {
 						$params = @{
 							VmfClassEntry	= $vmfClassEntry
-							Modify			= $Modify
+							Modify			= $Modify["modes"]["insert"][0]
 							MergesCount		= $MergesCount
 						}
 						ProcessStripperModInsert @params

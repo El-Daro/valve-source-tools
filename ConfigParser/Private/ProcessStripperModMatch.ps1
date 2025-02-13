@@ -1,5 +1,6 @@
 # match: Matches all entities that have the listed model and classname
 #		 You can use regular expressions (//) for any key values here.
+# NOTE: Temporarily swapped regex check with wildcard check
 
 using namespace System.Diagnostics
 
@@ -12,19 +13,20 @@ function ProcessStripperModMatch {
 
 		[Parameter(Position = 1,
 		Mandatory = $true)]
-		[System.Collections.IDictionary]$Modify
+		[System.Collections.IDictionary]$StripperBlock
 	)
 	
 	PROCESS {
 
 		$matchCounter = 0
-:main	foreach ($stripperProp in $Modify["modes"]["match"][0]["properties"].Keys) {
+# :main	foreach ($stripperProp in $Modify["modes"]["match"][0]["properties"].Keys) {
+:main	foreach ($stripperProp in $StripperBlock["properties"].Keys) {
 			if ($stripperProp -eq "hammerid") {
 				$key = "id"
 			} else {
 				$key = $stripperProp
 			}
-			$stripperValues = $Modify["modes"]["match"][0]["properties"][$stripperProp]
+			$stripperValues = $StripperBlock["properties"][$stripperProp]
 			foreach ($value in $stripperValues) {
 				# The new code for the matches
 				if ($value.Length -gt 2 -and $value[0] -eq "/" -and $value[$value.Length - 1] -eq "/") {
@@ -32,7 +34,7 @@ function ProcessStripperModMatch {
 					if ($vmfClassEntry["properties"].Contains($key)) {
 						try {
 							foreach ($vmfPropValue in $vmfClassEntry["properties"][$key]) {
-								if ($vmfPropValue -match $stripperValueRegex) {
+								if ($vmfPropValue -like $stripperValueRegex) {
 									$matchCounter++
 									break
 								}

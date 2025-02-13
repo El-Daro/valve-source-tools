@@ -32,7 +32,7 @@ function ConvertFrom-Stripper {
 	}
 	$stackBlocks		= [System.Collections.Generic.Stack[ordered]]::new()
 	$progressCounter	= 0
-	$progressStep		= $Lines.Count / 5
+	$progressStep		= [math]::Ceiling($Lines.Count / 5)
 	$regex				= Get-StripperRegex
 	#endregion
 
