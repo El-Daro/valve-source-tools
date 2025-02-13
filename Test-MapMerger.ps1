@@ -7,17 +7,20 @@ Param (
 	[Parameter(Position = 0,
 	Mandatory = $true)]
 	# [string]$VmfPath = "..\configs\vmf-lmp-stripper\mergeTest.vmf",
-	[string]$VmfPath = "..\configs\vmf-lmp-stripper\c5m3_cemetery_d.vmf",
+	# [string]$VmfPath = "..\configs\vmf-lmp-stripper\c5m3_cemetery_d.vmf",
+	[string]$VmfPath,
 
 	[Parameter(Position = 1,
 	Mandatory = $false)]
 	# [string]$LmpPath = "..\configs\vmf-lmp-stripper\mergeTest.lmp",
-	[string]$LmpPath = "..\configs\vmf-lmp-stripper\c5m3_cemetery_l_0.lmp",
+	# [string]$LmpPath = "..\configs\vmf-lmp-stripper\c5m3_cemetery_l_0.lmp",
+	[string]$LmpPath,
 
 	[Parameter(Position = 2,
 	Mandatory = $false)]
 	# [string]$StripperPath = "..\configs\vmf-lmp-stripper\mergeTest.cfg",
-	[string]$StripperPath = "..\configs\vmf-lmp-stripper\c5m3_cemetery.cfg",
+	# [string]$StripperPath = "..\configs\vmf-lmp-stripper\c5m3_cemetery.cfg",
+	[string]$StripperPath,
 
 	[Parameter(Position = 3)]
 	[string]$OutputFilePath,

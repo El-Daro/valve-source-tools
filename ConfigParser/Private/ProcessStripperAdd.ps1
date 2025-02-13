@@ -46,14 +46,16 @@ function ProcessStripperAdd {
 			#region with HammerID
 			$idKey = "id"
 			$idValue = $add["properties"]["hammerid"][0]
-			foreach ($vmfClassEntry in $Vmf["classes"][$class]) {
-				if ($vmfClassEntry["properties"].Contains($idKey) -and
-					$vmfClassEntry["properties"][$idKey].Contains($idValue)) {
-						# Might be worth updating id instead of skipping
-						# But the 'add' instruction clearly says add, not update
-						$MergesCount["addSkipped"]++
-						return $false
-					}
+			if ($Vmf["classes"].Contains($class)) {
+				foreach ($vmfClassEntry in $Vmf["classes"][$class]) {
+					if ($vmfClassEntry["properties"].Contains($idKey) -and
+						$vmfClassEntry["properties"][$idKey].Contains($idValue)) {
+							# Might be worth updating id instead of skipping
+							# But the 'add' instruction clearly says add, not update
+							$MergesCount["addSkipped"]++
+							return $false
+						}
+				}
 			}
 			# We need to swap 'hammerid' with 'id' for VMF structure
 			$newBlock["properties"].Add($idKey, [Collections.Generic.List[string]]::new())
@@ -77,6 +79,9 @@ function ProcessStripperAdd {
 			} else {
 				$newBlock["properties"].Add($stripperProp, $Add["properties"][$stripperProp])
 			}
+		}
+		if (-not $Vmf["classes"].Contains($class)) {
+			$Vmf["classes"][$class] = [System.Collections.Generic.List[ordered]]::new()
 		}
 		$Vmf["classes"][$class].Add($newBlock)
 		$MergesCount["add"]++

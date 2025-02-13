@@ -132,15 +132,41 @@ foreach ($vmf in $Vmfs) {
 		$outputFilePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($outputFilePath)
 		$outputFiles += $outputFilePath
 
-		$params = @{
-			VmfPath			= $inputVmfFilePath
-			LmpPath			= $inputLmpFilePath
-			StripperPath	= $inputStripperFilePath
-			OutputFilePath	= $outputFilePath
-			OutputExtension	= $Extension
-			Note			= $Note
-			LogFile			= $LogFile
-			Silent			= $Silent.IsPresent
+		if ([string]::IsNullOrEmpty($inputLmpFilePath)) {
+			if ([string]::IsNullOrEmpty($inputStripperFilePath)) {
+				continue
+			} else {
+				$params = @{
+					VmfPath			= $inputVmfFilePath
+					StripperPath	= $inputStripperFilePath
+					OutputFilePath	= $outputFilePath
+					OutputExtension	= $Extension
+					Note			= $Note
+					LogFile			= $LogFile
+					Silent			= $Silent.IsPresent
+				}
+			}
+		} elseif ([string]::IsNullOrEmpty($inputStripperFilePath)) {
+			$params = @{
+				VmfPath			= $inputVmfFilePath
+				LmpPath			= $inputLmpFilePath
+				OutputFilePath	= $outputFilePath
+				OutputExtension	= $Extension
+				Note			= $Note
+				LogFile			= $LogFile
+				Silent			= $Silent.IsPresent
+			}
+		} else {
+			$params = @{
+				VmfPath			= $inputVmfFilePath
+				LmpPath			= $inputLmpFilePath
+				StripperPath	= $inputStripperFilePath
+				OutputFilePath	= $outputFilePath
+				OutputExtension	= $Extension
+				Note			= $Note
+				LogFile			= $LogFile
+				Silent			= $Silent.IsPresent
+			}
 		}
 		
 		$success = .\Test-MapMerger @params -Fast
