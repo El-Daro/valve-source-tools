@@ -96,7 +96,7 @@ function AppendVmfBlockRecursive {
 		[void]$StringBuilder.Value.AppendFormat('{0}{1}{2}', $tabsKey, "}", "`n")
 	}
 
-	if ($EstimatedLines.Value -gt 0 -and ($LinesOut["lines"] -gt $ProgressStep -and [math]::Floor($LinesOut["lines"] / $ProgressStep) -gt $ProgressCounter.Value)) {
+	if ($EstimatedLines.Value -gt 10000 -and ($LinesOut["lines"] -gt $ProgressStep -and [math]::Floor($LinesOut["lines"] / $ProgressStep) -gt $ProgressCounter.Value)) {
 		$elapsedMilliseconds		= $StopWatch.Value.ElapsedMilliseconds
 		$estimatedMilliseconds		= ($EstimatedLines.Value / $LinesOut["lines"]) * $elapsedMilliseconds
 		$params = @{

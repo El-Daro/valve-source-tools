@@ -21,12 +21,12 @@ function CountElements {
 
 	foreach($propertyName in $Dictionary["properties"].Keys) {
 		# Counting properties
-		$Properties.Value += $Dictionary["properties"][$propertyName].Count
+		$Properties.Value += $Dictionary["properties"][$propertyName].get_Count()
 	}
 		
 	foreach($className in $Dictionary["classes"].Keys) {
 		# Counting classes
-		$Classes.Value += $Dictionary["classes"][$className].Count
+		$Classes.Value += $Dictionary["classes"][$className].get_Count()
 		foreach ($classEntry in $Dictionary["classes"][$className]) {
 			$params = @{
 				Dictionary	= $classEntry

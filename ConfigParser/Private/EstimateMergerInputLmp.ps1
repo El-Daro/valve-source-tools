@@ -24,7 +24,7 @@ function EstimateMergerInputLmp {
 			hammerid	= 0
 			classname	= 0
 			unknown		= 0
-			total		= $Lmp["data"].Count
+			total		= $Lmp["data"].get_Count()
 		}
 		
 		foreach ($lmpSection in $Lmp["data"].Keys) {

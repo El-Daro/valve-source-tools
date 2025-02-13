@@ -75,10 +75,10 @@ function AppendVmfBlockIter {
 			# $printProperties = $False
 		}
 
-:cLoop	while ($counter -lt $currentBlock["classes"].Count) {
+:cLoop	while ($counter -lt $currentBlock["classes"].get_Count()) {
 			$skip = $False
 			$className = ($currentBlock["classes"] | Select-Object -Property Keys).Keys[$counter]
-			while ($counterList -lt $currentBlock["classes"][$counter].Count) {
+			while ($counterList -lt $currentBlock["classes"][$counter].get_Count()) {
 				[void]$StringBuilder.Value.AppendFormat('{0}{1}{2}{0}{3}', $tabsKey, $className, "`n", "{`n")
 				$Depth++
 				$tabsKey			= "".PadRight($Depth, "`t")

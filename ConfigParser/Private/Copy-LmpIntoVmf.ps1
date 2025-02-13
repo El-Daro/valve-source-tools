@@ -48,6 +48,11 @@ function Copy-LmpIntoVmf {
 			$progressStep					= $CounterLmp["total"] / 10
 			#endregion
 
+			# Just a precaution
+			if (-not $Vmf["classes"].Contains("entity")) {
+				$Vmf["classes"]["entity"] = [System.Collections.Generic.List[ordered]]::new()
+			}
+
 :lmpLoop	foreach ($lmpSection in $Lmp["data"].Keys) {
 				$idToMatch	= $false
 				$matchBy	= ""
@@ -119,7 +124,7 @@ function Copy-LmpIntoVmf {
 							properties = $Lmp["data"][$lmpSection]
 							classes    = [ordered]@{}
 						}
-						$MergesCount["propsNew"] += $newBlock["properties"].Count
+						$MergesCount["propsNew"] += $newBlock["properties"].get_Count()
 						$Vmf["classes"]["entity"].Add($newBlock)
 					}
 				}

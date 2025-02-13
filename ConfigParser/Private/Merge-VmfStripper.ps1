@@ -69,8 +69,13 @@ function Merge-VmfStripper {
 
 			#region Logging
 			if (-not $Silent.IsPresent) {
-				# $sectionsPerSecond = ($mergesCount["section"] / $sw.ElapsedMilliseconds) * 1000
-				# $propsPerSecond = ($mergesCount["propsTotal"] / $sw.ElapsedMilliseconds) * 1000
+				# if ($sw.ElapsedMilliseconds -gt 0) {
+				# 	$sectionsPerSecond	= ($mergesCount["section"] / $sw.ElapsedMilliseconds) * 1000
+				# 	$propsPerSecond		= ($mergesCount["propsTotal"] / $sw.ElapsedMilliseconds) * 1000
+				# } else {
+				# 	$sectionsPerSecond	= $mergesCount["section"] * 1000
+				# 	$propsPerSecond		= $mergesCount["propsTotal"] * 1000
+				# }
 				$timeFormatted = "{0}m {1}s {2}ms" -f
 					$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
 				OutLog 							-Value "`nVMF-Stripper | Merging: Complete"													-Path $LogFile -OneLine

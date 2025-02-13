@@ -79,9 +79,9 @@ function Copy-StripperIntoVmf {
 					}
 					$filterProcessed = ProcessStripperFilter @params
 					$filterCounter["counter"]++
-					# if (-not $filterProcessed) {
-					# 	$MergesCount["failed"]++
-					# }
+					if (-not $filterProcessed) {
+						$MergesCount["failed"]++
+					}
 				}
 				$sw.Stop()
 			}

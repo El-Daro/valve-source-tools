@@ -17,7 +17,7 @@ function EstimateOutputLmp {
 	$estimatedLines = 0
 	try {
 
-		$estimatedSections	= $Lmp["data"].Count
+		$estimatedSections	= $Lmp["data"].get_Count()
 		foreach ($section in $Lmp["data"].Keys) {
 			$estimatedLines += $Lmp["data"][$section].Keys.Count
 			$estimatedLines += 2		#  Counting the brackets here

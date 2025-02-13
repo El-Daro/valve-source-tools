@@ -36,6 +36,7 @@ function ProcessStripperAdd {
 	
 	PROCESS {
 
+		$class = "entity"
 		$newBlock = [ordered]@{
 			properties	= [ordered]@{}
 			classes		= [ordered]@{}
@@ -45,7 +46,7 @@ function ProcessStripperAdd {
 			#region with HammerID
 			$idKey = "id"
 			$idValue = $add["properties"]["hammerid"][0]
-			foreach ($vmfClassEntry in $Vmf["classes"]["entity"]) {
+			foreach ($vmfClassEntry in $Vmf["classes"][$class]) {
 				if ($vmfClassEntry["properties"].Contains($idKey) -and
 					$vmfClassEntry["properties"][$idKey].Contains($idValue)) {
 						# Might be worth updating id instead of skipping
@@ -77,7 +78,7 @@ function ProcessStripperAdd {
 				$newBlock["properties"].Add($stripperProp, $Add["properties"][$stripperProp])
 			}
 		}
-		$Vmf["classes"]["entity"].Add($newBlock)
+		$Vmf["classes"][$class].Add($newBlock)
 		$MergesCount["add"]++
 		$MergesCount["propsNew"] += $Add["properties"].get_Count()
 		return $true

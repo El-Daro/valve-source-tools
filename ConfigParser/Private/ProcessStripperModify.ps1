@@ -48,78 +48,81 @@ function ProcessStripperModify {
 			return $False
 		}
 
-:mainL	foreach ($vmfClass in $Vmf["classes"].Keys) {
-			$vmfClassCount		= $Vmf["classes"][$vmfClass].get_Count()
-			$progressStep		= [math]::Ceiling($vmfClassCount / 3)
-			$vmfCounter			= 0
-			$progressCounter	= 0
-:vmfClassL	foreach ($vmfClassEntry in $Vmf["classes"][$vmfClass]) {
-				$matchCounter	= 0
-				#region 1. MATCH
-				$params = @{
-					VmfClassEntry	= $vmfClassEntry
-					StripperBlock	= $Modify["modes"]["match"][0]
-				}
-				$matchCounter	= ProcessStripperModMatch @params
-				#endregion
-				# If all the props in the 'match' section have matched
-				if ($matchCounter -eq $Modify["modes"]["match"][0]["properties"].get_Count()) {
-					#region 2. REPLACE
-					if ($Modify["modes"]["replace"].get_Count() -gt 0) {
-						$params = @{
-							VmfClassEntry	= $vmfClassEntry
-							Modify			= $Modify["modes"]["replace"][0]
-							MergesCount		= $MergesCount
-						}
-						ProcessStripperModReplace @params
-					}
-					#endregion
-
-					#region 3. DELETE
-					if ($Modify["modes"]["delete"].get_Count() -gt 0) {
-						$params = @{
-							VmfClassEntry	= $vmfClassEntry
-							Modify			= $Modify["modes"]["delete"][0]
-							MergesCount		= $MergesCount
-						}
-						ProcessStripperModDelete @params
-					}
-					#endregion
-
-					#region 4. INSERT
-					if ($Modify["modes"]["insert"].get_Count() -gt 0) {
-						$params = @{
-							VmfClassEntry	= $vmfClassEntry
-							Modify			= $Modify["modes"]["insert"][0]
-							MergesCount		= $MergesCount
-						}
-						ProcessStripperModInsert @params
-					}
-					#endregion
-
-					$MergesCount["modify"]++
-				}
-
-				#region Time estimation
-				if ($VmfClassCount -gt 1000 -and
-						$vmfCounter -ge $progressStep -and [math]::Floor($vmfCounter / $progressStep) -gt $progressCounter) { 
-					$progressCounter++
-					$elapsedMilliseconds	= $StopWatch.Value.ElapsedMilliseconds
-					$estimatedMilliseconds	= $elapsedMilliseconds *
-						(($VmfClassCount * $ProcessCounter["total"]) / ($vmfCounter + $VmfClassCount * $ProcessCounter["counter"]))
-					$params = @{
-						currentLine				= $vmfCounter
-						LinesCount				= $VmfClassCount
-						EstimatedMilliseconds	= $estimatedMilliseconds
-						ElapsedMilliseconds		= $StopWatch.Value.ElapsedMilliseconds
-						Activity				= $("Stripper: Merging modify {0} / {1} ..." -f
-														$ProcessCounter["counter"], $ProcessCounter["total"])
-					}
-					ReportProgress @params
-				}
-				#endregion
-				$vmfCounter++
+# :mainL	foreach ($vmfClass in $Vmf["classes"].Keys) {
+		$class	= "entity"
+		if (-not $Vmf["classes"].Contains($class) -or $Vmf["classes"][$class].get_Count() -eq 0) {
+			return $false
+		}
+		$vmfClassCount		= $Vmf["classes"][$class].get_Count()
+		$progressStep		= [math]::Ceiling($vmfClassCount / 3)
+		$vmfCounter			= 0
+		$progressCounter	= 0
+		foreach ($vmfClassEntry in $Vmf["classes"][$class]) {
+			$matchCounter	= 0
+			#region 1. MATCH
+			$params = @{
+				VmfClassEntry	= $vmfClassEntry
+				StripperBlock	= $Modify["modes"]["match"][0]
 			}
+			$matchCounter	= ProcessStripperModMatch @params
+			#endregion
+			# If all the props in the 'match' section have matched
+			if ($matchCounter -eq $Modify["modes"]["match"][0]["properties"].get_Count()) {
+				#region 2. REPLACE
+				if ($Modify["modes"]["replace"].get_Count() -gt 0) {
+					$params = @{
+						VmfClassEntry	= $vmfClassEntry
+						Modify			= $Modify["modes"]["replace"][0]
+						MergesCount		= $MergesCount
+					}
+					ProcessStripperModReplace @params
+				}
+				#endregion
+
+				#region 3. DELETE
+				if ($Modify["modes"]["delete"].get_Count() -gt 0) {
+					$params = @{
+						VmfClassEntry	= $vmfClassEntry
+						Modify			= $Modify["modes"]["delete"][0]
+						MergesCount		= $MergesCount
+					}
+					ProcessStripperModDelete @params
+				}
+				#endregion
+
+				#region 4. INSERT
+				if ($Modify["modes"]["insert"].get_Count() -gt 0) {
+					$params = @{
+						VmfClassEntry	= $vmfClassEntry
+						Modify			= $Modify["modes"]["insert"][0]
+						MergesCount		= $MergesCount
+					}
+					ProcessStripperModInsert @params
+				}
+				#endregion
+
+				$MergesCount["modify"]++
+			}
+
+			#region Time estimation
+			if ($VmfClassCount -gt 1000 -and
+					$vmfCounter -ge $progressStep -and [math]::Floor($vmfCounter / $progressStep) -gt $progressCounter) { 
+				$progressCounter++
+				$elapsedMilliseconds	= $StopWatch.Value.ElapsedMilliseconds
+				$estimatedMilliseconds	= $elapsedMilliseconds *
+					(($VmfClassCount * $ProcessCounter["total"]) / ($vmfCounter + $VmfClassCount * $ProcessCounter["counter"]))
+				$params = @{
+					currentLine				= $vmfCounter
+					LinesCount				= $VmfClassCount
+					EstimatedMilliseconds	= $estimatedMilliseconds
+					ElapsedMilliseconds		= $StopWatch.Value.ElapsedMilliseconds
+					Activity				= $("Stripper: Merging modify {0} / {1} ..." -f
+													$ProcessCounter["counter"], $ProcessCounter["total"])
+				}
+				ReportProgress @params
+			}
+			#endregion
+			$vmfCounter++
 		}
 
 		return $true

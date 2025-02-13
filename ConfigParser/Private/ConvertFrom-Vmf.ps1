@@ -60,7 +60,11 @@ function ConvertFrom-Vmf {
 		$sw.Stop()
 
 		if (-not $Silent.IsPresent) {
-			$linesPerSecond = ($currentLine / $sw.ElapsedMilliseconds) * 1000
+			if ($sw.ElapsedMilliseconds -gt 0) {
+				$linesPerSecond = ($currentLine / $sw.ElapsedMilliseconds) * 1000
+			} else {
+				$linesPerSecond = $currentLine * 1000
+			}
 			$timeFormatted = "{0}m {1}s {2}ms" -f
 				$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
 			OutLog 								-Value "`nVMF | Parsing: Complete"							-Path $LogFile -OneLine

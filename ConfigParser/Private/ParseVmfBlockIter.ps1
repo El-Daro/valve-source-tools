@@ -27,7 +27,7 @@ function ParseVmfBlockIter {
 	$stackBlocks			= [System.Collections.Generic.Stack[ordered]]::new()
 	$estimatedMilliseconds	= 0
 	$progressCounter		= 0
-	$progressStep			= $Lines.Count / 50
+	$progressStep			= [math]::Ceiling($Lines.Count / 50)
 
 	while ($currentLine.Value -lt $Lines.count) {
 	

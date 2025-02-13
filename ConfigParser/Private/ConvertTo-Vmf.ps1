@@ -41,7 +41,7 @@ function ConvertTo-Vmf {
 	#region PROCESS
 	try {
 
-		[int]$estimatedLines = 0
+		[int]$estimatedLines = 2
 		if (-not $Fast) {
 			try {
 				$dictEstimatedLines = EstimateOutputVmf -Vmf $Vmf -LogFile $LogFile -Silent:$Silent.IsPresent
@@ -53,10 +53,10 @@ function ConvertTo-Vmf {
 		if ($Fast) {
 			$roughLinesEstimate = $null
 			try {
-				$roughLinesEstimate = ($Vmf["classes"]["entity"].Count * 50) +
-				($Vmf["classes"]["world"]["0"]["classes"]["solid"].Count * 
-					$Vmf["classes"]["world"]["0"]["classes"]["solid"]["0"]["classes"]["side"].Count * 
-					($Vmf["classes"]["world"]["0"]["classes"]["solid"]["0"]["classes"]["side"]["0"]["properties"].Count + 1)
+				$roughLinesEstimate = ($Vmf["classes"]["entity"].get_Count() * 50) +
+				($Vmf["classes"]["world"]["0"]["classes"]["solid"].get_Count() * 
+					$Vmf["classes"]["world"]["0"]["classes"]["solid"]["0"]["classes"]["side"].get_Count() * 
+					($Vmf["classes"]["world"]["0"]["classes"]["solid"]["0"]["classes"]["side"]["0"]["properties"].get_Count() + 1)
 				)
 				$estimatedLines = $roughLinesEstimate
 				# $estimationError = ($roughLinesEstimate - $estimatedLines["lines"]) / $estimatedLines["lines"]
@@ -77,7 +77,7 @@ function ConvertTo-Vmf {
 				}
 				# }
 			} catch {
-				continue				# Fuhged about it
+				Write-Debug "$($MyInvocation.MyCommand): VMF | Output estimation failed"				# Fuhged about it
 				# throw $_.Exception
 			}
 		}

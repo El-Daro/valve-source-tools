@@ -46,56 +46,58 @@ function ProcessStripperFilter {
 	
 	PROCESS {
 
-:main	foreach ($vmfClass in $Vmf["classes"].Keys) {
-			$indexesToRemove	= @()
-			$vmfClassCount		= $Vmf["classes"][$vmfClass].get_Count()
-			$progressStep		= [math]::Ceiling($vmfClassCount / 3)
-			$vmfCounter			= 0
-			$progressCounter	= 0
-:vmfClass	foreach ($vmfClassEntry in $Vmf["classes"][$vmfClass]) {
+		$class	= "entity"
+		if (-not $Vmf["classes"].Contains($class) -or $Vmf["classes"][$class].get_Count() -eq 0) {
+			return $false
+		}
+		$indexesToRemove	= @()
+		$vmfClassCount		= $Vmf["classes"][$class].get_Count()
+		$progressStep		= [math]::Ceiling($vmfClassCount / 3)
+		$vmfCounter			= 0
+		$progressCounter	= 0
+		foreach ($vmfClassEntry in $Vmf["classes"][$class]) {
 
+			$params = @{
+				VmfClassEntry	= $vmfClassEntry
+				StripperBlock	= $Filter
+			}
+			$matchCounter	= ProcessStripperModMatch @params
+
+			if ($matchCounter -eq $Filter["properties"].get_Count()) {
+				# $toRemove = $true
+				$MergesCount["filter"]++
+				$index = $Vmf["classes"][$class].IndexOf($VmfClassEntry)
+				$indexesToRemove += $index
+			}
+
+			#region Time estimation
+			if ($VmfClassCount -gt 1000 -and
+					$vmfCounter -ge $progressStep -and [math]::Floor($vmfCounter / $progressStep) -gt $progressCounter) { 
+				$progressCounter++
+				$elapsedMilliseconds	= $StopWatch.Value.ElapsedMilliseconds
+				$estimatedMilliseconds	= $elapsedMilliseconds *
+					(($VmfClassCount * $ProcessCounter["total"]) / ($vmfCounter + $VmfClassCount * $ProcessCounter["counter"]))
 				$params = @{
-					VmfClassEntry	= $vmfClassEntry
-					StripperBlock	= $Filter
+					currentLine				= $vmfCounter
+					LinesCount				= $VmfClassCount
+					EstimatedMilliseconds	= $estimatedMilliseconds
+					ElapsedMilliseconds		= $StopWatch.Value.ElapsedMilliseconds
+					Activity				= $("Stripper: Merging filter {0} / {1} ..." -f
+													$ProcessCounter["counter"], $ProcessCounter["total"])
 				}
-				$matchCounter	= ProcessStripperModMatch @params
-
-				if ($matchCounter -eq $Filter["properties"].get_Count()) {
-					# $toRemove = $true
-					$MergesCount["filter"]++
-					$index = $Vmf["classes"][$vmfClass].IndexOf($VmfClassEntry)
-					$indexesToRemove += $index
-				}
-
-				#region Time estimation
-				if ($VmfClassCount -gt 1000 -and
-						$vmfCounter -ge $progressStep -and [math]::Floor($vmfCounter / $progressStep) -gt $progressCounter) { 
-					$progressCounter++
-					$elapsedMilliseconds	= $StopWatch.Value.ElapsedMilliseconds
-					$estimatedMilliseconds	= $elapsedMilliseconds *
-						(($VmfClassCount * $ProcessCounter["total"]) / ($vmfCounter + $VmfClassCount * $ProcessCounter["counter"]))
-					$params = @{
-						currentLine				= $vmfCounter
-						LinesCount				= $VmfClassCount
-						EstimatedMilliseconds	= $estimatedMilliseconds
-						ElapsedMilliseconds		= $StopWatch.Value.ElapsedMilliseconds
-						Activity				= $("Stripper: Merging filter {0} / {1} ..." -f
-														$ProcessCounter["counter"], $ProcessCounter["total"])
-					}
-					ReportProgress @params
-				}
-				#endregion
-				$vmfCounter++
-
+				ReportProgress @params
 			}
-			if ($indexesToRemove.Count -eq 0) {
-				$MergesCount["filterSkipped"]++
-			}
-			for ($i = $indexesToRemove.Count - 1; $i -ge 0; $i--) {
-				Write-Debug $("Filter: Removing at {0} / {1}" -f
-					$indexesToRemove[$i], $($Vmf["classes"][$vmfClass].get_Count()))
-				$Vmf["classes"][$vmfClass].RemoveAt($indexesToRemove[$i])
-			}
+			#endregion
+			$vmfCounter++
+
+		}
+		if ($indexesToRemove.Count -eq 0) {
+			$MergesCount["filterSkipped"]++
+		}
+		for ($i = $indexesToRemove.Count - 1; $i -ge 0; $i--) {
+			Write-Debug $("Filter: Removing at {0} / {1}" -f
+				$indexesToRemove[$i], $($Vmf["classes"][$class].get_Count()))
+			$Vmf["classes"][$class].RemoveAt($indexesToRemove[$i])
 		}
 		
 		return $true
