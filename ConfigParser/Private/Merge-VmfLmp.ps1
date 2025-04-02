@@ -13,9 +13,19 @@ function Merge-VmfLmp {
 
 		[Parameter(Position = 2,
 		Mandatory = $false)]
+		$VisgroupidTable,
+
+		[Parameter(Position = 3,
+		Mandatory = $false)]
+		$Visgroups,
+
+		[Parameter(Position = 4,
+		Mandatory = $false)]
 		[string]$LogFile,
 
-		[System.Management.Automation.SwitchParameter]$Silent
+		[System.Management.Automation.SwitchParameter]$Silent,
+
+		[System.Management.Automation.SwitchParameter]$Demo
 	)
 	
 	PROCESS {
@@ -53,6 +63,9 @@ function Merge-VmfLmp {
 				Lmp				= $Lmp
 				MergesCount		= $mergesCount
 				CounterLmp		= $counterLmp
+				VisgroupidTable	= $visgroupidTable
+				Visgroups		= $Visgroups
+				Demo			= $Demo.IsPresent
 			}
 			$copied = Copy-LmpIntoVmf @params
 

@@ -26,9 +26,19 @@ function Copy-LmpIntoVmf {
 
 		[Parameter(Position = 4,
 		Mandatory = $false)]
+		$VisgroupidTable,
+
+		[Parameter(Position = 5,
+		Mandatory = $false)]
+		$Visgroups,
+
+		[Parameter(Position = 6,
+		Mandatory = $false)]
 		[string]$LogFile,
 
-		[System.Management.Automation.SwitchParameter]$Silent
+		[System.Management.Automation.SwitchParameter]$Silent,
+
+		[System.Management.Automation.SwitchParameter]$Demo
 	)
 	
 	PROCESS {
@@ -46,6 +56,11 @@ function Copy-LmpIntoVmf {
 			$MergesCount["propsTotal"]		= 0
 			$progressCounter				= 0
 			$progressStep					= $CounterLmp["total"] / 10
+			$currentVisgroup				= $visgroups
+			$colorsTable					= Get-ColorsTable
+			$visgroupNameMain				= "LMP"
+			# $visgroupNameLmpEdited			= "LMP_Edited"
+			# $visgroupNameLmpAdded			= "LMP_Added"
 			#endregion
 
 			# Just a precaution
@@ -73,18 +88,52 @@ function Copy-LmpIntoVmf {
 :vmfListLoopH			foreach ($vmfClassEntry in $Vmf["classes"][$vmfClass]) {
 							if ($vmfClassEntry["properties"].Contains($matchBy) -and
 								$idToMatch -eq $vmfClassEntry["properties"][$matchBy][0]) {
-								$vmfSectionFound = $true
+								$vmfSectionFound	= $true
+								$vmfSectionEdited	= $false
 								if ($matchBy -eq "id") {
 									$MergesCount["hammerid"]++
 								} else {
 									$MergesCount["classname"]++
 								}
 								$params = @{
-									VmfSection	= $vmfClassEntry
-									LmpSection	= $Lmp["data"][$lmpSection]
-									MergesCount	= $MergesCount
+									VmfSection		= $vmfClassEntry
+									LmpSection		= $Lmp["data"][$lmpSection]
+									MergesCount		= $MergesCount
 								}
-								Copy-LmpSection @params
+								$vmfSectionEdited = Copy-LmpSection @params
+
+								#region LMP_Edited Visgroup
+								if ($vmfSectionEdited) {
+									# Create a new "LMP" visgroup if it doesn't already exist
+									if (-not $visgroupidTable.Contains($visgroupNameMain)) {
+										$params = @{
+											VmfSection		= $currentVisgroup
+											Name			= $visgroupNameMain
+											Color			= $colorsTable["Purple"]
+											VisgroupidTable	= $visgroupidTable
+										}
+										$currentVisgroup	= New-VmfVisgroupWrapper @params
+									}
+
+									# Create a new "LMP_Edited" visgroup if it doesn't already exist
+									if (-not $visgroupidTable.Contains("LMP_Edited")) {
+										$params = @{
+											VmfSection		= $currentVisgroup
+											Name			= "LMP_Edited"
+											Color			= $colorsTable["DeepSkyBlue"]
+											VisgroupidTable	= $visgroupidTable
+										}
+										$visgroupLmpEdited	= New-VmfVisgroupWrapper @params
+									}
+
+									$params = @{
+										VmfSection	= $vmfClassEntry
+										Color		= $colorsTable["DeepSkyBlue"]
+										VisgroupID	= $visgroupidTable["LMP_Edited"]
+									}
+									$success = Add-VmfEditor @params
+								}
+								#endregion
 
 								#region In-house copying function (for testing purposes)
 								# foreach ($propertyName in $Lmp["data"][$lmpSection].Keys) {
@@ -126,6 +175,39 @@ function Copy-LmpIntoVmf {
 						}
 						$MergesCount["propsNew"] += $newBlock["properties"].get_Count()
 						$Vmf["classes"]["entity"].Add($newBlock)
+
+						#region LMP_Added Visgroup
+						$lastSectionID	= $Vmf["classes"]["entity"].get_Count() - 1
+
+						# Create a new "LMP" visgroup if it doesn't already exist
+						if (-not $visgroupidTable.Contains($visgroupNameMain)) {
+							$params = @{
+								VmfSection		= $currentVisgroup
+								Name			= $visgroupNameMain
+								Color			= $colorsTable["Purple"]
+								VisgroupidTable	= $visgroupidTable
+							}
+							$currentVisgroup	= New-VmfVisgroupWrapper @params
+						}
+
+						# Create a new "LMP_Added" visgroup if it doesn't already exist
+						if (-not $visgroupidTable.Contains("LMP_Added")) {
+							$params = @{
+								VmfSection		= $currentVisgroup
+								Name			= "LMP_Added"
+								Color			= $colorsTable["Teal"]
+								VisgroupidTable	= $visgroupidTable
+							}
+							$visgroupLmpAdded	= New-VmfVisgroupWrapper @params
+						}
+
+						$params = @{
+							VmfSection	= $Vmf["classes"]["entity"][$lastSectionID]
+							Color		= $colorsTable["Teal"]
+							VisgroupID	= $visgroupidTable["LMP_Added"]
+						}
+						$success = Add-VmfEditor @params
+						#endregion
 					}
 				}
 				$MergesCount["section"]++

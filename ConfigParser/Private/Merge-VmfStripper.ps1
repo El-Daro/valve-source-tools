@@ -13,9 +13,19 @@ function Merge-VmfStripper {
 
 		[Parameter(Position = 2,
 		Mandatory = $false)]
+		$VisgroupidTable,
+
+		[Parameter(Position = 3,
+		Mandatory = $false)]
+		$Visgroups,
+
+		[Parameter(Position = 4,
+		Mandatory = $false)]
 		[string]$LogFile,
 
-		[System.Management.Automation.SwitchParameter]$Silent
+		[System.Management.Automation.SwitchParameter]$Silent,
+
+		[System.Management.Automation.SwitchParameter]$Demo
 	)
 	
 	PROCESS {
@@ -55,6 +65,7 @@ function Merge-VmfStripper {
 				MergesCount		= $mergesCount
 				CounterStripper	= $counterStripper
 				StopWatch		= [ref]$sw
+				Demo			= $Demo.IsPresent
 			}
 			$copied = Copy-StripperIntoVmf @params
 
