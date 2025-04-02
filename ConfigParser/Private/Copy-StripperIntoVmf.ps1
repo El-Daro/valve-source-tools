@@ -27,7 +27,9 @@ function Copy-StripperIntoVmf {
 		Mandatory = $false)]
 		[string]$LogFile,
 
-		[System.Management.Automation.SwitchParameter]$Silent
+		[System.Management.Automation.SwitchParameter]$Silent,
+
+		[System.Management.Automation.SwitchParameter]$Demo
 	)
 	
 	PROCESS {

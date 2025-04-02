@@ -40,13 +40,17 @@ Param (
 	[Parameter(Position = 8)]
 	[System.Management.Automation.SwitchParameter]$Silent,
 
-	[Parameter(Position = 9)]
-	[System.Management.Automation.SwitchParameter]$AsText,
+	[Parameter(Position = 9,
+	Mandatory = $false)]
+	[System.Management.Automation.SwitchParameter]$Demo,
 
 	[Parameter(Position = 10)]
+	[System.Management.Automation.SwitchParameter]$AsText,
+
+	[Parameter(Position = 11)]
 	$Note,
 
-	[Parameter(Position = 11,
+	[Parameter(Position = 12,
 	Mandatory = $false)]
 	[string]$LogFile = "../logs/stats_merger.log"
 
@@ -159,12 +163,12 @@ Try {
 	if ($vmfParsed) {
 		if ($lmpParsed) {
 			if ($stripperParsed) {
-				$vmfMerged = Merge-Map -Vmf $vmfParsed -Lmp $lmpParsed -Stripper $stripperParsed -LogFile $logFile -Silent:$Silent.IsPresent
+				$vmfMerged = Merge-Map -Vmf $vmfParsed -Lmp $lmpParsed -Stripper $stripperParsed -LogFile $logFile -Silent:$Silent.IsPresent -Demo:$Demo.IsPresent
 			} else {
 				$vmfMerged = Merge-Map -Vmf $vmfParsed -Lmp $lmpParsed -LogFile $logFile -Silent:$Silent.IsPresent
 			}
 		} elseif ($stripperParsed) {
-			$vmfMerged = Merge-Map -Vmf $vmfParsed -Stripper $stripperParsed -LogFile $logFile -Silent:$Silent.IsPresent
+			$vmfMerged = Merge-Map -Vmf $vmfParsed -Stripper $stripperParsed -LogFile $logFile -Silent:$Silent.IsPresent -Demo:$Demo.IsPresent
 		} else {
 			$vmfMerged = $false
 			$success = $false

@@ -25,6 +25,10 @@ Param (
 
 	[Parameter(Position = 5,
 	Mandatory = $false)]
+	[System.Management.Automation.SwitchParameter]$Demo,
+
+	[Parameter(Position = 5,
+	Mandatory = $false)]
 	$Note = "Batch test",
 
 	[Parameter(Position = 6,
@@ -144,6 +148,7 @@ foreach ($vmf in $Vmfs) {
 					Note			= $Note
 					LogFile			= $LogFile
 					Silent			= $Silent.IsPresent
+					Demo			= $Demo.IsPresent
 				}
 			}
 		} elseif ([string]::IsNullOrEmpty($inputStripperFilePath)) {
@@ -155,6 +160,7 @@ foreach ($vmf in $Vmfs) {
 				Note			= $Note
 				LogFile			= $LogFile
 				Silent			= $Silent.IsPresent
+				Demo			= $Demo.IsPresent
 			}
 		} else {
 			$params = @{
@@ -166,6 +172,7 @@ foreach ($vmf in $Vmfs) {
 				Note			= $Note
 				LogFile			= $LogFile
 				Silent			= $Silent.IsPresent
+				Demo			= $Demo.IsPresent
 			}
 		}
 		

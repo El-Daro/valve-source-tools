@@ -82,7 +82,9 @@ function Merge-Map {
 			Mandatory = $false)]
 			[string]$LogFile,
 	
-			[System.Management.Automation.SwitchParameter]$Silent
+			[System.Management.Automation.SwitchParameter]$Silent,
+
+			[System.Management.Automation.SwitchParameter]$Demo
 		)
 	
 		BEGIN {
@@ -151,23 +153,57 @@ function Merge-Map {
 			}
 			#endregion
 			$LogFile = $(Get-AbsolutePath -Path $LogFile)		# Just a precaution
+
+			#region Visgroups
+			# Ensure it does exist
+			if (-not $Vmf["classes"].Contains("visgroups") -or -not $Vmf["classes"]["visgroups"].get_Count() -gt 0) {
+				New-VmfVisgroupsContainer -Vmf $Vmf			# Ensure the main wrapper class exists
+			}
+			$params = @{
+				Vmf		= $Vmf
+				LogFile	= $LogFile
+				Silent	= $Silent.IsPresent
+			}
+			$visgroupidMax = Get-MaxVisgroupid @params
+
+			$visgroupidTable	= @{
+				vmfMax		= $visgroupidMax
+				current		= $visgroupidMax + 1
+			}
+			$colorsTable	= Get-ColorsTable
+
+
+			$params = @{
+				VmfSection		= $Vmf["classes"]["visgroups"][0]
+				Name			= "Custom"
+				Color			= $colorsTable["DarkGrey"]
+				VisgroupidTable	= $visgroupidTable
+			}
+			$visgroups			= New-VmfVisgroupWrapper @params
+			#endregion
 	
 			$vmfMerged = $Vmf						# This is the structure we'll be working with
 			if ($PSBoundParameters.ContainsKey('Lmp')) {
 				$params = @{
-					Vmf		= $vmfMerged
-					Lmp		= $Lmp
-					LogFile	= $LogFile
-					Silent	= $Silent.IsPresent
+					Vmf				= $vmfMerged
+					Lmp				= $Lmp
+					VisgroupidTable	= $visgroupidTable
+					Visgroups		= $visgroups
+					LogFile			= $LogFile
+					Silent			= $Silent.IsPresent
+					Demo			= $Demo.IsPresent
 				}
 				$vmfMerged = Merge-VmfLmp @params
 			}
 			if ($PSBoundParameters.ContainsKey('Stripper')) {
 				$params = @{
-					Vmf			= $vmfMerged
-					Stripper	= $Stripper
-					LogFile		= $LogFile
-					Silent		= $Silent.IsPresent
+					Vmf				= $vmfMerged
+					Stripper		= $Stripper
+					VisgroupidTable	= $visgroupidTable
+					Visgroups		= $visgroups
+					LogFile			= $LogFile
+					Silent			= $Silent.IsPresent
+					Demo			= $Demo.IsPresent
 				}
 				$vmfMerged = Merge-VmfStripper @params
 			}
