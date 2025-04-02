@@ -159,6 +159,7 @@ function Merge-Map {
 			if (-not $Vmf["classes"].Contains("visgroups") -or -not $Vmf["classes"]["visgroups"].get_Count() -gt 0) {
 				New-VmfVisgroupsContainer -Vmf $Vmf			# Ensure the main wrapper class exists
 			}
+
 			$params = @{
 				Vmf		= $Vmf
 				LogFile	= $LogFile
@@ -171,7 +172,6 @@ function Merge-Map {
 				current		= $visgroupidMax + 1
 			}
 			$colorsTable	= Get-ColorsTable
-
 
 			$params = @{
 				VmfSection		= $Vmf["classes"]["visgroups"][0]

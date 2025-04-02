@@ -1,3 +1,5 @@
+# TODO: Implement visgroups generation
+
 using namespace System.Diagnostics
 
 function Merge-VmfStripper {
