@@ -12,18 +12,26 @@ function Copy-StripperIntoVmf {
 		[System.Collections.IDictionary]$Stripper,
 
 		[Parameter(Position = 2,
+		Mandatory = $false)]
+		$VisgroupidTable,
+
+		[Parameter(Position = 3,
+		Mandatory = $false)]
+		$Visgroups,
+
+		[Parameter(Position = 4,
 		Mandatory = $true)]
 		$MergesCount,
 
-		[Parameter(Position = 3,
+		[Parameter(Position = 5,
 		Mandatory = $true)]
 		$CounterStripper,
 
-		[Parameter(Position = 3,
+		[Parameter(Position = 6,
 		Mandatory = $true)]
 		[ref]$StopWatch,
 
-		[Parameter(Position = 4,
+		[Parameter(Position = 7,
 		Mandatory = $false)]
 		[string]$LogFile,
 
@@ -61,6 +69,36 @@ function Copy-StripperIntoVmf {
 			$MergesCount["propsTotal"]		= 0
 			# $progressCounter				= 0
 			# $progressStep					= $CounterStripper["total"] / 10
+			$colorsTable					= Get-ColorsTable
+			$vgnStripper					= "Stripper"				# vgn = visgroupName
+			$vgnStripperFiltered			= "Stripper - Filtered"
+			$vgnStripperAdded				= "Stripper - Added"
+			$vgnStripperModified			= "Stripper - Modified"
+			if ($PSBoundParameters.ContainsKey('Visgroups')) {
+				$currentVisgroup			= $Visgroups
+			} else {
+				$currentVisgroup			= $false
+			}
+			#endregion
+
+			#region Visgroups
+			# Create a new "Stripper" visgroup if it doesn't already exist
+			# NOTE: This visgroup is initially created with a marker (additional parameter)
+			#		It gets either deleted or cleaned in the end,
+			#		depending on whether any rules were actually applied
+			if ($PSBoundParameters.ContainsKey('VisgroupidTable') -and
+				$PSBoundParameters.ContainsKey('Visgroups')) {
+				if (-not $visgroupidTable.Contains($vgnStripper)) {
+					$params = @{
+						VmfSection		= $currentVisgroup
+						Name			= $vgnStripper
+						Color			= $colorsTable["Magenta"]
+						VisgroupidTable	= $visgroupidTable
+						MarkTemporary	= $true
+					}
+					$currentVisgroup	= New-VmfVisgroupWrapper @params
+				}
+			}
 			#endregion
 
 			if ($Stripper["modes"]["filter"].get_Count() -gt 0) {
@@ -74,10 +112,13 @@ function Copy-StripperIntoVmf {
 					$params	= @{
 						Vmf				= $Vmf
 						Filter			= $filter
+						VisgroupidTable	= $visgroupidTable
+						CurrentVisgroup	= $currentVisgroup
 						MergesCount		= $MergesCount
 						CounterStripper	= $CounterStripper
 						StopWatch		= [ref]$sw
 						ProcessCounter	= $filterCounter
+						Demo			= $Demo.IsPresent
 					}
 					$filterProcessed = ProcessStripperFilter @params
 					$filterCounter["counter"]++
@@ -99,6 +140,8 @@ function Copy-StripperIntoVmf {
 					$params	= @{
 						Vmf				= $Vmf
 						Add				= $add
+						VisgroupidTable	= $visgroupidTable
+						CurrentVisgroup	= $currentVisgroup
 						MergesCount		= $MergesCount
 						CounterStripper	= $CounterStripper
 						StopWatch		= [ref]$sw
@@ -126,6 +169,8 @@ function Copy-StripperIntoVmf {
 					$params	= @{
 						Vmf				= $Vmf
 						Modify			= $modify
+						VisgroupidTable	= $visgroupidTable
+						CurrentVisgroup	= $currentVisgroup
 						MergesCount		= $MergesCount
 						CounterStripper	= $CounterStripper
 						StopWatch		= [ref]$sw
@@ -138,6 +183,22 @@ function Copy-StripperIntoVmf {
 					}
 				}
 				$sw.Stop()
+			}
+
+			# The container visgroup - Stripper - is created prior to processing all the rules
+			# Here it gets either deleted or cleaned, depending on whether any rules were actually applied
+			if ($currentVisgroup["properties"].Contains("temporary")) {
+				if (-not $visgroupidTable.Contains($vgnStripperFiltered) -and
+					-not $visgroupidTable.Contains($vgnStripperAdded) -and
+					-not $visgroupidTable.Contains($vgnStripperModified)) {
+					$params = @{
+						Vmf			= $Visgroups
+						MatchSet	= @{ name = $vgnStripper }
+					}
+					$success = Remove-VmfSection @params
+				} else {
+					$currentVisgroup["properties"].Remove("temporary")
+				}
 			}
 
 			$MergesCount["failed"]		= $MergesCount["addFailed"] + $MergesCount["modifyFailed"]

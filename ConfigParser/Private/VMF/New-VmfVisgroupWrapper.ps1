@@ -17,7 +17,9 @@ function New-VmfVisgroupWrapper {
 
 		[Parameter(Position = 3,
 		Mandatory = $false)]
-		[System.Collections.IDictionary]$VisgroupidTable = @{ custom = 1 }
+		[System.Collections.IDictionary]$VisgroupidTable = @{ custom = 1 },
+
+		[System.Management.Automation.SwitchParameter]$MarkTemporary
 	)
 	
 	PROCESS {
@@ -35,6 +37,8 @@ function New-VmfVisgroupWrapper {
 			if ($targetVisgroup -and $targetVisgroup["properties"].Contains("visgroupid") -and 
 									 $targetVisgroup["properties"]["visgroupid"].get_Count() -gt 0) {
 				$visgroupidTable[$Name] = $targetVisgroup["properties"]["visgroupid"][0]
+			# } elseif ($MarkTemporary.IsPresent) {
+			# 	return $false
 			} else {
 				$params = @{
 					Visgroup	= $VmfSection
@@ -52,6 +56,10 @@ function New-VmfVisgroupWrapper {
 						ClassName	= "visgroup"
 					}
 					$targetVisgroup	= Get-VmfSection @params
+					if ($MarkTemporary.IsPresent) {
+						$targetVisgroup["properties"]["temporary"] = [Collections.Generic.List[string]]::new()
+						$targetVisgroup["properties"]["temporary"].Add("1")
+					}
 				}
 			}
 			# TODO: Return the visgroup section

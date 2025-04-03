@@ -1,3 +1,5 @@
+# TODO: Rewrite the loop abd loop breaker
+
 using namespace System.Diagnostics
 
 function Get-VmfSection {

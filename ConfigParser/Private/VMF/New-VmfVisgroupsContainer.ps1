@@ -21,7 +21,7 @@ function New-VmfVisgroupsContainer {
 				classes		= [ordered]@{ }
 			})
 			$Vmf["classes"]["visgroups"][0]["classes"]["visgroup"] = [System.Collections.Generic.List[ordered]]::new()
-			if ($PSBoundParameters.Contains('Visgroup')) {
+			if ($PSBoundParameters.ContainsKey('Visgroup')) {
 				$Vmf["classes"]["visgroups"][0]["classes"]["visgroup"].Add($Visgroup)
 			}
 			$success = $true

@@ -12,22 +12,30 @@ function ProcessStripperAdd {
 		[System.Collections.IDictionary]$Add,
 
 		[Parameter(Position = 2,
-		Mandatory = $true)]
-		$MergesCount,
+		Mandatory = $false)]
+		$VisgroupidTable,
 
 		[Parameter(Position = 3,
 		Mandatory = $false)]
-		$CounterStripper,
+		$CurrentVisgroup,
 
 		[Parameter(Position = 4,
-		Mandatory = $false)]
-		[ref]$StopWatch,
+		Mandatory = $true)]
+		$MergesCount,
 
 		[Parameter(Position = 5,
 		Mandatory = $false)]
-		$ProcessCounter,
+		$CounterStripper,
 
 		[Parameter(Position = 6,
+		Mandatory = $false)]
+		[ref]$StopWatch,
+
+		[Parameter(Position = 7,
+		Mandatory = $false)]
+		$ProcessCounter,
+
+		[Parameter(Position = 8,
 		Mandatory = $false)]
 		[string]$LogFile,
 
@@ -36,7 +44,8 @@ function ProcessStripperAdd {
 	
 	PROCESS {
 
-		$class = "entity"
+		$class				= "entity"
+		$vgnStripperAdded	= "Stripper - Added"
 		$newBlock = [ordered]@{
 			properties	= [ordered]@{}
 			classes		= [ordered]@{}
@@ -80,6 +89,31 @@ function ProcessStripperAdd {
 				$newBlock["properties"].Add($stripperProp, $Add["properties"][$stripperProp])
 			}
 		}
+
+		#region Visgroup: Stripper - Added
+		if ($PSBoundParameters.ContainsKey('VisgroupidTable') -and
+			$PSBoundParameters.ContainsKey('CurrentVisgroup') -and
+			$false -ne $CurrentVisgroup) {
+			# Create a new "Stripper - Added" visgroup if it doesn't already exist
+			if (-not $visgroupidTable.Contains($vgnStripperAdded)) {
+				$params = @{
+					VmfSection		= $CurrentVisgroup
+					Name			= $vgnStripperAdded
+					Color			= $colorsTable["MediumPurple"]
+					VisgroupidTable	= $visgroupidTable
+				}
+				$visgroupStripperAdded	= New-VmfVisgroupWrapper @params
+			}
+
+			$params = @{
+				VmfSection	= $newBlock
+				Color		= $colorsTable["MediumPurple"]
+				VisgroupID	= $visgroupidTable[$vgnStripperAdded]
+			}
+			$success = Add-VmfEditor @params
+		}
+		#endregion
+
 		if (-not $Vmf["classes"].Contains($class)) {
 			$Vmf["classes"][$class] = [System.Collections.Generic.List[ordered]]::new()
 		}
