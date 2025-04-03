@@ -12,7 +12,7 @@
 RootModule = 'ConfigParser.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.9.6.001'
+ModuleVersion = '0.9.6.100'
 
 # ID used to uniquely identify this module
 GUID = 'ee86abf1-c36e-47e9-9bee-d975fbbea1ad'

@@ -135,7 +135,6 @@ foreach ($vmf in $Vmfs) {
 		}
 		$outputFilePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($outputFilePath)
 		$outputFiles += $outputFilePath
-		$DemoTest = $true
 
 		if ([string]::IsNullOrEmpty($inputLmpFilePath)) {
 			if ([string]::IsNullOrEmpty($inputStripperFilePath)) {
@@ -173,7 +172,7 @@ foreach ($vmf in $Vmfs) {
 				Note			= $Note
 				LogFile			= $LogFile
 				Silent			= $Silent.IsPresent
-				Demo			= $DemoTest
+				Demo			= $Demo.IsPresent
 			}
 		}
 		
