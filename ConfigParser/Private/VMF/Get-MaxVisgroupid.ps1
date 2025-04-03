@@ -16,7 +16,7 @@ function Get-MaxVisgroupid {
 
 		try {
 			$class			= "visgroups"
-			$visgroupidMax	= 1
+			$visgroupidMax	= 0
 
 			if (-not $Vmf["classes"].Contains($class) -or $Vmf["classes"][$class].get_Count() -eq 0) {
 				return $visgroupidMax

@@ -152,12 +152,12 @@ function Merge-Map {
 			}
 		}
 		#endregion
-		$LogFile = $(Get-AbsolutePath -Path $LogFile)		# Just a precaution
+		$LogFile = $(Get-AbsolutePath -Path $LogFile)	# Just a precaution
 
 		#region Visgroups
 		# Ensure it does exist
 		if (-not $Vmf["classes"].Contains("visgroups") -or -not $Vmf["classes"]["visgroups"].get_Count() -gt 0) {
-			New-VmfVisgroupsContainer -Vmf $Vmf			# Ensure the main wrapper class exists
+			$success = New-VmfVisgroupsContainer -Vmf $Vmf			# Ensure the main wrapper class exists
 		}
 
 		$params = @{

@@ -22,31 +22,42 @@ function ProcessStripperFilter {
 		[System.Collections.IDictionary]$Filter,
 
 		[Parameter(Position = 2,
+		Mandatory = $false)]
+		$VisgroupidTable,
+
+		[Parameter(Position = 3,
+		Mandatory = $false)]
+		$CurrentVisgroup,
+
+		[Parameter(Position = 4,
 		Mandatory = $true)]
 		$MergesCount,
 
-		[Parameter(Position = 3,
+		[Parameter(Position = 5,
 		Mandatory = $true)]
 		$CounterStripper,
 
-		[Parameter(Position = 4,
+		[Parameter(Position = 6,
 		Mandatory = $false)]
 		[ref]$StopWatch,
 
-		[Parameter(Position = 5,
+		[Parameter(Position = 7,
 		Mandatory = $false)]
 		$ProcessCounter,
 
-		[Parameter(Position = 6,
+		[Parameter(Position = 8,
 		Mandatory = $false)]
 		[string]$LogFile,
 
-		[System.Management.Automation.SwitchParameter]$Silent
+		[System.Management.Automation.SwitchParameter]$Silent,
+
+		[System.Management.Automation.SwitchParameter]$Demo
 	)
 	
 	PROCESS {
 
-		$class	= "entity"
+		$class					= "entity"
+		$vgnStripperFiltered	= "Stripper - Filtered"
 		if (-not $Vmf["classes"].Contains($class) -or $Vmf["classes"][$class].get_Count() -eq 0) {
 			return $false
 		}
@@ -97,7 +108,36 @@ function ProcessStripperFilter {
 		for ($i = $indexesToRemove.Count - 1; $i -ge 0; $i--) {
 			Write-Debug $("Filter: Removing at {0} / {1}" -f
 				$indexesToRemove[$i], $($Vmf["classes"][$class].get_Count()))
-			$Vmf["classes"][$class].RemoveAt($indexesToRemove[$i])
+			if ($PSBoundParameters.ContainsKey('VisgroupidTable') -and
+				$PSBoundParameters.ContainsKey('CurrentVisgroup') -and
+				$false -ne $CurrentVisgroup -and $Demo.IsPresent) {
+				#region Visgroup: Stripper - Filtered
+				# NOTE: This will keep the elements and make them hidden by default
+				#		They will still exist in the map!
+				#		Only do it for demonstration purposes (pass the '-Demo' parameter)
+				# Create a new "Stripper - Filtered" visgroup if it doesn't already exist
+				if (-not $visgroupidTable.Contains($vgnStripperFiltered)) {
+					$params = @{
+						VmfSection		= $CurrentVisgroup
+						Name			= $vgnStripperFiltered
+						Color			= $colorsTable["MediumVioletRed"]
+						VisgroupidTable	= $visgroupidTable
+					}
+					$visgroupStripperMod	= New-VmfVisgroupWrapper @params
+				}
+
+				$params = @{
+					VmfSection			= $Vmf["classes"][$class][$indexesToRemove[$i]]
+					Color				= $colorsTable["MediumVioletRed"]
+					VisgroupID			= $visgroupidTable[$vgnStripperFiltered]
+					VisgroupShown		= "0"
+					VisgroupAutoShown	= "0"
+				}
+				$success = Add-VmfEditor @params
+				#endregion
+			} else {
+				$Vmf["classes"][$class].RemoveAt($indexesToRemove[$i])
+			}
 		}
 		
 		return $true

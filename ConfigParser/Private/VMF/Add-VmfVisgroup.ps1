@@ -7,15 +7,15 @@ function Add-VmfVisgroup {
 		Mandatory = $true)]
 		$Visgroup,
 
-		[Parameter(Position = 0,
+		[Parameter(Position = 1,
 		Mandatory = $false)]
 		$Name = "Custom",
 
-		[Parameter(Position = 1,
+		[Parameter(Position = 2,
 		Mandatory = $false)]
 		$Color = "128 128 128",
 
-		[Parameter(Position = 2,
+		[Parameter(Position = 3,
 		Mandatory = $false)]
 		$Visgroupid = 1
 	)

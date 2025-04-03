@@ -1,4 +1,4 @@
-# TODO: Implement visgroups generation 
+# TODO: Implement visgroups generation
 
 using namespace System.Diagnostics
 
@@ -64,6 +64,8 @@ function Merge-VmfStripper {
 			$params	= @{
 				Vmf				= $Vmf
 				Stripper		= $Stripper
+				VisgroupidTable	= $visgroupidTable
+				Visgroups		= $visgroups
 				MergesCount		= $mergesCount
 				CounterStripper	= $counterStripper
 				StopWatch		= [ref]$sw

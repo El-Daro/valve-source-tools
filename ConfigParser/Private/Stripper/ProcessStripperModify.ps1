@@ -19,22 +19,30 @@ function ProcessStripperModify {
 		[System.Collections.IDictionary]$Modify,
 
 		[Parameter(Position = 2,
-		Mandatory = $true)]
-		$MergesCount,
+		Mandatory = $false)]
+		$VisgroupidTable,
 
 		[Parameter(Position = 3,
 		Mandatory = $false)]
-		$CounterStripper,
+		$CurrentVisgroup,
 
 		[Parameter(Position = 4,
-		Mandatory = $false)]
-		[ref]$StopWatch,
+		Mandatory = $true)]
+		$MergesCount,
 
 		[Parameter(Position = 5,
 		Mandatory = $false)]
-		$ProcessCounter,
+		$CounterStripper,
 
 		[Parameter(Position = 6,
+		Mandatory = $false)]
+		[ref]$StopWatch,
+
+		[Parameter(Position = 7,
+		Mandatory = $false)]
+		$ProcessCounter,
+
+		[Parameter(Position = 8,
 		Mandatory = $false)]
 		[string]$LogFile,
 
@@ -49,7 +57,8 @@ function ProcessStripperModify {
 		}
 
 # :mainL	foreach ($vmfClass in $Vmf["classes"].Keys) {
-		$class	= "entity"
+		$class					= "entity"
+		$vgnStripperModified	= "Stripper - Modified"
 		if (-not $Vmf["classes"].Contains($class) -or $Vmf["classes"][$class].get_Count() -eq 0) {
 			return $false
 		}
@@ -68,6 +77,7 @@ function ProcessStripperModify {
 			#endregion
 			# If all the props in the 'match' section have matched
 			if ($matchCounter -eq $Modify["modes"]["match"][0]["properties"].get_Count()) {
+				$modified = $false
 				#region 2. REPLACE
 				if ($Modify["modes"]["replace"].get_Count() -gt 0) {
 					$params = @{
@@ -76,17 +86,22 @@ function ProcessStripperModify {
 						MergesCount		= $MergesCount
 					}
 					ProcessStripperModReplace @params
+					$modified = $true
 				}
 				#endregion
 
 				#region 3. DELETE
 				if ($Modify["modes"]["delete"].get_Count() -gt 0) {
+					$modifyDeletedPrev = $MergesCount["modifyDeleted"]
 					$params = @{
 						VmfClassEntry	= $vmfClassEntry
 						Modify			= $Modify["modes"]["delete"][0]
 						MergesCount		= $MergesCount
 					}
 					ProcessStripperModDelete @params
+					if ($MergesCount["modifyDeleted"] -gt $modifyDeletedPrev) {
+						$modified = $true
+					}
 				}
 				#endregion
 
@@ -98,6 +113,31 @@ function ProcessStripperModify {
 						MergesCount		= $MergesCount
 					}
 					ProcessStripperModInsert @params
+					$modified = $true
+				}
+				#endregion
+
+				#region Visgroup: Stripper - Modified
+				if ($PSBoundParameters.ContainsKey('VisgroupidTable') -and
+					$PSBoundParameters.ContainsKey('CurrentVisgroup') -and
+					$false -ne $CurrentVisgroup -and $modified) {
+					# Create a new "Stripper - Modified" visgroup if it doesn't already exist
+					if (-not $visgroupidTable.Contains($vgnStripperModified)) {
+						$params = @{
+							VmfSection		= $CurrentVisgroup
+							Name			= $vgnStripperModified
+							Color			= $colorsTable["UltraViolet"]
+							VisgroupidTable	= $visgroupidTable
+						}
+						$visgroupStripperMod	= New-VmfVisgroupWrapper @params
+					}
+
+					$params = @{
+						VmfSection	= $vmfClassEntry
+						Color		= $colorsTable["UltraViolet"]
+						VisgroupID	= $visgroupidTable[$vgnStripperModified]
+					}
+					$success = Add-VmfEditor @params
 				}
 				#endregion
 
