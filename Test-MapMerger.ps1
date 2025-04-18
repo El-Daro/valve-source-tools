@@ -66,11 +66,10 @@ if ($PSBoundParameters.ContainsKey('Debug')) {
 }
 
 #region VARIABLES and PREPARATIONS
-$env:PSModulePath = $env:PSModulePath + [System.IO.Path]::PathSeparator + "c:\Projects\PowerShell\L4D2Launcher"
+$env:PSModulePath = $env:PSModulePath + [System.IO.Path]::PathSeparator + "c:\Projects\PowerShell\valve-source-tools"
 $modulesToImport = @{
-	# IniParser = "IniParser"
-	# VdfParser = "VdfParser"
-	ConfigParser = "ConfigParser"
+	PSResourceParser	= "PSResourceParser"
+	PSSourceEngineTools	= "PSSourceEngineTools"
 }
 
 $appendix = "_merged_"
