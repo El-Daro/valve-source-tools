@@ -1,6 +1,16 @@
-.vscode/launch.json
 .vmf
 .vdf
 .lmp
-\.ini
-log\
+/.ini
+
+# Folders
+.vscode/
+log/
+logs/
+# resources/
+resources/merger/
+resources/config/
+
+# Test scripts
+# Test-VmfLmpMerger.ps1
+# Test-VmfLmpMergerBatch.ps1

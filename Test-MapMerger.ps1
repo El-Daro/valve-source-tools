@@ -6,20 +6,20 @@ using namespace System.Diagnostics
 Param (
 	[Parameter(Position = 0,
 	Mandatory = $true)]
-	# [string]$VmfPath = "..\configs\vmf-lmp-stripper\mergeTest.vmf",
-	# [string]$VmfPath = "..\configs\vmf-lmp-stripper\c5m3_cemetery_d.vmf",
+	# [string]$VmfPath = ".\resources\merger\mergeTest.vmf",
+	# [string]$VmfPath = ".\resources\merger\vmf-lmp-stripper\c5m3_cemetery_d.vmf",
 	[string]$VmfPath,
 
 	[Parameter(Position = 1,
 	Mandatory = $false)]
-	# [string]$LmpPath = "..\configs\vmf-lmp-stripper\mergeTest.lmp",
-	# [string]$LmpPath = "..\configs\vmf-lmp-stripper\c5m3_cemetery_l_0.lmp",
+	# [string]$LmpPath = ".\resources\merger\mergeTest.lmp",
+	# [string]$LmpPath = ".\resources\merger\c5m3_cemetery_l_0.lmp",
 	[string]$LmpPath,
 
 	[Parameter(Position = 2,
 	Mandatory = $false)]
-	# [string]$StripperPath = "..\configs\vmf-lmp-stripper\mergeTest.cfg",
-	# [string]$StripperPath = "..\configs\vmf-lmp-stripper\c5m3_cemetery.cfg",
+	# [string]$StripperPath = ".\resources\merger\mergeTest.cfg",
+	# [string]$StripperPath = ".\resources\merger\c5m3_cemetery.cfg",
 	[string]$StripperPath,
 
 	[Parameter(Position = 3)]
@@ -40,8 +40,7 @@ Param (
 	[Parameter(Position = 8)]
 	[System.Management.Automation.SwitchParameter]$Silent,
 
-	[Parameter(Position = 9,
-	Mandatory = $false)]
+	[Parameter(Position = 9)]
 	[System.Management.Automation.SwitchParameter]$Demo,
 
 	[Parameter(Position = 10)]
@@ -52,7 +51,7 @@ Param (
 
 	[Parameter(Position = 12,
 	Mandatory = $false)]
-	[string]$LogFile = "../logs/stats_merger.log"
+	[string]$LogFile = ".\logs\stats_merger.log"
 
 )
 # This is necessary for Windows PowerShell (up to 5.1.3)
@@ -66,7 +65,8 @@ if ($PSBoundParameters.ContainsKey('Debug')) {
 }
 
 #region VARIABLES and PREPARATIONS
-$env:PSModulePath = $env:PSModulePath + [System.IO.Path]::PathSeparator + "c:\Projects\PowerShell\valve-source-tools"
+$oldPSModulePath = $env:PSModulePath
+$env:PSModulePath = $env:PSModulePath + [System.IO.Path]::PathSeparator + $PSScriptRoot
 $modulesToImport = @{
 	PSResourceParser	= "PSResourceParser"
 	PSSourceEngineTools	= "PSSourceEngineTools"
@@ -76,16 +76,18 @@ $appendix = "_merged_"
 if ([string]::IsNullOrWhiteSpace($OutputFilePath) -or -not $(Test-Path $OutputFilePath -IsValid)) {
 	$outputFilePath = (Split-Path -Path $VmfPath -LeafBase) + "_"
 	$baseName = Join-Path -Path (Split-Path -Path $VmfPath -Parent) -ChildPath (Split-Path -Path $VmfPath -LeafBase)
+	$maxOutputFiles = 100
 	$count = 1
 
 	# Compose the output file name
 	do {
 		$outputFilePath = "{0}{1}{2}{3}" -f $baseName, $appendix, $count, $OutputExtension
 		$count++
-	} while ((Test-Path -Path $outputFilePath) -and $count -le 100)
+	} while ((Test-Path -Path $outputFilePath) -and $count -le $maxOutputFiles)
 	# If there is too muny output files, call it off
-	if ($count -eq 100) {
-		Write-Debug "Too many output files, go and delete some, Little Coder"
+	if ($count -eq $maxOutputFiles) {
+		Write-Debug "Too many output files have been generated ($maxOutputFiles). Stopping execution"
+		Write-Debug "Last tried output path: $outputFilePath"
 		return -1
 	}
 }
@@ -117,13 +119,10 @@ if (-not $Silent.IsPresent) {
 }
 #endregion
 
-# $sw = [Stopwatch]::StartNew()
-# Try to parse .ini file
-Try {
+try {
 	$VerbosePreferenceOld = $VerbosePreference
 	$VerbosePreference = 'SilentlyContinue'
 	foreach ($module in $modulesToImport.GetEnumerator()) {
-		# TODO: Get PSModuleInfo from imported modules
 		Import-Module $module.Value
 	}
 	$VerbosePreference = $VerbosePreferenceOld
@@ -195,18 +194,19 @@ Try {
 	return $success
 } finally {
 	#region Logging
-	# $timestamp	 = Get-Date -Format "yyyy.MM.dd HH:mm:ss"
-
 	if (-not $Silent.IsPresent) {
-		
-		$timestamp	 = Get-Date -UFormat "%c" 
-		OutLog -Property "Success"	-Value $success		-Path $logFile -NoConsole
+		try {
+			$timestamp	 = Get-Date -UFormat "%c" 
+			OutLog -Property "Success"	-Value $success		-Path $logFile -NoConsole
 
-		$logMessage  = "-" * 15 + "Test ended" + "-" * 15 + "`n"
-		$logMessage += "$timestamp `n"
-		$logMessage += "=" * 40 + "`n`n"
-		OutLog -Value $logMessage -Path $logFile -NoConsole
-		Write-Host ""
+			$logMessage  = "-" * 15 + "Test ended" + "-" * 15 + "`n"
+			$logMessage += "$timestamp `n"
+			$logMessage += "=" * 40 + "`n`n"
+			OutLog -Value $logMessage -Path $logFile -NoConsole
+			Write-Host ""
+		} catch {
+			# Do nothing
+		}
 	}
 	#endregion
 
@@ -216,6 +216,5 @@ Try {
 		Remove-Module -Name $module.Value
 	}
 	$VerbosePreference = $VerbosePreferenceOld
+	$env:PSModulePath = $oldPSModulePath
 }
-# $sw.Stop()
-# Write-Host "Elapsed time: $($sw.Elapsed.Milliseconds) ms"

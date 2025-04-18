@@ -3,12 +3,12 @@ Param (
 	[Parameter(Position = 0,
 	Mandatory = $false,
 	ValueFromPipeline = $true)]
-	[string]$InputFolder = "..\vmf\inputs",
+	[string]$InputFolder = "resources\merger\vmf\inputs",
 
 	[Parameter(Position = 1,
 	Mandatory = $false,
 	ValueFromPipeline = $true)]
-	[string]$OutputFolder = "..\vmf\outputs\batch",
+	[string]$OutputFolder = "resources\merger\vmf\outputs\batch",
 	
 	[Parameter(Position = 2,
 	Mandatory = $false)]
@@ -29,7 +29,7 @@ Param (
 
 	[Parameter(Position = 6,
 	Mandatory = $false)]
-	[string]$LogFile = "../logs/stats_batch.log"
+	[string]$LogFile = ".\logs\stats_batch.log"
 )
 
 $vmfsToImport	= $PSScriptRoot + "\" + $InputFolder + "\" + "*.vmf"
@@ -58,13 +58,14 @@ foreach ($vmf in $Vmfs) {
 			$outputFilePath = "{0}{1}" -f $baseOutputName, $Extension
 		} else {
 			$appendix = "_"
+			$maxOutputFiles = 100
 			$count = 1
 			do {
 				$outputFilePath = "{0}{1}{2}{3}" -f $baseOutputName, $appendix, $count, $Extension
 				$count++
-			} while ((Test-Path -Path $outputFilePath) -and $count -le 100)
+			} while ((Test-Path -Path $outputFilePath) -and $count -le $maxOutputFiles)
 			# If there is too muny output files, call it off
-			if ($count -eq 100) {
+			if ($count -eq $maxOutputFiles) {
 				Write-Debug "Too many output files, go and delete some, Little Coder"
 				return -1
 			}
@@ -80,13 +81,10 @@ foreach ($vmf in $Vmfs) {
 			LogFile			= $LogFile
 			Silent			= $Silent.IsPresent
 		}
-		# if ($Silent) {
-		# 	$success = .\Test-Module @params -Fast -Silent
-		# } else {
-			$success = .\Test-Module @params -Fast
-		# }
+		$success = .\Test-Module @params -Fast
 		if ($success) {
-			Write-Host -ForegroundColor Green "$inputFilePath parsed successfully" 
+			Write-Host -ForegroundColor Green "$inputFilePath parsed successfully"
+			Write-Host -ForegroundColor Green "  Output: $outputFilePath"
 		}
 	} catch {
 		Write-Host -ForegroundColor Red "$inputFilePath failed to parse"

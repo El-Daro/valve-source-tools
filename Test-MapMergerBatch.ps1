@@ -3,12 +3,12 @@ Param (
 	[Parameter(Position = 0,
 	Mandatory = $false,
 	ValueFromPipeline = $true)]
-	[string]$InputFolder = "..\configs\vmf-lmp-stripper\inputs",
+	[string]$InputFolder = "resources\merger\inputs",
 
 	[Parameter(Position = 1,
 	Mandatory = $false,
 	ValueFromPipeline = $true)]
-	[string]$OutputFolder = "..\configs\vmf-lmp-stripper\outputs\batch",
+	[string]$OutputFolder = "resources\merger\outputs\batch",
 	
 	[Parameter(Position = 2,
 	Mandatory = $false)]
@@ -33,7 +33,7 @@ Param (
 
 	[Parameter(Position = 6,
 	Mandatory = $false)]
-	[string]$LogFile = "../logs/stats_merger_batch.log"
+	[string]$LogFile = ".\logs\stats_merger_batch.log"
 )
 
 $vmfsToImport		= $PSScriptRoot + "\" + $InputFolder + "\" + "*.vmf"
@@ -123,64 +123,47 @@ foreach ($vmf in $Vmfs) {
 		} else {
 			# $appendix = "_"
 			$count = 1
+			$maxOutputFiles = 100
 			do {
 				$outputFilePath = "{0}{1}{2}{3}" -f $baseOutputName, $appendix, $count, $Extension
 				$count++
-			} while ((Test-Path -Path $outputFilePath) -and $count -le 100)
+			} while ((Test-Path -Path $outputFilePath) -and $count -le $maxOutputFiles)
 			# If there is too muny output files, call it off
-			if ($count -eq 100) {
-				Write-Debug "Too many output files, go and delete some, Little Coder"
+			if ($count -eq $maxOutputFiles) {
+				Write-Debug "Too many output files have been generated ($maxOutputFiles). Stopping execution"
+				Write-Debug "Last tried output path: $outputFilePath"
 				return -1
 			}
 		}
 		$outputFilePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($outputFilePath)
 		$outputFiles += $outputFilePath
 
-		if ([string]::IsNullOrEmpty($inputLmpFilePath)) {
-			if ([string]::IsNullOrEmpty($inputStripperFilePath)) {
-				continue
-			} else {
-				$params = @{
-					VmfPath			= $inputVmfFilePath
-					StripperPath	= $inputStripperFilePath
-					OutputFilePath	= $outputFilePath
-					OutputExtension	= $Extension
-					Note			= $Note
-					LogFile			= $LogFile
-					Silent			= $Silent.IsPresent
-					Demo			= $Demo.IsPresent
-				}
-			}
-		} elseif ([string]::IsNullOrEmpty($inputStripperFilePath)) {
-			$params = @{
-				VmfPath			= $inputVmfFilePath
-				LmpPath			= $inputLmpFilePath
-				OutputFilePath	= $outputFilePath
-				OutputExtension	= $Extension
-				Note			= $Note
-				LogFile			= $LogFile
-				Silent			= $Silent.IsPresent
-				Demo			= $Demo.IsPresent
-			}
-		} else {
-			$params = @{
-				VmfPath			= $inputVmfFilePath
-				LmpPath			= $inputLmpFilePath
-				StripperPath	= $inputStripperFilePath
-				OutputFilePath	= $outputFilePath
-				OutputExtension	= $Extension
-				Note			= $Note
-				LogFile			= $LogFile
-				Silent			= $Silent.IsPresent
-				Demo			= $Demo.IsPresent
-			}
+		$params = @{
+			VmfPath			= $inputVmfFilePath
+			OutputFilePath	= $outputFilePath
+			OutputExtension	= $Extension
+			Note			= $Note
+			LogFile			= $LogFile
+			Silent			= $Silent.IsPresent
+			Demo			= $Demo.IsPresent
+		}
+
+		if ([string]::IsNullOrEmpty($inputLmpFilePath) -and
+			[string]::IsNullOrEmpty($inputStripperFilePath)) {
+			continue
+		}
+		if (-not [string]::IsNullOrEmpty($inputLmpFilePath)) {
+			$params.Add("LmpPath", $inputLmpFilePath)
+		}
+		if (-not [string]::IsNullOrEmpty($inputStripperFilePath)) {
+			$params.Add("StripperPath", $inputStripperFilePath)
 		}
 		
 		$success = .\Test-MapMerger @params -Fast
 
 		if ($success) {
-			Write-Host -ForegroundColor Green "$mapBaseName merged successfully" 
-			Write-Host -ForegroundColor Green "  Output: $outputFilePath" 
+			Write-Host -ForegroundColor Green "$mapBaseName merged successfully"
+			Write-Host -ForegroundColor Green "  Output: $outputFilePath"
 		}
 	} catch {
 		Write-Host -ForegroundColor Red "$mapBaseName failed to merge"

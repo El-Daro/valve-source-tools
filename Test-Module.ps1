@@ -1,4 +1,4 @@
-# A simple test script for the .ini and .vdf parsers
+# A simple test script for the .ini, .vdf, .vmf, .lmp and Stripper's .cfg parsers
 
 using namespace System.Diagnostics
 
@@ -7,7 +7,7 @@ Param (
 	[Parameter(Position = 0,
 	Mandatory = $true,
 	ValueFromPipeline = $true)]
-	[string]$InputFilePath = ".\tests\stresstest_tofix.ini",
+	[string]$InputFilePath = ".\resources\config\stresstest_tofix.ini",
 
 	[Parameter(Position = 1)]
 	$IgnoreCommentsPattern,
@@ -46,7 +46,7 @@ Param (
 
 	[Parameter(Position = 11,
 	Mandatory = $false)]
-	[string]$LogFile = "../logs/stats.log"
+	[string]$LogFile = ".\logs\stats.log"
 
 )
 # This is necessary for Windows PowerShell (up to 5.1.3)
@@ -60,7 +60,8 @@ if ($PSBoundParameters.ContainsKey('Debug')) {
 }
 
 #region VARIABLES
-$env:PSModulePath = $env:PSModulePath + [System.IO.Path]::PathSeparator + "c:\Projects\PowerShell\valve-source-tools"
+$oldPSModulePath = $env:PSModulePath
+$env:PSModulePath = $env:PSModulePath + [System.IO.Path]::PathSeparator + $PSScriptRoot
 $modulesToImport = @{
 	PSResourceParser	= "PSResourceParser"
 	PSSourceEngineTools	= "PSSourceEngineTools"
@@ -72,13 +73,14 @@ if ([string]::IsNullOrWhiteSpace($OutputFilePath) -or -not $(Test-Path $OutputFi
 	$baseName = Join-Path -Path (Split-Path -Path $InputFilePath -Parent) -ChildPath (Split-Path -Path $InputFilePath -LeafBase)
 	$testNoExtension = $false
 	if (Split-Path -Path $InputFilePath -Extension) {
-		if ($Extension -ne ".vdf" -and $Extension -ne ".ini" -and $Extension -ne ".vmf") {
+		if ($Extension -ne ".vdf" -and $Extension -ne ".ini" -and
+			$Extension -ne ".vmf" -and $Extension -ne ".lmp" -and $Extension -ne ".cfg") {
 			$Extension = Split-Path -Path $InputFilePath -Extension
 		}
 	} else {
-		#$Extension = ".ini"
 		$testNoExtension = $true
 	}
+	$maxOutputFiles = 100
 	$count = 1
 	#endregion
 
@@ -88,20 +90,22 @@ if ([string]::IsNullOrWhiteSpace($OutputFilePath) -or -not $(Test-Path $OutputFi
 		do {
 				$outputFilePath = "{0}{1}{2}" -f $baseName, $appendix, $count
 				$count++
-			} while ((Test-Path -Path ($outputFilePath + $Extension)) -and $count -le 100)
+			} while ((Test-Path -Path ($outputFilePath + $Extension)) -and $count -le $maxOutputFiles)
 			# If there is too muny output files, call it off
-			if ($count -eq 100) {
-				Write-Debug "Too many output files, go and delete some, Little Coder"
+			if ($count -eq $maxOutputFiles) {
+				Write-Debug "Too many output files have been generated ($maxOutputFiles). Stopping execution"
+				Write-Debug "Last tried output path: $outputFilePath"
 				return -1
 			}
 	} else {
 		do {
 			$outputFilePath = "{0}{1}{2}{3}" -f $baseName, $appendix, $count, $Extension
 			$count++
-		} while ((Test-Path -Path $outputFilePath) -and $count -le 100)
+		} while ((Test-Path -Path $outputFilePath) -and $count -le $maxOutputFiles)
 		# If there is too muny output files, call it off
-		if ($count -eq 100) {
-			Write-Debug "Too many output files, go and delete some, Little Coder"
+		if ($count -eq $maxOutputFiles) {
+			Write-Debug "Too many output files have been generated ($maxOutputFiles). Stopping execution"
+			Write-Debug "Last tried output path: $outputFilePath"
 			return -1
 		}
 	}
@@ -132,13 +136,10 @@ if (-not $Silent.IsPresent) {
 }
 #endregion
 
-# $sw = [Stopwatch]::StartNew()
-# Try to parse .ini file
 Try {
 	$VerbosePreferenceOld = $VerbosePreference
 	$VerbosePreference = 'SilentlyContinue'
 	foreach ($module in $modulesToImport.GetEnumerator()) {
-		# TODO: Get PSModuleInfo from imported modules
 		Import-Module $module.Value
 	}
 	$VerbosePreference = $VerbosePreferenceOld
@@ -162,17 +163,10 @@ Try {
 	}
 	#endregion
 
-	# Add properties to it
-	# $err = New-Object System.Management.Automation.ErrorRecord "Line 1 `n Line 2", $null, 'NotSpecified', $null
-	# $PSCmdlet.WriteError(($err))	
-
 	if ($Extension -eq ".ini") {
 		$iniParsed = Import-Ini -Path $InputFilePath -IgnoreCommentsPattern $IgnoreCommentsPattern
 
 		if ($iniParsed) {
-			# Write-Host "YAY! WE DID IT!"
-			# Write-Host $iniParsed
-
 			if  ($NoComments) {
 				if ($debugPassed) {
 					Export-Ini -Settings $iniParsed["settings"] -DebugOutput $outputFilePath -Force:$Force.IsPresent -Debug
@@ -187,14 +181,13 @@ Try {
 				}
 			}
 		} else {
-			Write-Debug "You're fucked, it's not even parsed. Go and fix it, Little Coder"
+			$success = $false
+			OutLog -Value "Failed to parse input file: $InputFilePath" -Path $LogFile -OneLine
 		}
+
 	} elseif ($Extension -eq ".vdf") {
 		$vdfParsed = Import-Vdf -Path $InputFilePath
 		if ($vdfParsed) {
-			# Write-Host "YAY! WE DID IT!"
-			# Write-Host $vdfParsed
-
 			if ($debugPassed) {
 				Export-Vdf -InputObject $vdfParsed -DebugOutput $outputFilePath -Force:$Force.IsPresent -Debug
 			} else {
@@ -202,70 +195,43 @@ Try {
 			}
 
 		}
+
 	} elseif ($Extension -eq ".vmf") {
 		$vmfParsed = Import-Vmf -Path $InputFilePath -LogFile $logFile -Silent:$Silent.IsPresent
 		if ($vmfParsed) {
-			# Write-Host "YAY! WE DID IT!"
-			# Write-Host $vmfParsed
-
-			# $loop = $true
-			# $fails = 0
-			# while ($loop) {
-				# try {
-				# 	if ($debugPassed) {
-				# 		Export-Vmf -InputObject $vmfParsed -DebugOutput $outputFilePath -Debug
-				# 		$loop = $false
-				# 	} else {
-				# 		Export-Vmf -InputObject $vmfParsed -Path $outputFilePath -Force
-				# 		$loop = $false
-				# 	}
-				# } catch {
-				# 	$fails++
-				# 	Write-Error "$($MyInvocation.MyCommand):  $($_.Exception.Message)"
-				# 	$response = Read-Host "Would you like to continue? y/n`n"
-				# 	if ($response -ne "y") {
-				# 		$loop = $false
-				# 	}
-				# } finally {
-				# 	if (-not $loop) {
-				# 		Write-Host -ForegroundColor DarkYellow "Finished exporting the file with $fails failed attempts"
-				# 	}
-				# }
-			# }
-
 			if ($debugPassed) {
 				Export-Vmf -InputObject $vmfParsed -DebugOutput $outputFilePath -LogFile $logFile -Fast $Fast -Silent:$Silent.IsPresent -Force:$Force.IsPresent -Debug
 			} else {
 				Export-Vmf -InputObject $vmfParsed -Path $outputFilePath -LogFile $logFile -Fast $Fast -Silent:$Silent.IsPresent -Force:$Force.IsPresent
 			}
 		}
+
 	} elseif ($Extension -eq ".lmp") {
 		$lmpParsed = Import-Lmp -Path $InputFilePath -LogFile $logFile -Silent:$Silent.IsPresent
 		if ($lmpParsed) {
-			# Write-Host "YAY! WE DID IT!"
-			
 			if ($debugPassed) {
 				Export-Lmp -InputObject $lmpParsed -DebugOutput $outputFilePath -LogFile $logFile -Silent:$Silent.IsPresent -AsText:$AsText.IsPresent -Force:$Force.IsPresent -Debug
 			} else {
 				Export-Lmp -InputObject $lmpParsed -Path $outputFilePath -LogFile $logFile -Silent:$Silent.IsPresent -AsText:$AsText.IsPresent -Force:$Force.IsPresent
 			}
 		}
+
 	} elseif ($Extension -eq ".cfg") {
 		$stripperParsed = Import-Stripper -Path $InputFilePath -LogFile $logFile -Silent:$Silent.IsPresent -Fast:$Fast
 		if ($stripperParsed) {
-			Write-Host "YAY! WE DID IT!"
-			
 			if ($debugPassed) {
 				Export-Stripper -InputObject $stripperParsed -DebugOutput $outputFilePath -LogFile $logFile -Silent:$Silent.IsPresent -Force:$Force.IsPresent -Debug
 			} else {
 				Export-Stripper -InputObject $stripperParsed -Path $outputFilePath -LogFile $logFile -Silent:$Silent.IsPresent -Force:$Force.IsPresent
 			}
 		}
-	} else {
 
+	} else {
+		$success = $false
+		Write-Error "$($MyInvocation.MyCommand):  Extension unrecognised: $Extension"
 	}
 
-	return $true
+	return $success
 } catch {
 	$success = $false
 	Write-Debug "Now this shit is seriously broken, we're in the catch statement"
@@ -275,17 +241,18 @@ Try {
 	return $false
 } finally {
 	#region Logging
-	# $timestamp	 = Get-Date -Format "yyyy.MM.dd HH:mm:ss"
-
 	if (-not $Silent.IsPresent) {
-		
-		$timestamp	 = Get-Date -UFormat "%c" 
-		OutLog -Property "Success"	-Value $success		-Path $logFile -NoConsole
+		try {
+			$timestamp	 = Get-Date -UFormat "%c" 
+			OutLog -Property "Success"	-Value $success		-Path $logFile -NoConsole
 
-		$logMessage  = "-" * 15 + "Test ended" + "-" * 15 + "`n"
-		$logMessage += "$timestamp `n"
-		$logMessage += "=" * 40 + "`n`n"
-		OutLog -Value $logMessage -Path $logFile -NoConsole
+			$logMessage  = "-" * 15 + "Test ended" + "-" * 15 + "`n"
+			$logMessage += "$timestamp `n"
+			$logMessage += "=" * 40 + "`n`n"
+			OutLog -Value $logMessage -Path $logFile -NoConsole
+		} catch {
+			# Do nothing
+		}
 	}
 	#endregion
 
@@ -295,6 +262,5 @@ Try {
 		Remove-Module -Name $module.Value
 	}
 	$VerbosePreference = $VerbosePreferenceOld
+	$env:PSModulePath = $oldPSModulePath
 }
-# $sw.Stop()
-# Write-Host "Elapsed time: $($sw.Elapsed.Milliseconds) ms"
