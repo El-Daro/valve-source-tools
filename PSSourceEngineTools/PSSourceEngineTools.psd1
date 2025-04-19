@@ -63,7 +63,13 @@ PowerShellVersion = '5.1'
 NestedModules = @("..\PSValveSourceUtils\PSValveSharedUtilsSourced.ps1")
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = @('Import-Vmf', 'Export-Vmf', 'Import-Lmp', 'Export-Lmp', 'Import-Stripper', 'Export-Stripper', 'Merge-Map')
+FunctionsToExport = @('Import-Vmf',
+                      'Export-Vmf',
+                      'Import-Lmp',
+                      'Export-Lmp',
+                      'Import-Stripper',
+                      'Export-Stripper',
+                      'Merge-Map')
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()

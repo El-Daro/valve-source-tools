@@ -64,7 +64,10 @@ NestedModules = @("..\PSValveSourceUtils\PSValveSharedUtilsSourced.ps1")
 # NestedModules = @("..\PSValveSourceUtils\PSValveSourceUtils.psm1", @{ModuleName="PSValveSourceUtils"; ModuleVersion="1.0.0"; GUID="421a5c93-853c-4133-8f75-cdbb4c508e9e"})
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = @('Import-Ini', 'Export-Ini', 'Import-Vdf', 'Export-Vdf')
+FunctionsToExport = @('Import-Ini',
+                      'Export-Ini',
+                      'Import-Vdf',
+                      'Export-Vdf')
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
