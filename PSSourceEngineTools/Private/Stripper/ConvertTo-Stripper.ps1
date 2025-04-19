@@ -66,8 +66,8 @@ function ConvertTo-Stripper {
 		if (-not $Silent.IsPresent) {
 			$timeFormatted = "{0}m {1}s {2}ms" -f
 				$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
-			OutLog 							-Value "`nStripper | Building output: Complete"	-Path $LogFile -OneLine
-			OutLog -Property "Elapsed time"	-Value $timeFormatted							-Path $LogFile
+			Out-Log 							-Value "`nStripper | Building output: Complete"	-Path $LogFile -OneLine
+			Out-Log -Property "Elapsed time"	-Value $timeFormatted							-Path $LogFile
 		}
 
 		return $stringBuilder.ToString().Trim()

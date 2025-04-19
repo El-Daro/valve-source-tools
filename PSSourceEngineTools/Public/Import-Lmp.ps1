@@ -228,7 +228,7 @@ function Import-Lmp {
 		$Path = $(Get-AbsolutePath -Path $Path)
 		$LogFile = $(Get-AbsolutePath -Path $LogFile)
 		if (-not $Silent.IsPresent) {
-			OutLog	-Value "`nLMP | Input received: $Path"	-Path $LogFile -OneLine
+			Out-Log	-Value "`nLMP | Input received: $Path"	-Path $LogFile -OneLine
 		}
 
 		try {
@@ -243,7 +243,7 @@ function Import-Lmp {
 					# ColumnWidth	= 25				# Should be default
 					Path		= $LogFile
 				}
-				OutLog @paramsLog
+				Out-Log @paramsLog
 			}
 			
 			$sw = [Stopwatch]::StartNew()
@@ -267,12 +267,12 @@ function Import-Lmp {
 			if (-not $Silent.IsPresent) {
 				$timeFormatted = "{0}m {1}s {2}ms" -f
 					$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
-				OutLog							-Value "`nLMP | Reading: Complete"	-Path $LogFile -OneLine
-				# OutLog -Property "Lmp header"		-Value $($lmpHeader | ConvertTo-Json -Compress)	-Path $LogFile
+				Out-Log							-Value "`nLMP | Reading: Complete"	-Path $LogFile -OneLine
+				# Out-Log -Property "Lmp header"		-Value $($lmpHeader | ConvertTo-Json -Compress)	-Path $LogFile
 				$sLmpHeader	= $lmpHeader.Keys.ForEach({"{0}={1}" -f $_, $($lmpHeader[$_])}) -join ' | '
-				OutLog -Property "Lmp header"		-Value $sLmpHeader			-Path $LogFile
-				OutLog -Property "Lmp data lines"	-Value $lmpContent.Length	-Path $LogFile
-				OutLog -Property "Elapsed time"		-Value $timeFormatted		-Path $LogFile
+				Out-Log -Property "Lmp header"		-Value $sLmpHeader			-Path $LogFile
+				Out-Log -Property "Lmp data lines"	-Value $lmpContent.Length	-Path $LogFile
+				Out-Log -Property "Elapsed time"		-Value $timeFormatted		-Path $LogFile
 			}
 
 			if ($lmpContent.Count -lt 2) {

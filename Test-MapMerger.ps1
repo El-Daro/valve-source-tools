@@ -136,15 +136,15 @@ try {
 		$logMessage  = "=" * 40 + "`n"
 		$logMessage += "$timestamp `n"
 		$logMessage += "-" * 14 + "Test started" + "-" * 14 + "`n"
-		OutLog -Value $logMessage -Path $logFile -NoConsole
+		Out-Log -Value $logMessage -Path $logFile -NoConsole
 
-		OutLog -Property "NOTE"					-Value $additionalLog	-Path $logFile -NoConsole
-		OutLog -Property "Input vmf path"		-Value $VmfPath			-Path $logFile -NoConsole
-		OutLog -Property "Input lmp path"		-Value $LmpPath			-Path $logFile -NoConsole
-		OutLog -Property "Input stripper path"	-Value $StripperPath	-Path $logFile -NoConsole
-		OutLog -Property "Output vmf path"		-Value $outputFilePath	-Path $logFile -NoConsole
-		OutLog -Property "Debug"				-Value $PSBoundParameters.ContainsKey('Debug').ToString()	-Path $logFile -NoConsole
-		OutLog -Property "Verbose"				-Value $PSBoundParameters.ContainsKey('Verbose').ToString()	-Path $logFile -NoConsole
+		Out-Log -Property "NOTE"					-Value $additionalLog	-Path $logFile -NoConsole
+		Out-Log -Property "Input vmf path"		-Value $VmfPath			-Path $logFile -NoConsole
+		Out-Log -Property "Input lmp path"		-Value $LmpPath			-Path $logFile -NoConsole
+		Out-Log -Property "Input stripper path"	-Value $StripperPath	-Path $logFile -NoConsole
+		Out-Log -Property "Output vmf path"		-Value $outputFilePath	-Path $logFile -NoConsole
+		Out-Log -Property "Debug"				-Value $PSBoundParameters.ContainsKey('Debug').ToString()	-Path $logFile -NoConsole
+		Out-Log -Property "Verbose"				-Value $PSBoundParameters.ContainsKey('Verbose').ToString()	-Path $logFile -NoConsole
 	}
 	#endregion
 	
@@ -170,7 +170,7 @@ try {
 		} else {
 			$vmfMerged = $false
 			$success = $false
-			OutLog -Value "Neither LMP, nor Stripper config were provided" -Path $LogFile -OneLine
+			Out-Log -Value "Neither LMP, nor Stripper config were provided" -Path $LogFile -OneLine
 		}
 
 		if ($vmfMerged) {
@@ -182,14 +182,14 @@ try {
 		}
 	} else {
 		$success = $false
-		OutLog -Value "Failed to parse input files" -Path $LogFile -OneLine
+		Out-Log -Value "Failed to parse input files" -Path $LogFile -OneLine
 	}
 	return $success
 } catch {
 	$success = $false
 	Write-Debug "Now this shit is seriously broken, we're in the catch statement"
 	Write-Error "$($MyInvocation.MyCommand):  $($_.Exception.Message)"
-	OutLog -Property "$($MyInvocation.MyCommand)" -Value "$($_.Exception.Message)" -ColumnWidth 0 -Path $logFile -NoConsole
+	Out-Log -Property "$($MyInvocation.MyCommand)" -Value "$($_.Exception.Message)" -ColumnWidth 0 -Path $logFile -NoConsole
 
 	return $success
 } finally {
@@ -197,12 +197,12 @@ try {
 	if (-not $Silent.IsPresent) {
 		try {
 			$timestamp	 = Get-Date -UFormat "%c" 
-			OutLog -Property "Success"	-Value $success		-Path $logFile -NoConsole
+			Out-Log -Property "Success"	-Value $success		-Path $logFile -NoConsole
 
 			$logMessage  = "-" * 15 + "Test ended" + "-" * 15 + "`n"
 			$logMessage += "$timestamp `n"
 			$logMessage += "=" * 40 + "`n`n"
-			OutLog -Value $logMessage -Path $logFile -NoConsole
+			Out-Log -Value $logMessage -Path $logFile -NoConsole
 			Write-Host ""
 		} catch {
 			# Do nothing

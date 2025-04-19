@@ -35,8 +35,8 @@ function Set-LmpHeader {
 		}
 
 		if ($PSBoundParameters.ContainsKey('Debug')) {
-			OutLog -Property "Header (old)" -Value "$headerOld"	-Path $LogFile
-			OutLog -Property "Header (new)" -Value "$header"	-Path $LogFile
+			Out-Log -Property "Header (old)" -Value "$headerOld"	-Path $LogFile
+			Out-Log -Property "Header (new)" -Value "$header"	-Path $LogFile
 		}
 
 		return [byte[]]$header

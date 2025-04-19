@@ -216,7 +216,7 @@ function Import-Vmf {
 		$Path = $(Get-AbsolutePath -Path $Path)
 		$LogFile = $(Get-AbsolutePath -Path $LogFile)
 		if (-not $Silent.IsPresent) {
-			OutLog	-Value "`nVMF | Input received: $Path"	-Path $LogFile -OneLine
+			Out-Log	-Value "`nVMF | Input received: $Path"	-Path $LogFile -OneLine
 		}
 
 		try {
@@ -231,7 +231,7 @@ function Import-Vmf {
 					# ColumnWidth	= 25				# Should be default
 					Path		= $LogFile
 				}
-				OutLog @paramsLog
+				Out-Log @paramsLog
 			}
 			
 			$stringBuilder	= [System.Text.StringBuilder]::new(256)
@@ -245,7 +245,7 @@ function Import-Vmf {
 					$averageLineLength = ($stringBuilder.ToString().Split("`n") | ForEach-Object { $_.Length } | Measure-Object -Average).Average
 					$estimatedLines = [math]::Floor($fileSize / $averageLineLength)
 					if (-not $Silent.IsPresent) {
-						OutLog -Property "Estimated lines" -Value $estimatedLines -Path $LogFile
+						Out-Log -Property "Estimated lines" -Value $estimatedLines -Path $LogFile
 					}
 
 				}
@@ -285,9 +285,9 @@ function Import-Vmf {
 			if (-not $Silent.IsPresent) {
 				$timeFormatted = "{0}m {1}s {2}ms" -f
 					$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
-				OutLog							-Value "`nVMF | Reading: Complete"	-Path $LogFile -OneLine
-				OutLog -Property "Read lines"	-Value $lineCount				-Path $LogFile
-				OutLog -Property "Elapsed time"	-Value $timeFormatted			-Path $LogFile
+				Out-Log							-Value "`nVMF | Reading: Complete"	-Path $LogFile -OneLine
+				Out-Log -Property "Read lines"	-Value $lineCount				-Path $LogFile
+				Out-Log -Property "Elapsed time"	-Value $timeFormatted			-Path $LogFile
 			}
 
 			$vmfContent = $stringBuilder.ToString().Trim() -split "\n"

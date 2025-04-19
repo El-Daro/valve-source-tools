@@ -50,11 +50,11 @@ function ConvertFrom-Lmp {
 					Write-Debug "Line $($currentLine): No hammerid was found. Adding as a classname"
 				} else {
 					Write-Debug "Line $($currentLine): No hammerid or classname was found. Adding as 'unknown-line-$currentLine'"
-					OutLog	-Value "Unknown section exit on line $currentLine" -Path $LogFile -OneLine
+					Out-Log	-Value "Unknown section exit on line $currentLine" -Path $LogFile -OneLine
 					foreach ($property in $currentBlock.Keys) {
-						OutLog	-Property $property	-Value $currentBlock[$property]	-Path $LogFile
+						Out-Log	-Property $property	-Value $currentBlock[$property]	-Path $LogFile
 					}
-					OutLog	-Value "Unknown section dump end" -Path $LogFile -OneLine
+					Out-Log	-Value "Unknown section dump end" -Path $LogFile -OneLine
 					$key 	= "unknown-line-$currentLine"
 				}
 				$sections.Add($key, $currentBlock)
@@ -114,13 +114,13 @@ function ConvertFrom-Lmp {
 			}
 			$timeFormatted = "{0}m {1}s {2}ms" -f
 				$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
-			OutLog 								-Value "`nLMP | Parsing: Complete"						-Path $LogFile -OneLine
-			OutLog -Property "Parsed lines"		-Value $("{0} / {1}" -f $currentLine, $Lines.Count)		-Path $LogFile
+			Out-Log 								-Value "`nLMP | Parsing: Complete"						-Path $LogFile -OneLine
+			Out-Log -Property "Parsed lines"		-Value $("{0} / {1}" -f $currentLine, $Lines.Count)		-Path $LogFile
 			if ($linesFaulty -gt 0) {
-				OutLog -Property "Faulty lines"	-Value $("{0} / {1}" -f $linesFaulty, $Lines.Count)		-Path $LogFile
+				Out-Log -Property "Faulty lines"	-Value $("{0} / {1}" -f $linesFaulty, $Lines.Count)		-Path $LogFile
 			}
-			OutLog -Property "Elapsed time"		-Value $timeFormatted									-Path $LogFile
-			OutLog -Property "Speed"			-Value $("{0:n0} lines per second" -f $linesPerSecond)	-Path $LogFile
+			Out-Log -Property "Elapsed time"		-Value $timeFormatted									-Path $LogFile
+			Out-Log -Property "Speed"			-Value $("{0:n0} lines per second" -f $linesPerSecond)	-Path $LogFile
 		}
 	}
 }

@@ -61,7 +61,7 @@ function ConvertTo-Lmp {
 			$dataBytes				+= 0x0A
 			$dataBytes				+= 0x00
 			if (-not $dataString) {
-				OutLog -Value "Lmp data is corrupted" -Path $LogFile -OneLine
+				Out-Log -Value "Lmp data is corrupted" -Path $LogFile -OneLine
 			}
 
 			$params			= @{
@@ -72,7 +72,7 @@ function ConvertTo-Lmp {
 			}
 			$headerBytes	= [byte[]](Set-LmpHeader @params)
 			if (-not $headerBytes) {
-				OutLog -Value "Lmp header is corrupted" -Path $LogFile -OneLine
+				Out-Log -Value "Lmp header is corrupted" -Path $LogFile -OneLine
 			}
 
 			if ($AsText.IsPresent) {
@@ -86,8 +86,8 @@ function ConvertTo-Lmp {
 			if (-not $Silent.IsPresent) {
 				$timeFormatted = "{0}m {1}s {2}ms" -f
 					$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
-				OutLog 							-Value "`nLMP | Building output: Complete"	-Path $LogFile -OneLine
-				OutLog -Property "Elapsed time"	-Value $timeFormatted					-Path $LogFile
+				Out-Log 							-Value "`nLMP | Building output: Complete"	-Path $LogFile -OneLine
+				Out-Log -Property "Elapsed time"	-Value $timeFormatted					-Path $LogFile
 			}
 
 			# MAIN EXIT ROUTE

@@ -224,7 +224,7 @@ function Import-Stripper {
 		$Path = $(Get-AbsolutePath -Path $Path)
 		$LogFile = $(Get-AbsolutePath -Path $LogFile)
 		if (-not $Silent.IsPresent) {
-			OutLog	-Value "`nStripper | Input received: $Path"	-Path $LogFile -OneLine
+			Out-Log	-Value "`nStripper | Input received: $Path"	-Path $LogFile -OneLine
 		}
 
 		try {
@@ -239,7 +239,7 @@ function Import-Stripper {
 					# ColumnWidth	= 25				# Should be default
 					Path		= $LogFile
 				}
-				OutLog @paramsLog
+				Out-Log @paramsLog
 			}
 			
 			$stringBuilder	= [System.Text.StringBuilder]::new(256)
@@ -253,7 +253,7 @@ function Import-Stripper {
 					$averageLineLength = ($stringBuilder.ToString().Split("`n") | ForEach-Object { $_.Length } | Measure-Object -Average).Average
 					$estimatedLines = [math]::Floor($fileSize / $averageLineLength)
 					if (-not $Silent.IsPresent) {
-						OutLog -Property "Estimated lines" -Value $estimatedLines -Path $LogFile
+						Out-Log -Property "Estimated lines" -Value $estimatedLines -Path $LogFile
 					}
 
 				}
@@ -275,9 +275,9 @@ function Import-Stripper {
 			if (-not $Silent.IsPresent) {
 				$timeFormatted = "{0}m {1}s {2}ms" -f
 					$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
-				OutLog					-Value "`nStripper | Reading: Complete"	-Path $LogFile -OneLine
-				OutLog -Property "Read lines"	-Value $lineCount				-Path $LogFile
-				OutLog -Property "Elapsed time"	-Value $timeFormatted			-Path $LogFile
+				Out-Log					-Value "`nStripper | Reading: Complete"	-Path $LogFile -OneLine
+				Out-Log -Property "Read lines"	-Value $lineCount				-Path $LogFile
+				Out-Log -Property "Elapsed time"	-Value $timeFormatted			-Path $LogFile
 			}
 
 			$stripperContent = $stringBuilder.ToString().Trim() -split "\n"

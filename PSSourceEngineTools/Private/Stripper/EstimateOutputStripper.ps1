@@ -111,12 +111,12 @@ function EstimateOutputStripper {
 	} finally {
 		if (-not $Silent.IsPresent) {
 			if ($estimatedOutput["lines"] -gt 0) {
-				OutLog					-Value "`nStripper | Output estimation: Complete"	-Path $LogFile -OneLine
-				OutLog -Property "Lines estimate"		-Value $estimatedOutput["lines"]	-Path $LogFile
-				OutLog -Property "Sections estimate"	-Value $estimatedOutput["modes"]	-Path $LogFile
-				OutLog -Property "Properties estimate"	-Value $estimatedOutput["props"]	-Path $LogFile
+				Out-Log					-Value "`nStripper | Output estimation: Complete"	-Path $LogFile -OneLine
+				Out-Log -Property "Lines estimate"		-Value $estimatedOutput["lines"]	-Path $LogFile
+				Out-Log -Property "Sections estimate"	-Value $estimatedOutput["modes"]	-Path $LogFile
+				Out-Log -Property "Properties estimate"	-Value $estimatedOutput["props"]	-Path $LogFile
 			} else {
-				OutLog	-Value "`nFailed to estimate lines count"	-Path $LogFile -OneLine
+				Out-Log	-Value "`nFailed to estimate lines count"	-Path $LogFile -OneLine
 			}
 		}
 

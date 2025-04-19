@@ -179,13 +179,13 @@ function ConvertFrom-Stripper {
 			}
 			$timeFormatted = "{0}m {1}s {2}ms" -f
 				$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
-			OutLog 							-Value "`nStripper | Parsing: Complete"					-Path $LogFile -OneLine
-			OutLog -Property "Parsed lines"	-Value $("{0} / {1}" -f $currentLine, $Lines.Count)		-Path $LogFile
+			Out-Log 							-Value "`nStripper | Parsing: Complete"					-Path $LogFile -OneLine
+			Out-Log -Property "Parsed lines"	-Value $("{0} / {1}" -f $currentLine, $Lines.Count)		-Path $LogFile
 			if ($linesFaulty -gt 0) {
-				OutLog -Property "Faulty lines"	-Value $("{0} / {1}" -f $linesFaulty, $Lines.Count)	-Path $LogFile
+				Out-Log -Property "Faulty lines"	-Value $("{0} / {1}" -f $linesFaulty, $Lines.Count)	-Path $LogFile
 			}
-			OutLog -Property "Elapsed time"	-Value $timeFormatted									-Path $LogFile
-			OutLog -Property "Speed"		-Value $("{0:n0} lines per second" -f $linesPerSecond)	-Path $LogFile
+			Out-Log -Property "Elapsed time"	-Value $timeFormatted									-Path $LogFile
+			Out-Log -Property "Speed"		-Value $("{0:n0} lines per second" -f $linesPerSecond)	-Path $LogFile
 		}
 	}
 }

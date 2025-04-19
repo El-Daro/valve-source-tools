@@ -179,7 +179,7 @@ function Export-Stripper {
 		Out-Config @params
 
 		if (-not $Silent.IsPresent) {
-			OutLog -Value "`nStripper | Exporting file: Complete `n" -Path $LogFile -OneLine
+			Out-Log -Value "`nStripper | Exporting file: Complete `n" -Path $LogFile -OneLine
 		}
 	}
 

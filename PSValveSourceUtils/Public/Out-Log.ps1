@@ -1,4 +1,4 @@
-function OutLog {
+function Out-Log {
 	[CmdletBinding()]
 	Param (
 		[Parameter(Position = 0,

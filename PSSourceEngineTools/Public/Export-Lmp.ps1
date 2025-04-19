@@ -219,7 +219,7 @@ function Export-Lmp {
 			Out-Config @params
 	
 			if (-not $Silent.IsPresent) {
-				OutLog -Value "`nLMP | Exporting file: Complete `n" -Path $LogFile -OneLine
+				Out-Log -Value "`nLMP | Exporting file: Complete `n" -Path $LogFile -OneLine
 			}
 		}
 	

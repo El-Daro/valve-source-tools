@@ -196,7 +196,7 @@ function Export-Vmf {
 		Out-Config @params
 
 		if (-not $Silent.IsPresent) {
-			OutLog -Value "`nVMF | Exporting file: Complete `n" -Path $LogFile -OneLine
+			Out-Log -Value "`nVMF | Exporting file: Complete `n" -Path $LogFile -OneLine
 		}
 	}
 

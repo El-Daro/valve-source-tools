@@ -211,8 +211,8 @@ function Merge-Map {
 		return $vmfMerged
 		
 		if (-not $Silent.IsPresent) {
-			OutLog -Value "`nMap Merger | Merging files: Complete `n" -Path $LogFile -OneLine
-			OutLog -Property "VMF merged type" -Value $vmfMerged.GetType().FullName -Path $LogFile
+			Out-Log -Value "`nMap Merger | Merging files: Complete `n" -Path $LogFile -OneLine
+			Out-Log -Property "VMF merged type" -Value $vmfMerged.GetType().FullName -Path $LogFile
 		}
 	}
 

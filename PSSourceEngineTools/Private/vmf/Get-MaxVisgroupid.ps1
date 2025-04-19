@@ -36,8 +36,8 @@ function Get-MaxVisgroupid {
 
 			#region Logging
 			if (-not $Silent.IsPresent) {
-				OutLog 	-Value "`nMerger | Visgroupid search: Complete"			-Path $LogFile -OneLine
-				OutLog -Property "Max visgroupid"		-Value $visgroupidMax	-Path $LogFile
+				Out-Log 	-Value "`nMerger | Visgroupid search: Complete"			-Path $LogFile -OneLine
+				Out-Log -Property "Max visgroupid"		-Value $visgroupidMax	-Path $LogFile
 			}
 			#endregion
 		}

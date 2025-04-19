@@ -69,11 +69,11 @@ function ConvertTo-Vmf {
 				# if ($LogFile) {
 					# $logMessage  = "Rough lines est: {0} `n" -f $roughLinesEstimate
 					# $logMessage  = "Rough lines est: {0} ({1:n2}% off) `n" -f $roughLinesEstimate, $($estimationError * 100)
-					# OutLog -Path $LogFile -Value $logMessage
+					# Out-Log -Path $LogFile -Value $logMessage
 
 				if (-not $Silent.IsPresent) {
-					OutLog			-Value "`nVMF | Output estimation: Complete"	-Path $LogFile -OneLine
-					OutLog -Property "Rough lines estimate" -Value $roughLinesEstimate -Path $LogFile
+					Out-Log			-Value "`nVMF | Output estimation: Complete"	-Path $LogFile -OneLine
+					Out-Log -Property "Rough lines estimate" -Value $roughLinesEstimate -Path $LogFile
 				}
 				# }
 			} catch {
@@ -111,8 +111,8 @@ function ConvertTo-Vmf {
 		if (-not $Silent.IsPresent) {
 			$timeFormatted = "{0}m {1}s {2}ms" -f
 				$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
-			OutLog 							-Value "`nVMF | Building output: Complete"	-Path $LogFile -OneLine
-			OutLog -Property "Elapsed time"	-Value $timeFormatted					-Path $LogFile
+			Out-Log 							-Value "`nVMF | Building output: Complete"	-Path $LogFile -OneLine
+			Out-Log -Property "Elapsed time"	-Value $timeFormatted					-Path $LogFile
 		}
 
 		return $stringBuilder.ToString().Trim()

@@ -153,13 +153,13 @@ Try {
 		$logMessage  = "=" * 40 + "`n"
 		$logMessage += "$timestamp `n"
 		$logMessage += "-" * 14 + "Test started" + "-" * 14 + "`n"
-		OutLog -Value $logMessage -Path $logFile -NoConsole
+		Out-Log -Value $logMessage -Path $logFile -NoConsole
 
-		OutLog -Property "NOTE"				-Value $additionalLog	-Path $logFile -NoConsole
-		OutLog -Property "Input file path"	-Value $InputFilePath	-Path $logFile -NoConsole
-		OutLog -Property "Output file path"	-Value $outputFilePath	-Path $logFile -NoConsole
-		OutLog -Property "Debug"			-Value $PSBoundParameters.ContainsKey('Debug').ToString()	-Path $logFile -NoConsole
-		OutLog -Property "Verbose"			-Value $PSBoundParameters.ContainsKey('Verbose').ToString()	-Path $logFile -NoConsole
+		Out-Log -Property "NOTE"				-Value $additionalLog	-Path $logFile -NoConsole
+		Out-Log -Property "Input file path"	-Value $InputFilePath	-Path $logFile -NoConsole
+		Out-Log -Property "Output file path"	-Value $outputFilePath	-Path $logFile -NoConsole
+		Out-Log -Property "Debug"			-Value $PSBoundParameters.ContainsKey('Debug').ToString()	-Path $logFile -NoConsole
+		Out-Log -Property "Verbose"			-Value $PSBoundParameters.ContainsKey('Verbose').ToString()	-Path $logFile -NoConsole
 	}
 	#endregion
 
@@ -182,7 +182,7 @@ Try {
 			}
 		} else {
 			$success = $false
-			OutLog -Value "Failed to parse input file: $InputFilePath" -Path $LogFile -OneLine
+			Out-Log -Value "Failed to parse input file: $InputFilePath" -Path $LogFile -OneLine
 		}
 
 	} elseif ($Extension -eq ".vdf") {
@@ -236,7 +236,7 @@ Try {
 	$success = $false
 	Write-Debug "Now this shit is seriously broken, we're in the catch statement"
 	Write-Error "$($MyInvocation.MyCommand):  $($_.Exception.Message)"
-	OutLog -Property "$($MyInvocation.MyCommand)" -Value "$($_.Exception.Message)" -ColumnWidth 0 -Path $logFile -NoConsole
+	Out-Log -Property "$($MyInvocation.MyCommand)" -Value "$($_.Exception.Message)" -ColumnWidth 0 -Path $logFile -NoConsole
 
 	return $false
 } finally {
@@ -244,12 +244,12 @@ Try {
 	if (-not $Silent.IsPresent) {
 		try {
 			$timestamp	 = Get-Date -UFormat "%c" 
-			OutLog -Property "Success"	-Value $success		-Path $logFile -NoConsole
+			Out-Log -Property "Success"	-Value $success		-Path $logFile -NoConsole
 
 			$logMessage  = "-" * 15 + "Test ended" + "-" * 15 + "`n"
 			$logMessage += "$timestamp `n"
 			$logMessage += "=" * 40 + "`n`n"
-			OutLog -Value $logMessage -Path $logFile -NoConsole
+			Out-Log -Value $logMessage -Path $logFile -NoConsole
 		} catch {
 			# Do nothing
 		}
