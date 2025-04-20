@@ -11,7 +11,3 @@ logs/
 # resources/
 resources/merger/
 resources/config/
-
-# Test scripts
-# Test-VmfLmpMerger.ps1
-# Test-VmfLmpMergerBatch.ps1
