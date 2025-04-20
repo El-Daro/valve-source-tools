@@ -1,5 +1,3 @@
-# TODO: Cleanup
-
 function EstimateOutputVmf {
 	[CmdletBinding()]
 	Param (
@@ -16,7 +14,6 @@ function EstimateOutputVmf {
 	)
 
 	$estimatedLines = 0
-	# Okay, so let's do some statistics analysis first
 	try {
 
 		$sw = [System.Diagnostics.Stopwatch]::StartNew()

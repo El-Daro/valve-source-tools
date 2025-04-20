@@ -1,4 +1,4 @@
-# TODO: Rewrite the loop abd loop breaker
+# TODO: Rewrite the loop and loop breaker
 
 using namespace System.Diagnostics
 

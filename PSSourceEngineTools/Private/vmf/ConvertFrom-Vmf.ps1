@@ -1,5 +1,3 @@
-# TODO: Cleanup
-
 using namespace System.Diagnostics
 
 function ConvertFrom-Vmf {

@@ -62,8 +62,6 @@ function New-VmfVisgroupWrapper {
 					}
 				}
 			}
-			# TODO: Return the visgroup section
-			$success = $true
 		} catch {
 			Write-Debug "$($MyInvocation.MyCommand):  Failed to instantiate '$Name' visgroup. Continuing as is"
 		}
