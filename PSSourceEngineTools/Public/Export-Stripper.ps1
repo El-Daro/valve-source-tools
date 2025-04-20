@@ -1,11 +1,14 @@
 function Export-Stripper {
 <#
 	.SYNOPSIS
-	Converts a hashtable into a stripper .cfg file format string and outputs it in a file, if specified.
+	Converts a hashtable into Stripper's .cfg file format string and outputs it in a file, if specified.
 
 	.DESCRIPTION
 	Converts a hashtable into a single string, formatted specifically for stripper .cfg files.
 	This function is designed to work with ordered and unordered hashtables.
+	
+	Stipper:Source is a Source engine plugin that is used to modify maps on the servers without requiring clients to redownload them.
+	You can see links to description and source code in the LINKS section.
 
 	.PARAMETER InputObject
 	The object to convert. It can be ordered or unordered hashtable.
@@ -56,10 +59,13 @@ function Export-Stripper {
 	Export-Ini
 
 	.LINK
-	Export-Csv
+	https://forums.alliedmods.net/showthread.php?t=39439
 
 	.LINK
-	Export-CliXml
+	https://www.bailopan.net/stripper/
+
+	.LINK
+	https://github.com/alliedmodders/stripper-source/tree/master
 	
 	.EXAMPLE
 	PS> $stripperFile = Import-Stripper -Path ".\c5m3_cemetery.cfg"

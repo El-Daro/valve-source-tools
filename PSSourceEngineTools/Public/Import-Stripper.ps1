@@ -3,10 +3,13 @@ using namespace System.Diagnostics
 function Import-Stripper {
 <#
 	.SYNOPSIS
-	Reads a stripper .cfg file and creates a corresponding hashtable.
+	Reads Stripper's .cfg file and creates a corresponding hashtable.
 
 	.DESCRIPTION
-	Reads through a stripper .cfg file and populates an ordered hashtable with blocks that contain relative Key-Value pairs or other blocks.
+	Reads through a Stripper's .cfg file and populates an ordered hashtable with blocks that contain relative Key-Value pairs or other blocks.
+	
+	Stipper:Source is a Source engine plugin that is used to modify maps on the servers without requiring clients to redownload them.
+	You can see links to description and source code in the LINKS section.
 
 	.PARAMETER Path
 	Specifies the path to the stripper .cfg file. Accepts absolute and relative paths. Does NOT accept wildcards.
@@ -65,15 +68,18 @@ function Import-Stripper {
 
 	.LINK
 	Import-Ini
-
-	.LINK
-	Import-Csv
-
-	.LINK
-	Import-CliXml
 	
 	.LINK
 	about_Hash_Tables
+
+	.LINK
+	https://forums.alliedmods.net/showthread.php?t=39439
+
+	.LINK
+	https://www.bailopan.net/stripper/
+
+	.LINK
+	https://github.com/alliedmodders/stripper-source/tree/master
 	
 	.EXAMPLE
 	PS> $stripperFile = Import-Stripper -Path ".\c5m3_cemetery.cfg"
@@ -236,7 +242,6 @@ function Import-Stripper {
 				$paramsLog	= @{
 					Property	= "File size"
 					Value		= $("{0,$digitsFileSize}Kb" -f $fileSizeKB)
-					# ColumnWidth	= 25				# Should be default
 					Path		= $LogFile
 				}
 				Out-Log @paramsLog

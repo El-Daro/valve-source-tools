@@ -1,5 +1,3 @@
-# TODO: Cleanup
-
 function Export-Vmf {
 <#
 	.SYNOPSIS
@@ -58,10 +56,7 @@ function Export-Vmf {
 	Export-Ini
 
 	.LINK
-	Export-Csv
-
-	.LINK
-	Export-CliXml
+	https://developer.valvesoftware.com/wiki/VMF_(Valve_Map_Format)
 	
 	.EXAMPLE
 	PS> $vmfFile = Import-Vmf -Path ".\c5m3_cemetery_d.vmf"

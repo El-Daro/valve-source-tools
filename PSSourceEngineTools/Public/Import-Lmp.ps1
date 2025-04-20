@@ -64,15 +64,12 @@ function Import-Lmp {
 
 	.LINK
 	Import-Ini
-
-	.LINK
-	Import-Csv
-
-	.LINK
-	Import-CliXml
 	
 	.LINK
 	about_Hash_Tables
+
+	.LINK
+	https://developer.valvesoftware.com/wiki/Lump_file_format
 	
 	.EXAMPLE
 	PS> $lmpFile = Import-Lmp -Path ".\c5m3_cemetery_l_0.lmp"
@@ -240,7 +237,6 @@ function Import-Lmp {
 				$paramsLog	= @{
 					Property	= "File size"
 					Value		= $("{0,$digitsFileSize}Kb" -f $fileSizeKB)
-					# ColumnWidth	= 25				# Should be default
 					Path		= $LogFile
 				}
 				Out-Log @paramsLog

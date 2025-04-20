@@ -63,15 +63,12 @@ function Import-Vmf {
 
 	.LINK
 	Import-Ini
-
-	.LINK
-	Import-Csv
-
-	.LINK
-	Import-CliXml
 	
 	.LINK
 	about_Hash_Tables
+
+	.LINK
+	https://developer.valvesoftware.com/wiki/VMF_(Valve_Map_Format)
 	
 	.EXAMPLE
 	PS> $vmfFile = Import-Vmf -Path ".\c5m3_cemetery_d.vmf"
@@ -228,7 +225,6 @@ function Import-Vmf {
 				$paramsLog	= @{
 					Property	= "File size"
 					Value		= $("{0,$digitsFileSize}Kb" -f $fileSizeKB)
-					# ColumnWidth	= 25				# Should be default
 					Path		= $LogFile
 				}
 				Out-Log @paramsLog
@@ -260,27 +256,10 @@ function Import-Vmf {
 					}
 					Write-Progress @progressParameters
 				}
-				<#
-				# if ($lineCount -gt 1000 -and $lineCount % 10000 -eq 0) {
-				# 	# ReCalculate average line length
-				# 	$averageLineLength = ($stringBuilder.ToString().Split("`n") | ForEach-Object { $_.Length } | Measure-Object -Average).Average
-
-				# 	# Estimate total lines
-				# 	$estimatedLines = [math]::Floor($fileSize / $averageLineLength)
-
-				# 	# Write-Host -ForegroundColor Magenta "      File size: $fileSize"
-				# 	# Write-Host -ForegroundColor Magenta "Estimated lines: $estimatedLines"
-				# }
-				#>
 
 				$lineCount += 1
 			}
 			$sw.Stop()
-
-			# if ($estimatedLines) {
-			# 	Write-Host -ForegroundColor Magenta -NoNewLine	"Estimated lines: "
-			# 	Write-Host -ForegroundColor Cyan				$("{0,6}" -f $estimatedLines)
-			# }
 
 			if (-not $Silent.IsPresent) {
 				$timeFormatted = "{0}m {1}s {2}ms" -f
