@@ -84,7 +84,7 @@ function Copy-StripperIntoVmf {
 			#region Visgroups
 			# Create a new "Stripper" visgroup if it doesn't already exist
 			# NOTE: This visgroup is initially created with a marker (additional parameter)
-			#		It gets either deleted or cleaned in the end,
+			#		It gets either deleted or cleaned out in the end,
 			#		depending on whether any rules were actually applied
 			if ($PSBoundParameters.ContainsKey('VisgroupidTable') -and
 				$PSBoundParameters.ContainsKey('Visgroups')) {
@@ -208,8 +208,6 @@ function Copy-StripperIntoVmf {
 		} catch {
 			# Pay attention to errors
 			return $false
-		} finally {
-			
 		}
 	}
 

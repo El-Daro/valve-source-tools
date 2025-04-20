@@ -56,7 +56,6 @@ function ProcessStripperModify {
 			return $False
 		}
 
-# :mainL	foreach ($vmfClass in $Vmf["classes"].Keys) {
 		$class					= "entity"
 		$vgnStripperModified	= "Stripper - Modified"
 		if (-not $Vmf["classes"].Contains($class) -or $Vmf["classes"][$class].get_Count() -eq 0) {

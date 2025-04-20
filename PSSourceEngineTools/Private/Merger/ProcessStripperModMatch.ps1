@@ -19,7 +19,6 @@ function ProcessStripperModMatch {
 	PROCESS {
 
 		$matchCounter = 0
-# :main	foreach ($stripperProp in $Modify["modes"]["match"][0]["properties"].Keys) {
 :main	foreach ($stripperProp in $StripperBlock["properties"].Keys) {
 			if ($stripperProp -eq "hammerid") {
 				$key = "id"
@@ -48,8 +47,7 @@ function ProcessStripperModMatch {
 				} else {
 					if ($vmfClassEntry["properties"].Contains($key) -and
 						$vmfClassEntry["properties"][$key].Contains($value)) {
-						$matchCounter++	
-					# $vmfSectionFound = $true
+						$matchCounter++
 					} else {
 						break main
 					}

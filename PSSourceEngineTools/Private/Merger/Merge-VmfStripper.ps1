@@ -1,5 +1,3 @@
-# TODO: Implement visgroups generation
-
 using namespace System.Diagnostics
 
 function Merge-VmfStripper {
@@ -84,13 +82,6 @@ function Merge-VmfStripper {
 
 			#region Logging
 			if (-not $Silent.IsPresent) {
-				# if ($sw.ElapsedMilliseconds -gt 0) {
-				# 	$sectionsPerSecond	= ($mergesCount["section"] / $sw.ElapsedMilliseconds) * 1000
-				# 	$propsPerSecond		= ($mergesCount["propsTotal"] / $sw.ElapsedMilliseconds) * 1000
-				# } else {
-				# 	$sectionsPerSecond	= $mergesCount["section"] * 1000
-				# 	$propsPerSecond		= $mergesCount["propsTotal"] * 1000
-				# }
 				$timeFormatted = "{0}m {1}s {2}ms" -f
 					$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
 				Out-Log 							-Value "`nVMF-Stripper | Merging: Complete"													-Path $LogFile -OneLine
@@ -114,12 +105,7 @@ function Merge-VmfStripper {
 					Out-Log -Property "Merges failed (modify)"	-Value $("{0} / {1}" -f $mergesCount["modifyFailed"], $mergesCount["failed"])	-Path $LogFile
 					Out-Log -Property "Merges failed (total)"	-Value $("{0}" -f $mergesCount["failed"])									-Path $LogFile
 				}
-				# Out-Log -Property "Properties edited"		-Value $("{0} / {1}" -f $mergesCount["propsEdited"], $mergesCount["propsTotal"])	-Path $LogFile
-				# Out-Log -Property "Properties skipped"		-Value $("{0} / {1}" -f $mergesCount["propsSkipped"], $mergesCount["propsTotal"])	-Path $LogFile
-				# Out-Log -Property "Properties new"			-Value $("{0} / {1}" -f $mergesCount["propsNew"], $mergesCount["propsTotal"])		-Path $LogFile
 				Out-Log -Property "Elapsed time"				-Value $timeFormatted								-Path $LogFile
-				# Out-Log -Property "Speed"		-Value $("{0:n0} sections per second" -f $sectionsPerSecond)	-Path $LogFile
-				# Out-Log -Property "Speed"		-Value $("{0:n0} properties per second" -f $propsPerSecond)		-Path $LogFile
 			}
 			#endregion
 		}

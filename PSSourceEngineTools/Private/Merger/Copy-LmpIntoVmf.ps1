@@ -137,34 +137,6 @@ function Copy-LmpIntoVmf {
 									$success = Add-VmfEditor @params
 								}
 								#endregion
-
-								#region In-house copying function (for testing purposes)
-								# foreach ($propertyName in $Lmp["data"][$lmpSection].Keys) {
-								# 	if ($propertyName -ne "hammerid") {				# We don't need to copy matched hammerid
-								# 		if ($vmfClassEntry["properties"][$propertyName] -ne $Lmp["data"][$lmpSection][$propertyName]) {
-								# 			$mergesCount["propsEdited"]++
-								# 			if ($propertyName.Length -gt 3 -and ($propertyName.SubString(0,2) -eq "On") -or
-								# 												($propertyName.SubString(0,3) -eq "Out")) {	
-								# 				try {														# See if property name starts with "On"
-								# 					if ($vmfClassEntry["classes"].Contains("connections")) {	# And put it in the 'connections' class
-								# 						$vmfClassEntry["classes"]["connections"][0]["properties"][$propertyName] = $Lmp["data"][$lmpSection][$propertyName]
-								# 					} else {
-								# 						$vmfClassEntry["properties"][$propertyName] = $Lmp["data"][$lmpSection][$propertyName]
-								# 					}
-								# 				} catch {
-								# 					# Do nothing
-								# 					Write-Host -ForegroundColor DarkYellow "Failed to copy connections. Hammerid: $($Lmp["data"][$lmpSection]["hammerid"])"
-								# 				}
-								# 			} else {
-								# 				$vmfClassEntry["properties"][$propertyName] = $Lmp["data"][$lmpSection][$propertyName]
-								# 			}
-								# 		} else {
-								# 			$mergesCount["propsSkipped"]++
-								# 		}
-								# 	}
-								# }
-								#endregion
-
 								break vmfHashLoopH
 							}
 						}
@@ -172,6 +144,7 @@ function Copy-LmpIntoVmf {
 					if (-not $vmfSectionFound) {
 						$MergesCount["new"]++
 						# Add a new section to VMF file
+						# TODO: Swap 'hammerid' with 'id'
 						$newBlock = [ordered]@{
 							properties = $Lmp["data"][$lmpSection]
 							classes    = [ordered]@{}
@@ -237,10 +210,8 @@ function Copy-LmpIntoVmf {
 			return $true
 
 		} catch {
-			# Pay attention to errors
+			# Pay more attention to errors
 			return $false
-		} finally {
-			
 		}
 	}
 
