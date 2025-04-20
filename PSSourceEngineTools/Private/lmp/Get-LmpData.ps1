@@ -14,16 +14,10 @@ function Get-LmpData {
 	)
 
 	try  {
-		
-		# $lmpStrings = [System.Text.Encoding]::UTF8.GetString($Binary).Trim("`0").Split()
-		# return $lmpStrings
 		return [System.Text.Encoding]::UTF8.GetString($Binary).Trim("`0").Trim().Split("`n")
-
 	} catch {
 		Write-Debug "Failed to read the LUMP data"
 		Write-Error "$($MyInvocation.MyCommand):  $($_.Exception.Message)"
 		Throw $_.Exception
-	} finally {
-
 	}
 }

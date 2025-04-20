@@ -77,7 +77,5 @@ function Set-LmpData {
 		Write-Debug "LUMP data is corrupted"
 		Write-Error -Message "$($MyInvocation.MyCommand):  $($_.Exception.Message)"
 		return $False
-	} finally {
-
 	}
 }

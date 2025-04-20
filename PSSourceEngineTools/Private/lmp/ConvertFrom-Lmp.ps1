@@ -16,14 +16,11 @@ function ConvertFrom-Lmp {
 	#region Variables
 	$linesFaulty			= 0
 	$currentLine			= 0
-	# $sectionsList			= [Collections.Generic.List[Collections.Specialized.OrderedDictionary]]::new()
 	$sections				= [ordered]@{ }
 	$currentBlock			= [ordered]@{ }
 	$sectionsCounter		= 0
-	$estimatedMilliseconds	= 0			# TODO: Del
 	$progressCounter		= 0
 	$progressStep			= [math]::Ceiling($Lines.Count / 10)
-
 	#endregion
 
 	try  {
@@ -66,7 +63,6 @@ function ConvertFrom-Lmp {
 			} else {
 				$sectionsCounter++
 				$currentBlock = [ordered]@{ }
-				# $sectionsList.Add($currentBlock)
 			}
 
 			

@@ -45,7 +45,5 @@ function Set-LmpHeader {
 		Write-Debug "LUMP header is corrupted"
 		Write-Error -Message "$($MyInvocation.MyCommand):  $($_.Exception.Message)"
 		return $False
-	} finally {
-
 	}
 }
