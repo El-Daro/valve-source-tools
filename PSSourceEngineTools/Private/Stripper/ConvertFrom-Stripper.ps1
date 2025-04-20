@@ -66,15 +66,6 @@ function ConvertFrom-Stripper {
 					$stackBlocks.Push($currentBlock)
 				}
 				if ($currentMode -eq "modify" -and $Depth -eq 1) {
-					# Initially contained ordered dictionaries 
-					# $currentBlock	= [ordered]@{
-					# 	match	= [ordered]@{};
-					# 	replace	= [ordered]@{};
-					# 	delete	= [ordered]@{};
-					# 	insert	= [ordered]@{}
-					# }
-
-					# Now contains Lists of ordered dictionaries populated with one element each 
 					$currentBlock	= [ordered]@{
 						properties	= [ordered]@{};
 						modes		= [ordered]@{
@@ -99,11 +90,8 @@ function ConvertFrom-Stripper {
 				}
 				if ($currentMode -eq "modify" -and $Depth -ne 0) {		# If we are in the modify block and just populated a new block
 					$parentBlock = $stackBlocks.Pop()					# Return one level up
-					# Initial implementation:
-					# $parentBlock[$currentSubmode] = $currentBlock		# Add the newly populated block
 					$parentBlock["modes"][$currentSubmode].Add($currentBlock)	# Add the newly populated block
 					$stackBlocks.Push($parentBlock)						# And push it back to the stack
-					# $currentSubmode = "none"
 				} else {
 					$stripper["modes"][$currentMode].Add($currentBlock)
 				}
