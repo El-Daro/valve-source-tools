@@ -7,7 +7,7 @@ Param (
 	[Parameter(Position = 0,
 	Mandatory = $true,
 	ValueFromPipeline = $true)]
-	[string]$InputFilePath = ".\resources\config\stresstest_tofix.ini",
+	[string]$InputFilePath,
 
 	[Parameter(Position = 1)]
 	$IgnoreCommentsPattern,
