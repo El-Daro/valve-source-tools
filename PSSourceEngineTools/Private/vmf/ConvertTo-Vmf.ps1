@@ -112,7 +112,7 @@ function ConvertTo-Vmf {
 			$timeFormatted = "{0}m {1}s {2}ms" -f
 				$sw.Elapsed.Minutes, $sw.Elapsed.Seconds, $sw.Elapsed.Milliseconds
 			Out-Log 							-Value "`nVMF | Building output: Complete"	-Path $LogFile -OneLine
-			Out-Log -Property "Elapsed time"	-Value $timeFormatted					-Path $LogFile
+			Out-Log -Property "Elapsed time"	-Value $timeFormatted						-Path $LogFile
 		}
 
 		return $stringBuilder.ToString().Trim()

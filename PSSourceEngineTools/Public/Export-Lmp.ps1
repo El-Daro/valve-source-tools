@@ -105,12 +105,12 @@ function Export-Lmp {
 		classname                      {light_directional}
 		hammerid                       {2935785}
 		
-	PS> Export-Lmp -InputObject $lmpFile -Path ".\c5m3_cemetery_d_1.lmp"
+	PS> Export-Lmp -InputObject $lmpFile -Path ".\c5m3_cemetery_l_0-1.lmp"
 	
 	.EXAMPLE
 	PS> $lmpFile = Import-Lmp -Path ".\c5m3_cemetery_l_0.lmp"
 	PS> $lmpFile["data"]["hammerid-2935785"]["angles"][0] = "45 120 0"
-	PS> Export-Lmp -InputObject $lmpFile -Path ".\c5m3_cemetery_d_1.lmp"
+	PS> Export-Lmp -InputObject $lmpFile -Path ".\c5m3_cemetery_l_0-1.lmp"
 
 #>
 	
@@ -199,7 +199,13 @@ function Export-Lmp {
 			}
 		}
 		#endregion
-		$LogFile = $(Get-AbsolutePath -Path $LogFile)		# Just a precaution
+		if ($PSBoundParameters.ContainsKey('logFile') -and
+				-not [string]::IsNullOrWhiteSpace($logFile) -and
+				$(Test-Path $logFile -IsValid)) {
+			$LogFile = $(Get-AbsolutePath -Path $LogFile)
+		} else {
+			$LogFile = $false
+		}
 
 		$lmp = ConvertTo-Lmp -Lmp $InputObject -LogFile $LogFile -Silent:$Silent.IsPresent -AsText:$AsText.IsPresent
 

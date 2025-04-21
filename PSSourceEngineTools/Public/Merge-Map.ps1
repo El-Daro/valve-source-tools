@@ -243,7 +243,13 @@ function Merge-Map {
 			}
 		}
 		#endregion
-		$LogFile = $(Get-AbsolutePath -Path $LogFile)	# Just a precaution
+		if ($PSBoundParameters.ContainsKey('logFile') -and
+				-not [string]::IsNullOrWhiteSpace($logFile) -and
+				$(Test-Path $logFile -IsValid)) {
+			$LogFile = $(Get-AbsolutePath -Path $LogFile)
+		} else {
+			$LogFile = $false
+		}
 
 		#region Visgroups
 		# Ensure it does exist

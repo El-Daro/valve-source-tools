@@ -228,7 +228,13 @@ function Import-Stripper {
 		
 		# Had to do this due to a nasty bug with .NET being dependent on the context of where the script was launched from
 		$Path = $(Get-AbsolutePath -Path $Path)
-		$LogFile = $(Get-AbsolutePath -Path $LogFile)
+		if ($PSBoundParameters.ContainsKey('logFile') -and
+				-not [string]::IsNullOrWhiteSpace($logFile) -and
+				$(Test-Path $logFile -IsValid)) {
+			$LogFile = $(Get-AbsolutePath -Path $LogFile)
+		} else {
+			$LogFile = $false
+		}
 		if (-not $Silent.IsPresent) {
 			Out-Log	-Value "`nStripper | Input received: $Path"	-Path $LogFile -OneLine
 		}
