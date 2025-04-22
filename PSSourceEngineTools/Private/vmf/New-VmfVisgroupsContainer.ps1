@@ -15,12 +15,12 @@ function New-VmfVisgroupsContainer {
 
 		$success = $false
 		try {
-			$Vmf["classes"]["visgroups"] = [System.Collections.Generic.List[ordered]]::new()
+			$Vmf["classes"]["visgroups"] = [Collections.Generic.List[Collections.Specialized.OrderedDictionary]]::new()
 			$Vmf["classes"]["visgroups"].Add([ordered]@{
 				properties	= [ordered]@{ }
 				classes		= [ordered]@{ }
 			})
-			$Vmf["classes"]["visgroups"][0]["classes"]["visgroup"] = [System.Collections.Generic.List[ordered]]::new()
+			$Vmf["classes"]["visgroups"][0]["classes"]["visgroup"] = [Collections.Generic.List[Collections.Specialized.OrderedDictionary]]::new()
 			if ($PSBoundParameters.ContainsKey('Visgroup')) {
 				$Vmf["classes"]["visgroups"][0]["classes"]["visgroup"].Add($Visgroup)
 			}

@@ -104,9 +104,9 @@ function ParseVmfBlockRecursive {
 			$Depth.Value++
 			if (-not $currentBlock["classes"].Contains($line)) {
 				if ($line -eq "entity" -or $line -eq "solid") {
-					$currentBlock["classes"][$line] = [System.Collections.Generic.List[System.Collections.Specialized.OrderedDictionary]]::new(8000)
+					$currentBlock["classes"][$line] = [Collections.Generic.List[Collections.Specialized.OrderedDictionary]]::new(8000)
 				} else {
-					$currentBlock["classes"][$line] = [System.Collections.Generic.List[System.Collections.Specialized.OrderedDictionary]]::new()
+					$currentBlock["classes"][$line] = [Collections.Generic.List[Collections.Specialized.OrderedDictionary]]::new()
 				}
 			}
 			$params = @{

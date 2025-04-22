@@ -20,7 +20,8 @@ function CountElementsIter {
 		[ref]$Classes
 	)
 
-	$stackBlocks		= [System.Collections.Generic.Stack[ordered]]::new()
+	# $stackBlocks		= [System.Collections.Generic.Stack[ordered]]::new()
+	$stackBlocks		= [Collections.Generic.Stack[Collections.Specialized.OrderedDictionary]]::new()
 	$counter			= 0
 	$counterList		= 0
 	$countProperties	= $True

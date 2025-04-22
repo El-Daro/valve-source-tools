@@ -39,7 +39,8 @@ function AppendVmfBlockIter {
 	)
 
 	#region VARIABLES
-	$stackBlocks		= [System.Collections.Generic.Stack[ordered]]::new()
+	# $stackBlocks		= [System.Collections.Generic.Stack[ordered]]::new()
+	$stackBlocks		= [Collections.Generic.Stack[Collections.Specialized.OrderedDictionary]]::new()
 	$counter			= 0
 	$counterList		= 0
 	$printProperties	= $True

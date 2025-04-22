@@ -50,7 +50,7 @@ function ProcessStripperModInsert {
 					if (-not $vmfClassEntry["classes"].Contains("connections")) {	# And we don't have the class
 																					# Create it
 						try {
-							$vmfClassEntry["classes"]["connections"] = [System.Collections.Generic.List[ordered]]::new()
+							$vmfClassEntry["classes"]["connections"] = [Collections.Generic.List[Collections.Specialized.OrderedDictionary]]::new()
 							$vmfClassEntry["classes"]["connections"].Add([ordered]@{
 								properties	= [ordered]@{ }
 								classes		= [ordered]@{ }

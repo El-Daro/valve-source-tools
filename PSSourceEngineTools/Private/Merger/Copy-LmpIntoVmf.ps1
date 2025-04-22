@@ -67,7 +67,7 @@ function Copy-LmpIntoVmf {
 
 			# Just a precaution
 			if (-not $Vmf["classes"].Contains("entity")) {
-				$Vmf["classes"]["entity"] = [System.Collections.Generic.List[ordered]]::new()
+				$Vmf["classes"]["entity"] = [Collections.Generic.List[Collections.Specialized.OrderedDictionary]]::new()
 			}
 
 :lmpLoop	foreach ($lmpSection in $Lmp["data"].Keys) {

@@ -75,7 +75,7 @@ function ProcessStripperAdd {
 			if ($stripperProp.Length -gt 3 -and ($stripperProp.SubString(0,2) -eq "On") -or
 												($stripperProp.SubString(0,3) -eq "Out")) {	
 				try {					# See if property name starts with "On" or "Out"
-					$newBlock["classes"]["connections"] = [System.Collections.Generic.List[ordered]]::new()
+					$newBlock["classes"]["connections"] = [Collections.Generic.List[Collections.Specialized.OrderedDictionary]]::new()
 					$newBlock["classes"]["connections"].Add([ordered]@{
 						properties	= [ordered]@{ }
 						classes		= [ordered]@{ }
@@ -115,7 +115,7 @@ function ProcessStripperAdd {
 		#endregion
 
 		if (-not $Vmf["classes"].Contains($class)) {
-			$Vmf["classes"][$class] = [System.Collections.Generic.List[ordered]]::new()
+			$Vmf["classes"][$class] = [Collections.Generic.List[Collections.Specialized.OrderedDictionary]]::new()
 		}
 		$Vmf["classes"][$class].Add($newBlock)
 		$MergesCount["add"]++

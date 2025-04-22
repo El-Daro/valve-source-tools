@@ -25,7 +25,7 @@ function Add-VmfVisgroup {
 		$success = $false
 		try {
 			if (-not $visgroup["classes"].Contains("visgroup") -or -not $visgroup["classes"]["visgroup"].get_Count() -gt 0) {
-				$visgroup["classes"]["visgroup"] = [System.Collections.Generic.List[ordered]]::new()
+				$visgroup["classes"]["visgroup"] = [Collections.Generic.List[Collections.Specialized.OrderedDictionary]]::new()
 			}
 			$params = @{
 				Name		= $Name

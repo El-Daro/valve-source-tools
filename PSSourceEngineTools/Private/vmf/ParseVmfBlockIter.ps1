@@ -1,5 +1,3 @@
-# TODO: Cleanup
-
 function ParseVmfBlockIter {
 
 	Param(
@@ -24,7 +22,8 @@ function ParseVmfBlockIter {
 		properties			= [ordered]@{};
 		classes				= [ordered]@{}
 	}
-	$stackBlocks			= [System.Collections.Generic.Stack[ordered]]::new()
+	# $stackBlocks			= [System.Collections.Generic.Stack[ordered]]::new()
+	$stackBlocks			= [Collections.Generic.Stack[Collections.Specialized.OrderedDictionary]]::new()
 	$estimatedMilliseconds	= 0
 	$progressCounter		= 0
 	$progressStep			= [math]::Ceiling($Lines.Count / 50)
@@ -55,7 +54,7 @@ function ParseVmfBlockIter {
 			# In VMF class names are NOT enclosed in quotation marks
 			$CurrentLine.Value += 1				# Jump over the open bracket
 			if (-not $currentBlock["classes"].Contains($line)) {
-				$currentBlock["classes"][$line] = [System.Collections.Generic.List[System.Collections.Specialized.OrderedDictionary]]::new()
+				$currentBlock["classes"][$line] = [Collections.Generic.List[Collections.Specialized.OrderedDictionary]]::new()
 			}
             # Create a new block for the class
             $newBlock = [ordered]@{

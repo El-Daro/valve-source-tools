@@ -27,12 +27,13 @@ function ConvertFrom-StripperRegex {
 	$stripper			= [ordered]@{	# This gets populated with currentBlock on bracket close
 		properties		= [ordered]@{};
 		modes			= [ordered]@{
-			filter	= [System.Collections.Generic.List[ordered]]::new()
-			add		= [System.Collections.Generic.List[ordered]]::new()
-			modify	= [System.Collections.Generic.List[ordered]]::new()
+			filter	= [Collections.Generic.List[Collections.Specialized.OrderedDictionary]]::new()
+			add		= [Collections.Generic.List[Collections.Specialized.OrderedDictionary]]::new()
+			modify	= [Collections.Generic.List[Collections.Specialized.OrderedDictionary]]::new()
 		}
 	}
-	$stackBlocks		= [System.Collections.Generic.Stack[ordered]]::new()
+	# $stackBlocks		= [System.Collections.Generic.Stack[ordered]]::new()
+	$stackBlocks		= [Collections.Generic.Stack[Collections.Specialized.OrderedDictionary]]::new()
 	$progressCounter	= 0
 	$progressStep		= [math]::Ceiling($Lines.Count / 5)
 	$regex				= Get-StripperRegex
@@ -72,10 +73,10 @@ function ConvertFrom-StripperRegex {
 						$currentBlock	= [ordered]@{
 							properties	= [ordered]@{};
 							modes		= [ordered]@{
-								match	= [System.Collections.Generic.List[ordered]]::new();
-								replace	= [System.Collections.Generic.List[ordered]]::new();
-								delete	= [System.Collections.Generic.List[ordered]]::new();
-								insert	= [System.Collections.Generic.List[ordered]]::new()
+								match	= [Collections.Generic.List[Collections.Specialized.OrderedDictionary]]::new();
+								replace	= [Collections.Generic.List[Collections.Specialized.OrderedDictionary]]::new();
+								delete	= [Collections.Generic.List[Collections.Specialized.OrderedDictionary]]::new();
+								insert	= [Collections.Generic.List[Collections.Specialized.OrderedDictionary]]::new()
 							}
 						}
 					} else {

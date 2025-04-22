@@ -42,7 +42,7 @@ function Add-VmfEditor {
 		$class = "editor"
 		
 		if (-not $vmfSection["classes"].Contains($class)) {
-			$vmfSection["classes"][$class] = [System.Collections.Generic.List[ordered]]::new()
+			$vmfSection["classes"][$class] = [Collections.Generic.List[Collections.Specialized.OrderedDictionary]]::new()
 			$vmfSection["classes"][$class].Add([ordered]@{
 				properties	= [ordered]@{ }
 				classes		= [ordered]@{ }
