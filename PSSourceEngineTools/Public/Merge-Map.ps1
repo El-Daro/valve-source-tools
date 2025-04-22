@@ -247,8 +247,8 @@ function Merge-Map {
 				-not [string]::IsNullOrWhiteSpace($logFile) -and
 				$(Test-Path $logFile -IsValid)) {
 			$LogFile = $(Get-AbsolutePath -Path $LogFile)
-		} else {
-			$LogFile = $false
+		# } else {
+		# 	$LogFile = $false
 		}
 
 		#region Visgroups

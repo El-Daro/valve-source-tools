@@ -173,8 +173,8 @@ function Export-Stripper {
 				-not [string]::IsNullOrWhiteSpace($logFile) -and
 				$(Test-Path $logFile -IsValid)) {
 			$LogFile = $(Get-AbsolutePath -Path $LogFile)
-		} else {
-			$LogFile = $false
+		# } else {
+		# 	$LogFile = $false
 		}
 
 		$stripper	= ConvertTo-Stripper -Stripper $InputObject -LogFile $LogFile -Silent:$Silent.IsPresent

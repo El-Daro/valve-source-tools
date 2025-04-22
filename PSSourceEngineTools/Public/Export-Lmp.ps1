@@ -203,8 +203,8 @@ function Export-Lmp {
 				-not [string]::IsNullOrWhiteSpace($logFile) -and
 				$(Test-Path $logFile -IsValid)) {
 			$LogFile = $(Get-AbsolutePath -Path $LogFile)
-		} else {
-			$LogFile = $false
+		# } else {
+		# 	$LogFile = $false
 		}
 
 		$lmp = ConvertTo-Lmp -Lmp $InputObject -LogFile $LogFile -Silent:$Silent.IsPresent -AsText:$AsText.IsPresent

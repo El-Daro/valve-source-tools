@@ -215,8 +215,8 @@ function Import-Vmf {
 				-not [string]::IsNullOrWhiteSpace($logFile) -and
 				$(Test-Path $logFile -IsValid)) {
 			$LogFile = $(Get-AbsolutePath -Path $LogFile)
-		} else {
-			$LogFile = $false
+		# } else {
+		# 	$LogFile = $false
 		}
 		if (-not $Silent.IsPresent) {
 			Out-Log	-Value "`nVMF | Input received: $Path"	-Path $LogFile -OneLine

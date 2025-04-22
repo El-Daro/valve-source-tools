@@ -179,8 +179,8 @@ function Export-Vmf {
 				-not [string]::IsNullOrWhiteSpace($logFile) -and
 				$(Test-Path $logFile -IsValid)) {
 			$LogFile = $(Get-AbsolutePath -Path $LogFile)
-		} else {
-			$LogFile = $false
+		# } else {
+		# 	$LogFile = $false
 		}
 
 		$vmf = ConvertTo-Vmf -Vmf $InputObject -LogFile $LogFile -Fast $Fast -Silent:$Silent.IsPresent

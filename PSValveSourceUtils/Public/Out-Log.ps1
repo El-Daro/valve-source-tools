@@ -51,7 +51,7 @@ function Out-Log {
 	}
 
 	# Send the line to the file
-	if (-not $NoFile.IsPresent -and $false -ne $logFile) {
+	if (-not $NoFile.IsPresent -and -not [string]::IsNullOrEmpty($logFile)) {
 		$params = @{
 			Value		= $line
 			Path		= $Path
