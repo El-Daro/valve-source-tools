@@ -51,9 +51,12 @@ if (-not (Test-Path -Path $OutputFolder)) {
 foreach ($vmf in $Vmfs) {
 	try {
 		$inputFilePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($vmf)
-		$outputFilePath = (Split-Path -Path $inputFilePath -LeafBase) + "_"
-		$baseOutputName = Join-Path -Path $outputFolder -ChildPath (Split-Path -Path $inputFilePath -LeafBase)
-		$Extension = Split-Path -Path $InputFilePath -Extension
+		# $outputFilePath = (Split-Path -Path $inputFilePath -LeafBase) + "_"
+		$outputFilePath = ([IO.Path]::GetFileNameWithoutExtension($inputFilePath)) + "_"
+		# $baseOutputName = Join-Path -Path $outputFolder -ChildPath (Split-Path -Path $inputFilePath -LeafBase)
+		$baseOutputName = Join-Path -Path $outputFolder -ChildPath ([IO.Path]::GetFileNameWithoutExtension($inputFilePath))
+		# $Extension = Split-Path -Path $InputFilePath -Extension
+		$Extension = [IO.Path]::GetExtension($InputFilePath)
 		if ($OneCopy) {
 			$outputFilePath = "{0}{1}" -f $baseOutputName, $Extension
 		} else {

@@ -69,13 +69,17 @@ $modulesToImport = @{
 
 $appendix = "_"
 if ([string]::IsNullOrWhiteSpace($OutputFilePath) -or -not $(Test-Path $OutputFilePath -IsValid)) {
-	$outputFilePath = (Split-Path -Path $InputFilePath -LeafBase) + "_"
-	$baseName = Join-Path -Path (Split-Path -Path $InputFilePath -Parent) -ChildPath (Split-Path -Path $InputFilePath -LeafBase)
+	# $outputFilePath = (Split-Path -Path $InputFilePath -LeafBase) + "_"
+	$outputFilePath = ([IO.Path]::GetFileNameWithoutExtension($InputFilePath)) + "_"
+	# $baseName = Join-Path -Path (Split-Path -Path $InputFilePath -Parent) -ChildPath (Split-Path -Path $InputFilePath -LeafBase)
+	$baseName = Join-Path -Path (Split-Path -Path $InputFilePath -Parent) -ChildPath ([IO.Path]::GetFileNameWithoutExtension($InputFilePath))
 	$testNoExtension = $false
-	if (Split-Path -Path $InputFilePath -Extension) {
+	# if (Split-Path -Path $InputFilePath -Extension) {
+	if ([IO.Path]::GetExtension($InputFilePath)) {
 		if ($Extension -ne ".vdf" -and $Extension -ne ".ini" -and
 			$Extension -ne ".vmf" -and $Extension -ne ".lmp" -and $Extension -ne ".cfg") {
-			$Extension = Split-Path -Path $InputFilePath -Extension
+			# $Extension = Split-Path -Path $InputFilePath -Extension
+			$Extension = [IO.Path]::GetExtension($InputFilePath)
 		}
 	} else {
 		$testNoExtension = $true
@@ -119,12 +123,18 @@ if (-not $Note) {
 }
 
 # $logFilePath = (Split-Path -Path $LogFile -LeafBase) + "_"
-$baseLogName = Join-Path -Path (Split-Path -Path $LogFile -Parent) -ChildPath (Split-Path -Path $LogFile -LeafBase)
-$logFile = "{0}{1}{2}{3}" -f
-	$baseLogName,
-	$appendix,
-	$Extension.SubString(1, $Extension.Length - 1),
-	$(Split-Path -Path $logFile -Extension)
+# $logFilePath = ([IO.Path]::GetFileNameWithoutExtension($LogFile)) + "_"
+
+if ($LogFile -eq ".\logs\stats.log") {
+	# $baseLogName = Join-Path -Path (Split-Path -Path $LogFile -Parent) -ChildPath (Split-Path -Path $LogFile -LeafBase)
+	$baseLogName = Join-Path -Path (Split-Path -Path $LogFile -Parent) -ChildPath ([IO.Path]::GetFileNameWithoutExtension($LogFile))
+	$logFile = "{0}{1}{2}{3}" -f
+		$baseLogName,
+		$appendix,
+		$Extension.SubString(1, $Extension.Length - 1),
+		# $(Split-Path -Path $logFile -Extension)
+		$([IO.Path]::GetExtension($LogFile))
+}
 
 # $logFile = "../logs/stats_" + $Extension.SubString(1, $Extension.Length - 1) + ".log"
 Write-Debug "Input file: $InputFilePath"

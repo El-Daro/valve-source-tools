@@ -74,8 +74,10 @@ $modulesToImport = @{
 
 $appendix = "_merged_"
 if ([string]::IsNullOrWhiteSpace($OutputFilePath) -or -not $(Test-Path $OutputFilePath -IsValid)) {
-	$outputFilePath = (Split-Path -Path $VmfPath -LeafBase) + "_"
-	$baseName = Join-Path -Path (Split-Path -Path $VmfPath -Parent) -ChildPath (Split-Path -Path $VmfPath -LeafBase)
+	# $outputFilePath = (Split-Path -Path $VmfPath -LeafBase) + "_"
+	$outputFilePath = ([IO.Path]::GetFileNameWithoutExtension($VmfPath)) + "_"
+	# $baseName = Join-Path -Path (Split-Path -Path $VmfPath -Parent) -ChildPath (Split-Path -Path $VmfPath -LeafBase)
+	$baseName = Join-Path -Path (Split-Path -Path $VmfPath -Parent) -ChildPath ([IO.Path]::GetFileNameWithoutExtension($VmfPath))
 	$maxOutputFiles = 100
 	$count = 1
 
@@ -100,13 +102,18 @@ if (-not $Note) {
 }
 
 # $logFilePath = (Split-Path -Path $LogFile -LeafBase) + "_"
-$baseLogName = Join-Path -Path (Split-Path -Path $LogFile -Parent) -ChildPath (Split-Path -Path $LogFile -LeafBase)
-$logFile = "{0}{1}{2}{3}" -f
-	$baseLogName,
-	$appendix,
-	$OutputExtension.SubString(1, $OutputExtension.Length - 1),
-	$(Split-Path -Path $logFile -Extension)
+# $logFilePath = ([IO.Path]::GetFileNameWithoutExtension($LogFile)) + "_"
+# $baseLogName = Join-Path -Path (Split-Path -Path $LogFile -Parent) -ChildPath (Split-Path -Path $LogFile -LeafBase)
 
+if ($LogFile -eq ".\logs\stats_merger.log") {
+	$baseLogName = Join-Path -Path (Split-Path -Path $LogFile -Parent) -ChildPath ([IO.Path]::GetFileNameWithoutExtension($LogFile))
+	$LogFile = "{0}{1}{2}{3}" -f
+		$baseLogName,
+		$appendix,
+		$OutputExtension.SubString(1, $OutputExtension.Length - 1),
+		# $(Split-Path -Path $logFile -Extension)
+		$([IO.Path]::GetExtension($LogFile))
+}
 # $logFile = "../logs/stats_" + $OutputExtension.SubString(1, $OutputExtension.Length - 1) + ".log"
 Write-Debug "Input vmf file: $VmfPath"
 Write-Debug "Input lmp file: $LmpPath"

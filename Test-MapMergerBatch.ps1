@@ -65,7 +65,8 @@ if (-not (Test-Path -Path $OutputFolder)) {
 foreach ($vmf in $Vmfs) {
 	try {
 		$inputVmfFilePath	= $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($vmf)
-		$vmfBaseName		= Split-Path -Path $inputVmfFilePath -LeafBase
+		# $vmfBaseName		= Split-Path -Path $inputVmfFilePath -LeafBase
+		$vmfBaseName		= [IO.Path]::GetFileNameWithoutExtension($inputVmfFilePath)
 		$mapBaseName		= $vmfBaseName.Substring(0, $vmfBaseName.Length - 2)
 
 		# Find lmp
@@ -73,7 +74,8 @@ foreach ($vmf in $Vmfs) {
 		$inputLmpFilePath	= ""
 		foreach ($lmp in $Lmps) {
 			$inputLmpFilePath	= $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($lmp)
-			$lmpBaseName		= Split-Path -Path $inputLmpFilePath -LeafBase
+			# $lmpBaseName		= Split-Path -Path $inputLmpFilePath -LeafBase
+			$lmpBaseName		= [IO.Path]::GetFileNameWithoutExtension($inputLmpFilePath)
 			if ($mapBaseName -eq $lmpBaseName.Substring(0, $lmpBaseName.Length - 4)) {
 				$lmpFound	= $true
 				break
@@ -91,7 +93,8 @@ foreach ($vmf in $Vmfs) {
 		$inputStripperFilePath	= ""
 		foreach ($stripper in $Strippers) {
 			$inputStripperFilePath	= $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($stripper)
-			$stripperBaseName		= Split-Path -Path $inputStripperFilePath -LeafBase
+			# $stripperBaseName		= Split-Path -Path $inputStripperFilePath -LeafBase
+			$stripperBaseName		= [IO.Path]::GetFileNameWithoutExtension($inputStripperFilePath)
 			if ($mapBaseName -eq $stripperBaseName) {
 				$stripperFound		= $true
 				break
@@ -104,9 +107,11 @@ foreach ($vmf in $Vmfs) {
 			# continue
 		}
 
-		$outputFilePath = (Split-Path -Path $inputVmfFilePath -LeafBase) + "_"
-		$baseOutputName = Join-Path -Path $outputFolder -ChildPath (Split-Path -Path $inputVmfFilePath -LeafBase)
-		$Extension = Split-Path -Path $inputVmfFilePath -Extension
+		# $outputFilePath = (Split-Path -Path $inputVmfFilePath -LeafBase) + "_"
+		$outputFilePath = ([IO.Path]::GetFileNameWithoutExtension($inputVmfFilePath)) + "_"
+		$baseOutputName = Join-Path -Path $outputFolder -ChildPath ([IO.Path]::GetFileNameWithoutExtension($inputVmfFilePath)) # (Split-Path -Path $inputVmfFilePath -LeafBase)
+		# $Extension = Split-Path -Path $inputVmfFilePath -Extension
+		$Extension = [IO.Path]::GetExtension($inputVmfFilePath)
 		
 		$appendix = "_merged"
 		if (-not $lmpFound -and -not $stripperFound) {
