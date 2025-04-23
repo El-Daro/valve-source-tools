@@ -179,7 +179,8 @@ BEGIN {
 		Write-Host -ForegroundColor Magenta	-NoNewLine	"<ModuleName> "
 		Write-Host -ForegroundColor Yellow				"-ListAvailable"
 		Write-Host -ForegroundColor Yellow	-NoNewLine	"    Get-Help "
-		Write-Host -ForegroundColor Magenta				"<ModuleName> "
+		Write-Host -ForegroundColor Magenta	-NoNewLine	"<ModuleName> "
+		Write-Host -ForegroundColor Yellow				"-Full"
 	}
 
 	function Show-HelpFailure {
@@ -194,9 +195,11 @@ BEGIN {
 		Write-Host -ForegroundColor Yellow "  - Try running this script without any parameteres to install modules to default paths"
 		Write-Host -ForegroundColor Yellow "  - Make sure this script is placed in the same folder as the modules. Example:"
 		Write-Host -ForegroundColor DarkCyan	-NoNewLine	"  |-"
-		Write-Host -ForegroundColor Magenta					"<ModuleNameOne>"
+		Write-Host -ForegroundColor Magenta					"ValveSourceTools.<ModuleNameOne>"
 		Write-Host -ForegroundColor DarkCyan	-NoNewLine	"  |-"
-		Write-Host -ForegroundColor Magenta					"<ModuleNameTwo>"
+		Write-Host -ForegroundColor Magenta					"ValveSourceTools.<ModuleNameTwo>"
+		Write-Host -ForegroundColor DarkCyan	-NoNewLine	"  |-"
+		Write-Host -ForegroundColor Magenta					"..."
 		Write-Host -ForegroundColor DarkCyan				"  |-$([IO.Path]::GetFileName($PSCommandPath))"
 	}
 
