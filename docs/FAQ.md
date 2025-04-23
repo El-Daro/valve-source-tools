@@ -12,8 +12,8 @@ You don't need to install the modules in order to use them — just downloading 
 4. Import the modules:
 
 ```powershell
-Import-Module .\PSSourceEngineTools\PSSourceEngineTools.psd1
-Import-Module .\PSResourceParser\PSResourceParser.psd1
+Import-Module .\ValveSourceTools.SourceEngine\ValveSourceTools.SourceEngine.psd1
+Import-Module .\ValveSourceTools.Steam\ValveSourceTools.Steam.psd1
 ```
 Now these modules will be loaded for the duration of the session.
 
@@ -47,11 +47,11 @@ Where `<FunctionName>` is a name of a function, e.g. `Get-Help Merge-Map`
 
 List of available function names: `Import-Vmf`, `Export-Vmf`, `Import-Lmp`, `Export-Lmp`, `Import-Stripper`, `Export-Stripper`, `Merge-Map`
 
-### PSSourceEngineTools
+### ValveSourceTools.SourceEngine
 
 - [Simple examples](examples/simple.md)
 - [Advanced examples](examples/advanced.md)
 
-### PSResourceParser
+### ValveSourceTools.Steam
 
 *Coming soon...*

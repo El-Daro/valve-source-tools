@@ -68,8 +68,8 @@ if ($PSBoundParameters.ContainsKey('Debug')) {
 $oldPSModulePath = $env:PSModulePath
 $env:PSModulePath = $env:PSModulePath + [System.IO.Path]::PathSeparator + $PSScriptRoot
 $modulesToImport = @{
-	PSResourceParser	= "PSResourceParser"
-	PSSourceEngineTools	= "PSSourceEngineTools"
+	ValveSourceToolsSteam			= "ValveSourceTools.Steam"
+	ValveSourceToolsSourceEngine	= "ValveSourceTools.SourceEngine"
 }
 
 $appendix = "_merged_"
