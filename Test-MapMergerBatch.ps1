@@ -56,7 +56,7 @@ foreach ($stripper in $Strippers) {
 	Write-Debug "$stripper"
 }
 if (-not (Test-Path -Path $OutputFolder)) {
-	New-Item -Path $OutputFolder -ItemType Directory | Out-Null
+	New-Item -Path $OutputFolder -ItemType Directory -Force | Out-Null
 	Write-Debug "Output folder has been created: $OutputFolder"
 } else {
 	Write-Debug "Output folder already exists: $OutputFolder"
