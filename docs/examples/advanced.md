@@ -1,3 +1,14 @@
+## ValveSourceTools.SourceEngine
+
+### Visgroups
+
+Hammer map editor has a number of different features. One of these features that is not presented in a freshly decompiled `.vmf` file is `visgroups`. `Visgroups` are used to separate entities and brushes into their own groups and control their visibility. Upon loading the map in Hammer, standard automatic `visgroups` are generated. After loading the map, you can create your own `visgroups` and assign entities or brushes to them.
+
+This tool generates new `visgroups` for entities that were added from `.lmp`, edited from `.lmp` and added, removed or modified from Stripper's `.cfg`.
+
+- Pass `-Demo` parameter to the `Map-Merger` function to simulate removal of the entities. Entities that were supposed to be removed by Stripper's `filter:` directive will instead be placed in their own hidden `visgroup`.
+	- **NOTE**: *This only affects entity's visibility in Hammer.*  
+
 ### Usage examples
 
 Although examples, provided in the [simple](simple.md) are enough for the tasks you face, there is more you can do with this tool. Explore possible scenarios below.
@@ -34,6 +45,7 @@ $vmfFile["classes"]
     entity     {System.Collections.Specialized.OrderedDictionary, System.Collections.Specialized.OrderedDictionary, System.Collections…
     cameras    {System.Collections.Specialized.OrderedDictionary}
 ```
+
 In there we see three classes: `world`, `entity` and `cameras`. Each of them is a List of ordered dictionaries (`System.Collections.Generic.List[System.Collections.Specialized.OrderedDictionary]`). It was a necessary design decision due to the fact that key-value pairs are not unique and may contain more than one value. Some classes (like `entity`, for example) may contain thousands of different entries all with the same name.
 Therefore, in order to access class' content we need to specify the item index:
 
@@ -105,8 +117,8 @@ $lmpFile
     data           {[hammerid-1, System.Collections.Specialized.OrderedDictionary], [hammerid-162364, System.Collections.…
 ```
 
- Note that here we have two different hashtables: `header` and `data`. LUMP files (`.lmp`) are binary. And even though we don't need the header part, it is still stored after importing the file. But we'll be working with `data` only:
-
+ Note that here we have two different hashtables: `header` and `data`. LUMP files (`.lmp`) are binary. And even though we don't need the header part, it is still stored after importing the file. But we'll be working with `data` only:
+ 
 ```powershell
 $lmpFile["data"].Keys
 
