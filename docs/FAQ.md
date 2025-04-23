@@ -41,9 +41,9 @@ Get-Module ValveSourceTools.* -ListAvailable
 
 Get-Help ValveSourceTools.SourceEngine
 Get-Help ValveSourceTools.ResourceParser
-Get-Help <FunctionName>
+Get-Help <FunctionName> -Full
 ```
-Where `<FunctionName>` is a name of a function, e.g. `Get-Help Merge-Map`
+Where `<FunctionName>` is a name of a function, e.g. `Get-Help Merge-Map -Full`
 
 List of available function names: `Import-Vmf`, `Export-Vmf`, `Import-Lmp`, `Export-Lmp`, `Import-Stripper`, `Export-Stripper`, `Merge-Map`
 

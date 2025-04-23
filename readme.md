@@ -28,7 +28,7 @@ There can be three (or more) different files with slightly different formats tha
 ### Notes
 
 - Even though this module is supposed to work with a number of Source games, it was only thoroughly tested with **Left 4 Dead 2**.
-- Use `Get-Help <function name>` to get complete 
+- Use `Get-Help <function name> -Full` to get complete 
 - All of the module's public functions accept both absolute and relative paths as inputs.
 - If you specify path to a log file with the `-LogFile` parameter with any function, its actions will be logged to the specified file.
 - If you specify `-Silent`, both console and file logging will be disabled *even* if path to a log file was specified. Note that progress bars will still be visible, as the whole process may take some time (usually takes a few seconds, but can be half a minute, depending on your machine and main core load at the moment). Those will be wiped from the screen after the process is done.
@@ -70,7 +70,7 @@ Get-Help ValveSourceTools.SourceEngine
 Get-Help ValveSourceTools.ResourceParser
 Get-Help <FunctionName>
 ```
-Where `<FunctionName>` is a name of a function, e.g. `Get-Help Merge-Map`
+Where `<FunctionName>` is a name of a function, e.g. `Get-Help Merge-Map -Full`
 
 List of available function names: `Import-Vmf`, `Export-Vmf`, `Import-Lmp`, `Export-Lmp`, `Import-Stripper`, `Export-Stripper`, `Merge-Map`
 
