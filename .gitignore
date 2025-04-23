@@ -1,13 +1,13 @@
-.vmf
+# .vmf
 .vdf
 .lmp
 .txt
-/.ini
+.ini
 
 # Folders
 .vscode/
 log/
 logs/
 # resources/
-resources/merger/
-resources/config/
+resources/merger/outputs/*
+resources/config
