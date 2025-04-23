@@ -12,7 +12,7 @@
 RootModule = 'PSSourceEngineTools.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.1.0'
+ModuleVersion = '1.1.0.0'
 
 # ID used to uniquely identify this module
 GUID = '9fb9d809-924a-481c-b79a-7cea2b9ce120'
@@ -107,7 +107,7 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        # ReleaseNotes = ''
+        ReleaseNotes = 'Initial release'
 
         # Prerelease string of this module
         # Prerelease = ''

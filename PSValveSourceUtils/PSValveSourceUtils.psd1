@@ -12,7 +12,7 @@
 RootModule = 'PSValveSourceUtils.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0.0'
+ModuleVersion = '1.0.0.0'
 
 # ID used to uniquely identify this module
 GUID = '421a5c93-853c-4133-8f75-cdbb4c508e9e'
