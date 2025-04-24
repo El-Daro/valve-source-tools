@@ -7,7 +7,7 @@ Hammer map editor has a number of different features. One of these features that
 This tool generates new `visgroups` for entities that were added from `.lmp`, edited from `.lmp` and added, removed or modified from Stripper's `.cfg`.
 
 - Pass `-Demo` parameter to the `Map-Merger` function to simulate removal of the entities. Entities that were supposed to be removed by Stripper's `filter:` directive will instead be placed in their own hidden `visgroup`.
-	- **NOTE**: *This only affects entity's visibility in Hammer. Entities themselves will still remain in the map.* 
+- **NOTE**: *This only affects entity's visibility in Hammer. Entities themselves will still remain in the map.*
 
 ### Usage examples
 
@@ -15,17 +15,17 @@ Although examples provided in the [simple](simple.md) section are enough for the
 
 If you wish to modify the data inside, you may do so before or after merging the inputs. But first, let's take a look at how it is represented internally:
 
-```powershell
-$vmfFile = Import-Vmf -Path ".\c5m3_cemetery_d.vmf"
-$vmfFile
+```none
+PS> $vmfFile = Import-Vmf -Path ".\c5m3_cemetery_d.vmf"
+PS> $vmfFile
 
     Name           Value
     ----           -----
     properties     {}
     classes        {[world, System.Collections.Generic.List`1[System.Collections.Specialized.OrderedDictionary]], [entity, System.Collecti… 
 
-$lmpFile = Import-Lmp -Path ".\c5m3_cemetery_l_0.lmp"
-$lmpFile
+PS> $lmpFile = Import-Lmp -Path ".\c5m3_cemetery_l_0.lmp"
+PS> $lmpFile
 
     Name           Value
     ----           -----
@@ -36,8 +36,8 @@ $lmpFile
 After importing, `.vmf` file is represented as recursive structure of ordered hashtables. At the root it has two ordered hashtables: `properties` and `classes`. `properties` are empty, because there can be no properties outside of a class definition. Refer to [this page](https://developer.valvesoftware.com/wiki/VMF_(Valve_Map_Format)) in order to learn more about how `.vmf` files are structured.
 Let's take a look inside the `classes` hashtable:
 
-```powershell
-$vmfFile["classes"]
+```none
+PS> $vmfFile["classes"]
 
     Name       Value
     ----       -----
@@ -49,8 +49,8 @@ $vmfFile["classes"]
 In there we see three classes: `world`, `entity` and `cameras`. Each of them is a List of ordered dictionaries (`System.Collections.Generic.List[System.Collections.Specialized.OrderedDictionary]`). It was a necessary design decision due to the fact that key-value pairs are not unique and may contain more than one value. Some classes (like `entity`, for example) may contain thousands of different entries all with the same name.
 Therefore, in order to access class' content we need to specify the item index:
 
-```powershell
-$vmfFile["classes"]["world"][0]["properties"]
+```none
+PS> $vmfFile["classes"]["world"][0]["properties"]
 
     Name                   Value
     ----                   -----
@@ -73,11 +73,11 @@ Notice two things here:
 
 Let's take a look at a short example of working with entities:
 
-```powershell
-$vmfFile["classes"]["entity"].Count
+```none
+PS> $vmfFile["classes"]["entity"].Count
 
 6648
-$vmfFile["classes"]["entity"][1459]["properties"]
+PS> $vmfFile["classes"]["entity"][1459]["properties"]
 
     Name               Value
     ----               -----
@@ -87,14 +87,14 @@ $vmfFile["classes"]["entity"][1459]["properties"]
     spawnflags         {1}
     classname          {logic_auto}
 
-$vmfFile["classes"]["entity"][1459]["properties"]["spawnflags"].GetType()
+PS> $vmfFile["classes"]["entity"][1459]["properties"]["spawnflags"].GetType()
 
     IsPublic IsSerial Name                     BaseType
     -------- -------- ----                     --------
     True     True     List`1                   System.Object
 
-$vmfFile["classes"]["entity"][1459]["properties"]["spawnflags"][0] = 0
-$vmfFile["classes"]["entity"][1459]["properties"]
+PS> $vmfFile["classes"]["entity"][1459]["properties"]["spawnflags"][0] = 0
+PS> $vmfFile["classes"]["entity"][1459]["properties"]
 
     Name               Value
     ----               -----
@@ -107,9 +107,9 @@ $vmfFile["classes"]["entity"][1459]["properties"]
 
 LUMP files are somewhat similar, but they don't have a nested structure. Instead, every entity definition is on one level.
 
-```powershell
-$lmpFile = Import-Lmp -Path ".\c5m3_cemetery_l_0.lmp"
-$lmpFile
+```none
+PS> $lmpFile = Import-Lmp -Path ".\c5m3_cemetery_l_0.lmp"
+PS> $lmpFile
 
     Name           Value
     ----           -----
@@ -119,8 +119,8 @@ $lmpFile
 
  Note that here we have two different hashtables: `header` and `data`. LUMP files (`.lmp`) are binary. And even though we don't need the header part, it is still stored after importing the file. But we'll be working with `data` only:
  
-```powershell
-$lmpFile["data"].Keys
+```none
+PS> $lmpFile["data"].Keys
 
     hammerid-1
     hammerid-162364
@@ -129,10 +129,10 @@ $lmpFile["data"].Keys
     hammerid-1030152
     ...
 
-$lmpFile["data"].Count  
+PS> $lmpFile["data"].Count  
 
 1616
-$lmpFile["data"][0]
+PS> $lmpFile["data"][0]
 
     Name                   Value
     ----                   -----
@@ -156,8 +156,8 @@ Notice that here every `data` entry has a unique key that starts with `hammerid-
 - However, imported VMF has no names assigned to any of the class entries. The comparison and identifications is done manually. 
 This also means that for imported LMP you can access different entries both by index (example above) and `hammerid` like this:
 
-```powershell
-$lmpFile["data"]["hammerid-2935785"]
+```none
+PS> $lmpFile["data"]["hammerid-2935785"]
 
     Name                   Value
     ----                   -----
@@ -170,14 +170,14 @@ $lmpFile["data"]["hammerid-2935785"]
     classname              {light_directional}
     hammerid               {2935785}
 
-$lmpFile["data"]["hammerid-2935785"]["angles"].GetType()
+PS> $lmpFile["data"]["hammerid-2935785"]["angles"].GetType()
 
     IsPublic IsSerial Name                 BaseType
     -------- -------- ----                 --------
     True     True     List`1               System.Object
 
-$lmpFile["data"]["hammerid-2935785"]["angles"][0] = "45 120 0"
-$lmpFile["data"]["hammerid-2935785"]
+PS> $lmpFile["data"]["hammerid-2935785"]["angles"][0] = "45 120 0"
+PS> $lmpFile["data"]["hammerid-2935785"]
 
     Name                   Value
     ----                   -----
@@ -195,16 +195,16 @@ Notice that, just like in VMF, all properties are represented as **.NET** Lists 
 
 Let's import Stripper's config now:
 
-```powershell
-$stripperFile = Import-Stripper -Path ".\c5m3_cemetery.cfg"
-$stripperFile
+```none
+PS> $stripperFile = Import-Stripper -Path ".\c5m3_cemetery.cfg"
+PS> $stripperFile
 
     Name               Value
     ----               -----
     properties         {}
     modes              {[filter, System.Collections.Generic.List`1[System.Collections.Specialized.OrderedDictionary]]…
 
-$stripperFile["modes"]
+PS> $stripperFile["modes"]
 
     Name               Value
     ----               -----
@@ -218,8 +218,8 @@ And even though only the `modify` hashtable may include other modes (submodes), 
 
 Let's take a look at a simple example of editing before we go into merging:
 
-```powershell
-$stripperFile["modes"]["add"][2]["properties"]
+```none
+PS> $stripperFile["modes"]["add"][2]["properties"]
 
     Name                   Value
     ----                   -----
@@ -230,17 +230,17 @@ $stripperFile["modes"]["add"][2]["properties"]
     classname              {prop_dynamic}
     disableshadows         {1}
 
-$stripperFile["modes"]["add"][2]["properties"]["disableshadows"]
+PS> $stripperFile["modes"]["add"][2]["properties"]["disableshadows"]
 
 1
-$stripperFile["modes"]["add"][2]["properties"]["disableshadows"].GetType()
+PS> $stripperFile["modes"]["add"][2]["properties"]["disableshadows"].GetType()
 
     IsPublic IsSerial Name         BaseType
     -------- -------- ----         --------
     True     True     List`1       System.Object
 
-$stripperFile["modes"]["add"][2]["properties"]["disableshadows"][0] = 0
-$stripperFile["modes"]["add"][2]["properties"]
+PS> $stripperFile["modes"]["add"][2]["properties"]["disableshadows"][0] = 0
+PS> $stripperFile["modes"]["add"][2]["properties"]
 
     Name                   Value
     ----                   -----
