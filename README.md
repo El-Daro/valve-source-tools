@@ -5,17 +5,19 @@
 **Valve Source Tools** is a set of console instruments designed to work with Valve's software infrastructure, including Steam and Source Engine games.
 
 Currently the core of its functionality lies in two **PowerShell** modules: `ValveSourceTools.Steam` and `ValveSourceTools.SourceEngine`. These modules are designed to work with **Windows PowerShell** (version 5.1) and **.NET Framework 4.8+**.
-Note that even though **Windows PowerShell** is shipped with every standard **Windows** installation, it is recommended to use a more recent version of **PowerShell**, which is available as a separate downloadable distributive. Refer to the [installation section](#installation) for the latest version of **PowerShell**.
+Note that even though Windows PowerShell is shipped with every standard Windows installation, it is recommended to use a more recent version of PowerShell, which is available as a separate downloadable distributive. Refer to the [installation section](#powershell) for the latest version of PowerShell.
 
 ## Description
 
-`ValveSourceTools.Steam` provides parsers for `.ini` (`Import-Ini`, `Export-Ini`) and Valve's `.vdf` (`Import-Vdf`, `Export-Vdf`) formats. VDFs are used by Steam to store configurations and other related information. This module is currently in development with more features coming later, as well as user-oriented instruments built on top of them.
+`ValveSourceTools.Steam` provides parsers for `.ini` and Valve's `.vdf` formats. VDFs are used by Steam to store configurations and other related information. This module is currently in development with more features coming later, as well as user-oriented instruments built on top of them.
 
 `ValveSourceTools.SourceEngine` is designed to work with Source Engine resources and provides multiple instruments for importing/exporting `.vmf`, `.lmp` and Stripper's `.cfg` formats, as well as merging them together.
 
+See the [Links](#links) section for more info.
+
 ## ValveSourceTools.SourceEngine — What does it do?
 
-Source Engine maps are packed in the `.bsp` format (see Binary Space Partitioning). It's a map compiled for the game engine, but it's not the format you can work with in an editor (Hammer). To work on a map you need to decompile it, which gives you a `.vmf` file. Its structure is similar to JSON, except it allows for the same key to have numerous different values (so not the usual unique key-value pair). 
+Source Engine maps are packed in the `.bsp` format (see [BSP (Source)](https://developer.valvesoftware.com/wiki/BSP_(Source))). It's a map compiled for the game engine, but it's not the format you can work with in an editor ([Hammer](https://developer.valvesoftware.com/wiki/Valve_Hammer_Editor)). To work on a map you need to decompile it, which gives you a `.vmf` file. Its structure is similar to JSON, except it allows for the same key to have numerous different values (so not the usual unique key-value pair). 
 
 If a map is updated after the game was already shipped, devs don't change the whole `.bsp` file. Instead, they add additional files (`.lmp`, LUMP) that describe changes to the map. These files are read and processed by the game engine when the map is loaded.
 
@@ -28,10 +30,10 @@ There can be three (or more) different files with slightly different formats tha
 ### Notes
 
 - Even though this module is supposed to work with a number of Source games, it was only thoroughly tested with **Left 4 Dead 2**.
-- Use `Get-Help <function name> -Full` to get complete 
+- Use `Get-Help <function name> -Full` to get complete complete help info on a given function.
 - All of the module's public functions accept both absolute and relative paths as inputs.
-- If you specify path to a log file with the `-LogFile` parameter with any function, its actions will be logged to the specified file.
-- If you specify `-Silent`, both console and file logging will be disabled *even* if path to a log file was specified. Note that progress bars will still be visible, as the whole process may take some time (usually takes a few seconds, but can be half a minute, depending on your machine and main core load at the moment). Those will be wiped from the screen after the process is done.
+- Specify path to a log file with the `-LogFile` parameter for any function to log its actions.
+- Include the `-Silent` paramater to suppress both console and file logging *even* if path to a log file was specified. Note that progress bars will still be visible, as the whole process may take some time (usually takes a few seconds, but can be half a minute, depending on your machine and main core load at the moment). Those will be wiped from the screen after the process is done.
 
 ## Getting started
 
@@ -40,7 +42,7 @@ There can be three (or more) different files with slightly different formats tha
 You don't need to install the modules in order to use them — just downloading them is enough:
 1. Click on the `<> Code` button in the top-right corner of this page, choose **"Download ZIP"** and save it anywhere you want;
 2. Unpack the zip to a directory of your choosing;
-	- Make sure to avoid whitespaces in the path
+	- Make sure to avoid whitespaces in the path.
 3. Launch PowerShell CLI in the directory where the zip was unpacked to;
 4. Import the modules:
 
@@ -48,6 +50,7 @@ You don't need to install the modules in order to use them — just downloading 
 Import-Module .\ValveSourceTools.SourceEngine\ValveSourceTools.SourceEngine.psd1
 Import-Module .\ValveSourceTools.Steam\ValveSourceTools.Steam.psd1
 ```
+
 Now these modules will be loaded for the duration of the session.
 
 ### Installation
@@ -55,9 +58,10 @@ Now these modules will be loaded for the duration of the session.
 Install the modules on your system:
 1. Click on the `<> Code` button in the top-right corner of this page, choose **"Download ZIP"** and save it anywhere you want;
 2. Unpack the zip to a directory of your choosing;
-	- Make sure to avoid whitespaces in the path
+	- Make sure to avoid whitespaces in the path.
 3. Launch PowerShell CLI in the directory where the zip was unpacked to;
 4. Run `.\setup.bat`
+
 Now these modules will be available whenever you launch PowerShell.
 
 ### Getting help
@@ -68,7 +72,7 @@ Get-Module ValveSourceTools.* -ListAvailable
 
 Get-Help ValveSourceTools.SourceEngine
 Get-Help ValveSourceTools.Steam
-Get-Help <FunctionName>
+Get-Help <FunctionName> -Full
 ```
 Where `<FunctionName>` is a name of a function, e.g. `Get-Help Merge-Map -Full`
 
@@ -82,6 +86,7 @@ List of available function names: `Import-Vmf`, `Export-Vmf`, `Import-Lmp`, `Exp
 ## Links
 #### Source Engine
 - [BSP (Source) | Valve Developer Community](https://developer.valvesoftware.com/wiki/BSP_\(Source\))
+- [Binary Space Partitioning | Valve Developer Community](https://developer.valvesoftware.com/wiki/Binary_space_partitioning)
 - [VMF (Valve Map Format) | Valve Developer Community](https://developer.valvesoftware.com/wiki/VMF_\(Valve_Map_Format\))
 - [Lump file format | Valve Developer Community](https://developer.valvesoftware.com/wiki/Lump_file_format)
 - [Stripper:Source | AlliedModders](https://forums.alliedmods.net/showthread.php?t=39439)
