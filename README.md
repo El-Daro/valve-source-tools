@@ -4,8 +4,8 @@
 
 **Valve Source Tools** is a set of console instruments designed to work with Valve's software infrastructure, including Steam and Source Engine games.
 
-Currently the core of its functionality lies in two **PowerShell** modules: `ValveSourceTools.Steam` and `ValveSourceTools.SourceEngine`. These modules are designed to work with **Windows PowerShell** (version 5.1) and **.NET Framework 4.8+**.
-Note that even though Windows PowerShell is shipped with every standard Windows installation, it is recommended to use a more recent version of PowerShell, which is available as a separate downloadable distributive. Refer to the [installation section](#powershell) for the latest version of PowerShell.
+Currently the core of its functionality lies in two **PowerShell** modules: `ValveSourceTools.Steam` and `ValveSourceTools.SourceEngine`. These modules are designed to work with **Windows PowerShell** (version 5.1) and **.NET Framework 4.8+**.\
+Note that even though Windows PowerShell is shipped with every standard Windows installation, it is recommended to use a more recent version of PowerShell, which is available as a separate downloadable distributive. Refer to the [Links](#powershell) section for the latest version of PowerShell.
 
 ## Description
 
@@ -17,11 +17,11 @@ See the [Links](#links) section for more info.
 
 ## ValveSourceTools.SourceEngine — What does it do?
 
-Source Engine maps are packed in the `.bsp` format (see [BSP (Source)](https://developer.valvesoftware.com/wiki/BSP_(Source))). It's a map compiled for the game engine, but it's not the format you can work with in an editor ([Hammer](https://developer.valvesoftware.com/wiki/Valve_Hammer_Editor)). To work on a map you need to decompile it, which gives you a `.vmf` file. Its structure is similar to JSON, except it allows for the same key to have numerous different values (so not the usual unique key-value pair). 
+Source Engine maps are packed in the `.bsp` format (see [BSP (Source)](https://developer.valvesoftware.com/wiki/BSP_(Source))). It's a map compiled for the game engine, but it's not the format you can work with in an editor ([Hammer or Hammer++](#map-editors)). To work on a map you need to [decompile](#bsp-decompilers) it, which gives you a `.vmf` file. Its structure is similar to JSON, except it allows for the same key to have numerous different values (so not the usual unique key-value pair). 
 
-If a map is updated after the game was already shipped, devs don't change the whole `.bsp` file. Instead, they add additional files (`.lmp`, LUMP) that describe changes to the map. These files are read and processed by the game engine when the map is loaded.
+If a map is updated after the game was already shipped, devs don't change the whole `.bsp` file. Instead, they add additional files (`.lmp`, [LUMP](https://developer.valvesoftware.com/wiki/Lump_file_format)) that describe changes to the map. These files are read and processed by the game engine when the map is loaded.
 
-Additionally, server admins may also want to introduce unique changes to the maps on their own servers. A common way to do that would be with the help of a **Metamod** plugin, **Stripper:Source**. It allows you to *add*, *remove* or *modify* entities on the map without requiring clients to have the same version of the map, because all of the `.bsp` and `.lmp` files remain unchanged. All the changes are described in `.cfg` files with specific instructions for **Metamod** that are executed on map launch.
+Additionally, server admins may also want to introduce unique changes to the maps on their own servers. A common way to do that would be with the help of a **Metamod** plugin, [**Stripper:Source**](#stripper). It allows you to *add*, *remove* or *modify* entities on the map without requiring clients to have the same version of the map, because all of the `.bsp` and `.lmp` files remain unchanged. All the changes are described in `.cfg` files with specific instructions for **Metamod** that are executed on map launch.
 
 However, there is no known way to work with those Stripper's config files locally in a map editor, no way to incorporate all the changes. That is, there wasn't until now...
 
@@ -30,7 +30,7 @@ There can be three (or more) different files with slightly different formats tha
 ### Notes
 
 - Even though this module is supposed to work with a number of Source games, it was only thoroughly tested with **Left 4 Dead 2**.
-- Use `Get-Help <function name> -Full` to get complete complete help info on a given function.
+- Use `Get-Help <function name> -Full` to get complete help info on a given function.
 - All of the module's public functions accept both absolute and relative paths as inputs.
 - Specify path to a log file with the `-LogFile` parameter for any function to log its actions.
 - Include the `-Silent` paramater to suppress both console and file logging *even* if path to a log file was specified. Note that progress bars will still be visible, as the whole process may take some time (usually takes a few seconds, but can be half a minute, depending on your machine and main core load at the moment). Those will be wiped from the screen after the process is done.
@@ -89,6 +89,8 @@ List of available function names: `Import-Vmf`, `Export-Vmf`, `Import-Lmp`, `Exp
 - [Binary Space Partitioning | Valve Developer Community](https://developer.valvesoftware.com/wiki/Binary_space_partitioning)
 - [VMF (Valve Map Format) | Valve Developer Community](https://developer.valvesoftware.com/wiki/VMF_\(Valve_Map_Format\))
 - [Lump file format | Valve Developer Community](https://developer.valvesoftware.com/wiki/Lump_file_format)
+
+#### Stripper
 - [Stripper:Source | AlliedModders](https://forums.alliedmods.net/showthread.php?t=39439)
 - [Stripper:Source | bailopan](https://www.bailopan.net/stripper/)
 - [alliedmodders/stripper-source | GitHub](https://github.com/alliedmodders/stripper-source/tree/master)
@@ -97,6 +99,11 @@ List of available function names: `Import-Vmf`, `Export-Vmf`, `Import-Lmp`, `Exp
 - [List of the Source decompilers | Valve Developer Community](https://developer.valvesoftware.com/wiki/Decompiling_Maps#Source)
 - [BSPSource | Valve Developer Community](https://developer.valvesoftware.com/wiki/BSPSource)
 - [BSPSource Releases | GitHub](https://github.com/ata4/bspsrc/releases)
+
+#### Map editors
+- [Valve Hammer Editor (Source) | Valve Developer Community](https://developer.valvesoftware.com/wiki/Valve_Hammer_Editor)
+- [Hammer++ | Valve Developer Community](https://developer.valvesoftware.com/wiki/Hammer%2B%2B)
+- [Hammer++ Features | ficool2.github.io](https://ficool2.github.io/HammerPlusPlus-Website/features.html)
 
 #### PowerShell
 - [PowerShell/PowerShell | GitHub](https://github.com/PowerShell/PowerShell/tree/master)

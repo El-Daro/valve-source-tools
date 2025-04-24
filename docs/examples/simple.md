@@ -26,9 +26,9 @@ This will automatically generate a new name for the output file, read inputs, me
 .\Test-MapMergerBatch.ps1 -Silent
 ```
 To suppress console output and logging. Note that progress bars will still be visible, as the whole process may take some time (usually takes a few seconds, but can be half a minute, depending on your machine and main core load at the moment). Those will be wiped from the screen after the process is done.
-- Note: using `.\Test-MapMergerBatch.ps1` already uses `-Fast` internally.
+- Note: `.\Test-MapMergerBatch.ps1` script already uses `-Fast` option internally.
 - Logs to the same `logs` folder, but to a different file.
 
-Some sample input files already in `resource\merger\input` are shipped with this project. These files will be automatically proccessed by `.\Test-MapMergerBatch.ps1` if no other input path is given with the `-InputFolder` parameter.
+Some sample input files are shipped with this project in `resource\merger\input`. These files will be automatically proccessed by `.\Test-MapMergerBatch.ps1` if no other input path is given with the `-InputFolder` parameter.
 
 However, there's [more](advanced.md) you can do with this tool.

@@ -7,13 +7,13 @@ Hammer map editor has a number of different features. One of these features that
 This tool generates new `visgroups` for entities that were added from `.lmp`, edited from `.lmp` and added, removed or modified from Stripper's `.cfg`.
 
 - Pass `-Demo` parameter to the `Map-Merger` function to simulate removal of the entities. Entities that were supposed to be removed by Stripper's `filter:` directive will instead be placed in their own hidden `visgroup`.
-	- **NOTE**: *This only affects entity's visibility in Hammer.*  
+	- **NOTE**: *This only affects entity's visibility in Hammer. Entities themselves will still remain in the map.* 
 
 ### Usage examples
 
-Although examples, provided in the [simple](simple.md) are enough for the tasks you face, there is more you can do with this tool. Explore possible scenarios below.
+Although examples provided in the [simple](simple.md) section are enough for the tasks you face, there is more you can do with this tool. Explore possible scenarios below.
 
-If you wish to modify the data inside, you may do so before or after merging them. But first, let's take a look at how it is represented internally:
+If you wish to modify the data inside, you may do so before or after merging the inputs. But first, let's take a look at how it is represented internally:
 
 ```powershell
 $vmfFile = Import-Vmf -Path ".\c5m3_cemetery_d.vmf"
@@ -33,7 +33,7 @@ $lmpFile
     data           {[hammerid-1, System.Collections.Specialized.OrderedDictionary], [hammerid-162364, System.Collections.…
 ```
 
-After importing, `.vmf` file is represented as recursive structure of ordered hashtables. At the root it has two ordered hashtables: `properties` and `classes`. `properties` are empty, because there can be no properties outside of a class definition. Refer to this page in order to learn more about how `.vmf` files are structured.
+After importing, `.vmf` file is represented as recursive structure of ordered hashtables. At the root it has two ordered hashtables: `properties` and `classes`. `properties` are empty, because there can be no properties outside of a class definition. Refer to [this page](https://developer.valvesoftware.com/wiki/VMF_(Valve_Map_Format)) in order to learn more about how `.vmf` files are structured.
 Let's take a look inside the `classes` hashtable:
 
 ```powershell
@@ -153,8 +153,8 @@ $lmpFile["data"][0]
 Notice that here every `data` entry has a unique key that starts with `hammerid-`. Although the vast majority of LUMP file entries represent entities with their unique hammerid's, there are some exceptional cases where there is no hammerid present. In those cases the `classname` property is used to construct the unique name. 
 - Hammerids are used to pair them with `.vmf`'s entity id's and replace the information with the one provided in `.lmp` — or, if no corresponding id was found, the entity gets added as a new one.
 - Same principle works with the `classname` property if there is no `hammerid` in the LUMP section.
-- However, imported VMF have no names assigned to any of the class entries. The comparison and identifications is done manually. 
-This also means that for imported LMP you can access different entries both by index and `hammerid` like this:
+- However, imported VMF has no names assigned to any of the class entries. The comparison and identifications is done manually. 
+This also means that for imported LMP you can access different entries both by index (example above) and `hammerid` like this:
 
 ```powershell
 $lmpFile["data"]["hammerid-2935785"]
@@ -191,7 +191,7 @@ $lmpFile["data"]["hammerid-2935785"]
     hammerid               {2935785}
 ```
 
-Notice that, just like in VMF, all properties are represented as **.NET** Lists of type `string` (`System.Collections.Generic.List[string]`). Which is why we access the actual value this: `$lmpFile["data"]["hammerid-2935785"]["angles"][0]`. Here we know — and explicitly checked — that it has only one value, and that would be true in most cases. But in some cases it won't be.
+Notice that, just like in VMF, all properties are represented as **.NET** Lists of type `string` (`System.Collections.Generic.List[string]`). Which is why we access the actual value like this: `$lmpFile["data"]["hammerid-2935785"]["angles"][0]`. Here we know — and explicitly checked — that it has only one value, and that would be true in most cases. But in some cases it won't be.
 
 Let's import Stripper's config now:
 
@@ -214,7 +214,7 @@ $stripperFile["modes"]
 ```
 
 Just like with VMF, Stripper's config is interpreted as a nested structure of `properties` and `modes` hashtable. The way that modes are represented is largely similar to how classes are represented in imported VMF.
-And even though only the `modify` hashtable may include other modes (submodes), all of them are treated in the same way (so every mode essentially contains `properties` and `modes` hashtable, even if the latter might be completely empty).
+And even though only the `modify` hashtable may include other modes (submodes), all of them are treated in the same way (so every mode essentially contains `properties` and `modes` hashtables, even if the latter might be completely empty).
 
 Let's take a look at a simple example of editing before we go into merging:
 
@@ -252,7 +252,7 @@ $stripperFile["modes"]["add"][2]["properties"]
     disableshadows         {0}
 ```
 
-Now that we have all of our changes done, we may want to save in new files before merging:
+Now that we have all of our changes done, we may want to save them all in new files before merging:
 
 ```powershell
 Export-Vmf -InputObject $vmfFile -Path ".\c5m3_cemetery-2_d.vmf"
