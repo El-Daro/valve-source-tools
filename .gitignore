@@ -9,7 +9,6 @@
 .vscode/*
 log/
 logs/
-# resources/
 resources/merger/outputs/
 resources/merger/outputs/*
 resources/config
