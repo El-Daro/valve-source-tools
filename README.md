@@ -67,7 +67,7 @@ These commands will help you get started:
 Get-Module ValveSourceTools.* -ListAvailable
 
 Get-Help ValveSourceTools.SourceEngine
-Get-Help ValveSourceTools.ResourceParser
+Get-Help ValveSourceTools.Steam
 Get-Help <FunctionName>
 ```
 Where `<FunctionName>` is a name of a function, e.g. `Get-Help Merge-Map -Full`

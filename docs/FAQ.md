@@ -29,7 +29,7 @@ Now these modules will be available whenever you launch PowerShell.
 
 ### Decompiling maps
 
-- See [decompiling maps](/readme.md#bsp-decompilers) section.
+- See [decompiling maps](/README.md#bsp-decompilers) section.
 
 ## Usage Examples
 
@@ -40,7 +40,7 @@ These commands will help you get started:
 Get-Module ValveSourceTools.* -ListAvailable
 
 Get-Help ValveSourceTools.SourceEngine
-Get-Help ValveSourceTools.ResourceParser
+Get-Help ValveSourceTools.Steam
 Get-Help <FunctionName> -Full
 ```
 Where `<FunctionName>` is a name of a function, e.g. `Get-Help Merge-Map -Full`
