@@ -7,7 +7,13 @@ Hammer map editor has a number of different features. One of these features that
 This tool generates new `visgroups` for entities that were added from `.lmp`, edited from `.lmp` and added, removed or modified from Stripper's `.cfg`.
 
 - Pass `-Demo` parameter to the `Map-Merger` function to simulate removal of the entities. Entities that were supposed to be removed by Stripper's `filter:` directive will instead be placed in their own hidden `visgroup`.
-- **NOTE**: *This only affects entity's visibility in Hammer. Entities themselves will still remain in the map.*
+
+> [!WARNING]
+> *This only affects entity's visibility in Hammer. Entities themselves will still remain in the map.*
+
+### Data structure
+
+Refer to these [sample files](/resources/merger/inputs/) for real-life data structure examples.
 
 ### Usage examples
 
@@ -23,14 +29,6 @@ PS> $vmfFile
     ----           -----
     properties     {}
     classes        {[world, System.Collections.Generic.List`1[System.Collections.Specialized.OrderedDictionary]], [entity, System.Collecti… 
-
-PS> $lmpFile = Import-Lmp -Path ".\c5m3_cemetery_l_0.lmp"
-PS> $lmpFile
-
-    Name           Value
-    ----           -----
-    header         {[Offset, 20], [Id, 0], [Version, 0], [Length, 600261]…}
-    data           {[hammerid-1, System.Collections.Specialized.OrderedDictionary], [hammerid-162364, System.Collections.…
 ```
 
 After importing, `.vmf` file is represented as recursive structure of ordered hashtables. At the root it has two ordered hashtables: `properties` and `classes`. `properties` are empty, because there can be no properties outside of a class definition. Refer to [this page](https://developer.valvesoftware.com/wiki/VMF_(Valve_Map_Format)) in order to learn more about how `.vmf` files are structured.
@@ -151,7 +149,7 @@ PS> $lmpFile["data"][0]
 ```
 
 Notice that here every `data` entry has a unique key that starts with `hammerid-`. Although the vast majority of LUMP file entries represent entities with their unique hammerid's, there are some exceptional cases where there is no hammerid present. In those cases the `classname` property is used to construct the unique name. 
-- Hammerids are used to pair them with `.vmf`'s entity id's and replace the information with the one provided in `.lmp` — or, if no corresponding id was found, the entity gets added as a new one.
+- Hammerids are used to pair them with `.vmf`'s entity id's and replace the information with the one provided in `.lmp` — or, if no corresponding id was found, to add an entity as a new one.
 - Same principle works with the `classname` property if there is no `hammerid` in the LUMP section.
 - However, imported VMF has no names assigned to any of the class entries. The comparison and identifications is done manually. 
 This also means that for imported LMP you can access different entries both by index (example above) and `hammerid` like this:
@@ -213,7 +211,7 @@ PS> $stripperFile["modes"]
     modify             {System.Collections.Specialized.OrderedDictionary, System.Collections.Specialized.OrderedDictionary, …
 ```
 
-Just like with VMF, Stripper's config is interpreted as a nested structure of `properties` and `modes` hashtable. The way that modes are represented is largely similar to how classes are represented in imported VMF.
+Just like with VMF, Stripper's config is interpreted as a nested structure of `properties` and `modes` hashtables. The way that modes are represented is largely similar to how classes are represented in imported VMF.
 And even though only the `modify` hashtable may include other modes (submodes), all of them are treated in the same way (so every mode essentially contains `properties` and `modes` hashtables, even if the latter might be completely empty).
 
 Let's take a look at a simple example of editing before we go into merging:
