@@ -80,6 +80,7 @@ Get-Help <FunctionName> -Full
 Where `<FunctionName>` is a name of a function, e.g. `Get-Help Merge-Map -Full`
 
 List of available function names (`ValveSourceTools.SourceEngine`): `Import-Vmf`, `Export-Vmf`, `Import-Lmp`, `Export-Lmp`, `Import-Stripper`, `Export-Stripper`, `Merge-Map`
+
 List of available function names (`ValveSourceTools.Steam`): `Import-Vdf`, `Export-Vdf`, `Import-Ini`, `Export-Ini`
 
 ## Links
