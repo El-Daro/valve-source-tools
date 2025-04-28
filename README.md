@@ -17,7 +17,7 @@ See the [Links](#links) section for more info.
 
 ## ValveSourceTools.SourceEngine — What does it do?
 
-Source Engine maps are packed in the `.bsp` format (see [BSP (Source)](https://developer.valvesoftware.com/wiki/BSP_(Source))). It's a map compiled for the game engine, but it's not the format you can work with in an editor ([Hammer or Hammer++](#map-editors)). To work on a map you need to [decompile](#bsp-decompilers) it, which gives you a `.vmf` file. Its structure is similar to JSON, except it allows for the same key to have numerous different values (so not the usual unique key-value pair). 
+Source Engine maps are packed in the `.bsp` format (see [BSP (Source)](https://developer.valvesoftware.com/wiki/BSP_(Source))). It's a map compiled for the game engine, but it's not the format you can work with in a [map editor](#map-editors) (Hammer or Hammer++). To work on a map you need to [decompile](#bsp-decompilers) it, which gives you a `.vmf` file. Its structure is similar to JSON, except it allows for the same key to have numerous different values (so not the usual unique key-value pair). 
 
 If a map is updated after the game was already shipped, devs don't change the whole `.bsp` file. Instead, they add additional files (`.lmp`, [LUMP](https://developer.valvesoftware.com/wiki/Lump_file_format)) that describe changes to the map. These files are read and processed by the game engine when the map is loaded.
 
@@ -26,6 +26,9 @@ Additionally, server admins may also want to introduce unique changes to the map
 However, there is no known way to work with those Stripper's config files locally in a map editor, no way to incorporate all the changes. That is, there wasn't until now...
 
 There can be three (or more) different files with slightly different formats that describe the end result seen by players on the server. In order to load it all in the map editor, the `ValveSourceTools.SourceEngine` module was developed that would help merge these resources into a new single `.vmf` file.
+
+- [Simple usage examples](docs/examples/simple.md)
+- [Advanced usage examples](docs/examples/advanced.md)
 
 ### Notes
 
@@ -76,12 +79,8 @@ Get-Help <FunctionName> -Full
 ```
 Where `<FunctionName>` is a name of a function, e.g. `Get-Help Merge-Map -Full`
 
-List of available function names: `Import-Vmf`, `Export-Vmf`, `Import-Lmp`, `Export-Lmp`, `Import-Stripper`, `Export-Stripper`, `Merge-Map`
-
-### ValveSourceTools.SourceEngine
-
-- [Simple usage examples](docs/examples/simple.md)
-- [Advanced usage examples](docs/examples/advanced.md)
+List of available function names (`ValveSourceTools.SourceEngine`): `Import-Vmf`, `Export-Vmf`, `Import-Lmp`, `Export-Lmp`, `Import-Stripper`, `Export-Stripper`, `Merge-Map`
+List of available function names (`ValveSourceTools.Steam`): `Import-Vdf`, `Export-Vdf`, `Import-Ini`, `Export-Ini`
 
 ## Links
 #### Source Engine
@@ -100,12 +99,12 @@ List of available function names: `Import-Vmf`, `Export-Vmf`, `Import-Lmp`, `Exp
 - [BSPSource | Valve Developer Community](https://developer.valvesoftware.com/wiki/BSPSource)
 - [BSPSource Releases | GitHub](https://github.com/ata4/bspsrc/releases)
 
-#### Map editors
+#### Map Editors
 - [Valve Hammer Editor (Source) | Valve Developer Community](https://developer.valvesoftware.com/wiki/Valve_Hammer_Editor)
 - [Hammer++ | Valve Developer Community](https://developer.valvesoftware.com/wiki/Hammer%2B%2B)
 - [Hammer++ Features | ficool2.github.io](https://ficool2.github.io/HammerPlusPlus-Website/features.html)
 
 #### PowerShell
 - [PowerShell/PowerShell | GitHub](https://github.com/PowerShell/PowerShell/tree/master)
-	- See **Releases** for the latest version
+	- See **Releases** for the latest version;
 	- Or use [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/): `winget install Microsoft.PowerShell`
