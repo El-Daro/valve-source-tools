@@ -47,11 +47,13 @@ Where `<FunctionName>` is a name of a function, e.g. `Get-Help Merge-Map -Full`
 
 List of available function names: `Import-Vmf`, `Export-Vmf`, `Import-Lmp`, `Export-Lmp`, `Import-Stripper`, `Export-Stripper`, `Merge-Map`
 
-### ValveSourceTools.SourceEngine
+### Usage Examples
+
+#### ValveSourceTools.SourceEngine
 
 - [Simple examples](examples/simple.md)
 - [Advanced examples](examples/advanced.md)
 
-### ValveSourceTools.Steam
+#### ValveSourceTools.Steam
 
 *Coming soon...*
