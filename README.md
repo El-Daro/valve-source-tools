@@ -30,6 +30,21 @@ There can be three (or more) different files with slightly different formats tha
 - [Simple usage examples](docs/examples/simple.md)
 - [Advanced usage examples](docs/examples/advanced.md)
 
+<details open>
+
+<summary>So how does it look like?</summary>
+
+### Showcase
+
+**Vanilla** is how it looks like in the base game.\
+**Custom** is an example of how it may look like on a community server.\
+Now you can have these changes in the map editor, too.
+
+![ValveSourceTools.SourceEngine Showcase | Closet](docs/resources/Showcase_source_v1.1.0.0_closet.png)
+![ValveSourceTools.SourceEngine Showcase | Truck](docs/resources/Showcase_source_v1.1.0.0_truck.png)
+
+</details>
+
 ### Notes
 
 - Even though this module is supposed to work with a number of Source games, it was only thoroughly tested with **Left 4 Dead 2**.
