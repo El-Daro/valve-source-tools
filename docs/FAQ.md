@@ -45,7 +45,9 @@ Get-Help <FunctionName> -Full
 ```
 Where `<FunctionName>` is a name of a function, e.g. `Get-Help Merge-Map -Full`
 
-List of available function names: `Import-Vmf`, `Export-Vmf`, `Import-Lmp`, `Export-Lmp`, `Import-Stripper`, `Export-Stripper`, `Merge-Map`
+List of available function names (`ValveSourceTools.SourceEngine`): `Import-Vmf`, `Export-Vmf`, `Import-Lmp`, `Export-Lmp`, `Import-Stripper`, `Export-Stripper`, `Merge-Map`
+
+List of available function names (`ValveSourceTools.Steam`): `Import-Vdf`, `Export-Vdf`, `Import-Ini`, `Export-Ini`
 
 ### Usage Examples
 
@@ -53,6 +55,21 @@ List of available function names: `Import-Vmf`, `Export-Vmf`, `Import-Lmp`, `Exp
 
 - [Simple examples](examples/simple.md)
 - [Advanced examples](examples/advanced.md)
+
+<details>
+
+<summary>Showcase</summary>
+
+### Showcase
+
+**Vanilla** is how it looks like in the base game.\
+**Custom** is an example of how it may look like on a community server.\
+Now you can have these changes in the map editor, too.
+
+![ValveSourceTools.SourceEngine Showcase | Closet](resources/Showcase_source_v1.1.0.0_closet.png)
+![ValveSourceTools.SourceEngine Showcase | Truck](resources/Showcase_source_v1.1.0.0_truck.png)
+
+</details>
 
 #### ValveSourceTools.Steam
 
