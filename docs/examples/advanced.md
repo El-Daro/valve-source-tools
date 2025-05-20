@@ -6,7 +6,7 @@ Hammer map editor has a number of different features. One of these features that
 
 This tool generates new `visgroups` for entities that were added from `.lmp`, edited from `.lmp` and added, removed or modified from Stripper's `.cfg`.
 
-- Pass `-Demo` parameter to the `Map-Merger` function to simulate removal of the entities. Entities that were supposed to be removed by Stripper's `filter:` directive will instead be placed in their own hidden `visgroup`.
+- Pass `-Demo` parameter to the `Merge-Map` function to simulate removal of the entities. Entities that were supposed to be removed by Stripper's `filter:` directive will instead be placed in their own hidden `visgroup`.
 
 > [!WARNING]
 > *This only affects entity's visibility in Hammer. Entities themselves will still remain in the map.*
