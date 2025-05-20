@@ -114,6 +114,7 @@ List of available function names (`ValveSourceTools.Steam`): `Import-Vdf`, `Expo
 - [List of the Source decompilers | Valve Developer Community](https://developer.valvesoftware.com/wiki/Decompiling_Maps#Source)
 - [BSPSource | Valve Developer Community](https://developer.valvesoftware.com/wiki/BSPSource)
 - [BSPSource Releases | GitHub](https://github.com/ata4/bspsrc/releases)
+- [List of decompiled maps by Spumer | GitHub](https://github.com/spumer/left_4_dead_2__decompiled_maps/)
 
 #### Map Editors
 - [Valve Hammer Editor (Source) | Valve Developer Community](https://developer.valvesoftware.com/wiki/Valve_Hammer_Editor)
